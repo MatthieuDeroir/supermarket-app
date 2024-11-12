@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  deno-app:
+    build:
+      context: ..
+      dockerfile: Dockerfile.env
+    ports:
+      - "4000:4000"
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+    command: deno run --allow-net --allow-read --allow-env server.ts
