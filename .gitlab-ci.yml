@@ -21,6 +21,7 @@ test:
     - sudo docker run --rm app-test sh -c "deno test --allow-import --allow-net --allow-run --allow-read --allow-env"
   only:
     - main
+    - dev
 
 # Build Stage
 build:
@@ -36,6 +37,7 @@ build:
       - ./  # Store your build artifacts, adjust path as needed
   only:
     - main
+    - dev
 
 # Deploy Stage
 deploy:
