@@ -1,7 +1,7 @@
-import { Hono } from 'hono'
+import { Hono } from "hono";
 
-const app = new Hono()
+const app = new Hono();
 
-app.get('/', (c) => c.text('Hello Deno!'))
+app.get("/", (c) => c.text("Hello Deno!"));
 
-Deno.serve(app.fetch)
+Deno.serve({ port: 4000 }, app.fetch);

@@ -1,0 +1,23 @@
+FROM denoland/deno:alpine as builder
+
+WORKDIR /app
+
+COPY deno.json deno.json
+COPY deno.lock deno.lock
+COPY package.json package.json
+COPY . .
+
+RUN deno cache deno.json && deno run -A npm:next build
+
+FROM denoland/deno:alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/deno.json ./deno.json
+
+EXPOSE 3000
+
+CMD ["deno", "run", "-A", "npm:next", "start"]
