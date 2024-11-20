@@ -1,50 +1,84 @@
 stages:
+  - test-build
   - test
-  - build
-  - deploy
+  - deploy-build
+  - deploy-green
+  - test-green
+  - deploy-blue
+  - rollback
 
-# Define default image if not specified in jobs
 default:
   image: docker:latest
   services:
     - docker:dind
 
-# Test Stage
+variables:
+  DOCKER_TLS_CERTDIR: ""
+
+before_script:
+  - mkdir -p ~/.ssh
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+  - chmod 600 ~/.ssh/id_rsa
+  - ssh-keyscan -H $BLUE_SERVER_IP $GREEN_SERVER_IP $LOAD_BALANCER_IP >> ~/.ssh/known_hosts
+
+# Stage 1: Build the dev environment for testing
+test-build:
+  stage: test-build
+  script:
+    - echo "Building test environment..."
+    - docker build -t backend-dev -f ./backend/Dockerfile.dev ./backend
+    - docker build -t frontend-dev -f ./frontend/Dockerfile.dev ./frontend
+
+# Stage 2: Run tests
 test:
   stage: test
   script:
-    - echo "Running tests..."
-    - ls -la
-    - cd app
-    - ls -la
-    - sudo docker build -t app-test -f Dockerfile.prod .
-    - sudo docker run --rm app-test sh -c "deno test --allow-import --allow-net --allow-run --allow-read --allow-env"
-  only:
-    - main
-    - dev
+    - echo "Running backend tests..."
+    - docker run --rm backend-dev deno test
+    - echo "Running frontend tests..."
+    - docker run --rm frontend-dev npm test
 
-# Build Stage
-build:
-  stage: build
+# Stage 3: Build the prod environment for deployment
+deploy-build:
+  stage: deploy-build
   script:
-    - echo "Building Docker image..."
-    - ls -la
-    - cd app
-    - sudo docker build -t app-image -f Dockerfile.prod .
-  artifacts:
-    name: "app-image"
-    paths:
-      - ./  # Store your build artifacts, adjust path as needed
-  only:
-    - main
-    - dev
+    - echo "Building prod environment..."
+    - docker build -t $CI_REGISTRY_IMAGE/backend:latest -f ./backend/Dockerfile.prod ./backend
+    - docker build -t $CI_REGISTRY_IMAGE/frontend:latest -f ./frontend/Dockerfile.prod ./frontend
+    - docker push $CI_REGISTRY_IMAGE/backend:latest
+    - docker push $CI_REGISTRY_IMAGE/frontend:latest
 
-# Deploy Stage
-deploy:
-  stage: deploy
+# Stage 4: Deploy to Green
+deploy-green:
+  stage: deploy-green
   script:
-    - echo "Deploying application..."
-    - sleep 5
-    - echo "Deployed!"
-  only:
-    - main
+    - echo "Deploying to Green..."
+    - ssh $DEPLOY_USER@$GREEN_SERVER_IP "docker pull $CI_REGISTRY_IMAGE/backend:latest && docker pull $CI_REGISTRY_IMAGE/frontend:latest"
+    - ssh $DEPLOY_USER@$GREEN_SERVER_IP "docker-compose -f docker-compose.prod.yml up -d"
+
+# Stage 5: Test Green
+test-green:
+  stage: test-green
+  script:
+    - echo "Testing Green environment health check..."
+    - curl -f http://$GREEN_SERVER_IP/health || exit 1
+    - echo "Green health check passed."
+  allow_failure: false
+
+# Stage 6: Deploy to Blue
+deploy-blue:
+  stage: deploy-blue
+  script:
+    - echo "Deploying to Blue..."
+    - ssh $DEPLOY_USER@$BLUE_SERVER_IP "docker pull $CI_REGISTRY_IMAGE/backend:latest && docker pull $CI_REGISTRY_IMAGE/frontend:latest"
+    - ssh $DEPLOY_USER@$BLUE_SERVER_IP "docker-compose -f docker-compose.prod.yml up -d"
+    - ssh $DEPLOY_USER@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
+
+# Stage 7: Rollback Green
+rollback:
+  stage: rollback
+  script:
+    - echo "Rolling back Green environment..."
+    - ssh $DEPLOY_USER@$GREEN_SERVER_IP "docker-compose -f docker-compose.prod.yml down"
+    - ssh $DEPLOY_USER@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
+  when: on_failure
