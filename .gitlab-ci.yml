@@ -46,8 +46,8 @@ deploy-build:
     - echo "Pushing Docker images to GitLab Registry..."
     - docker push $CI_REGISTRY_IMAGE/backend:latest
     - docker push $CI_REGISTRY_IMAGE/frontend:latest
-  only:
-    - main
+#  only:
+#    - main
   after_script:
     - docker images
 
@@ -58,8 +58,8 @@ deploy-green:
     - echo "Deploying to Green environment..."
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker pull $CI_REGISTRY_IMAGE/backend:latest && docker pull $CI_REGISTRY_IMAGE/frontend:latest"
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker-compose -f docker-compose.prod.yml up -d"
-  only:
-    - main
+#  only:
+#    - main
 
 # Stage 5: Test Green environment
 test-green:
@@ -68,8 +68,8 @@ test-green:
     - echo "Performing health checks on Green environment..."
     - curl -f http://$GREEN_SERVER_IP/health || (echo 'Green environment health check failed!' && exit 1)
     - echo "Green environment is healthy."
-  only:
-    - main
+#  only:
+#    - main
 
 # Stage 6: Deploy to Blue environment
 deploy-blue:
@@ -80,8 +80,8 @@ deploy-blue:
     - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker-compose -f docker-compose.prod.yml up -d"
     - echo "Switching load balancer to Blue environment..."
     - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
-  only:
-    - main
+#  only:
+#    - main
 
 
 # Stage 7: Rollback in case of failure
@@ -93,5 +93,5 @@ rollback:
     - echo "Reverting load balancer to Blue environment..."
     - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
   when: on_failure
-  only:
-    - main
+#  only:
+#    - main
