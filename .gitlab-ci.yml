@@ -83,6 +83,7 @@ deploy-blue:
   only:
     - main
 
+
 # Stage 7: Rollback in case of failure
 rollback:
   stage: rollback
