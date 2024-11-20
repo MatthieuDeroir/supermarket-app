@@ -1,0 +1,12 @@
+# Dockerfile.dev
+FROM denoland/deno:alpine
+
+WORKDIR /app
+
+COPY . .
+
+RUN deno cache deno.json
+
+EXPOSE 3000
+
+CMD ["deno", "task", "dev"]
