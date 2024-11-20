@@ -23,28 +23,29 @@ test-build:
   stage: test-build
   script:
     - echo "Building test environment..."
-    - docker build -t my-app-backend-dev -f ./backend/Dockerfile.dev ./backend
-    - docker build -t my-app-frontend-dev -f ./frontend/Dockerfile.dev ./frontend
+    - sudo docker build -t my-app-backend-dev -f ./backend/Dockerfile.dev ./backend
+    - sudo docker build -t my-app-frontend-dev -f ./frontend/Dockerfile.dev ./frontend
+
 
 # Stage 2: Run tests
 test:
   stage: test
   script:
     - echo "Running backend tests..."
-    - docker run --rm my-app-backend-dev deno test
+    - sudo docker run --rm my-app-backend-dev deno test
     - echo "Running frontend tests..."
-    - docker run --rm my-app-frontend-dev npm test
+    - sudo docker run --rm my-app-frontend-dev npm test
 
 # Stage 3: Build the prod environment for deployment
 deploy-build:
   stage: deploy-build
   script:
     - echo "Building production Docker images..."
-    - docker build -t $CI_REGISTRY_IMAGE/backend:latest -f ./backend/Dockerfile.prod ./backend
-    - docker build -t $CI_REGISTRY_IMAGE/frontend:latest -f ./frontend/Dockerfile.prod ./frontend
+    - sudo docker build -t $CI_REGISTRY_IMAGE/backend:latest -f ./backend/Dockerfile.prod ./backend
+    - sudo docker build -t $CI_REGISTRY_IMAGE/frontend:latest -f ./frontend/Dockerfile.prod ./frontend
     - echo "Pushing Docker images to GitLab Registry..."
-    - docker push $CI_REGISTRY_IMAGE/backend:latest
-    - docker push $CI_REGISTRY_IMAGE/frontend:latest
+    - sudo docker push $CI_REGISTRY_IMAGE/backend:latest
+    - sudo docker push $CI_REGISTRY_IMAGE/frontend:latest
   only:
     - main
   after_script:
@@ -55,8 +56,8 @@ deploy-green:
   stage: deploy-green
   script:
     - echo "Deploying to Green environment..."
-    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker pull $CI_REGISTRY_IMAGE/backend:latest && docker pull $CI_REGISTRY_IMAGE/frontend:latest"
-    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker-compose -f docker-compose.prod.yml up -d"
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "sudo docker pull $CI_REGISTRY_IMAGE/backend:latest && sudo docker pull $CI_REGISTRY_IMAGE/frontend:latest"
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "sudo docker-compose -f docker-compose.prod.yml up -d"
   only:
     - main
 
@@ -75,8 +76,8 @@ deploy-blue:
   stage: deploy-blue
   script:
     - echo "Deploying to Blue environment..."
-    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker pull $CI_REGISTRY_IMAGE/backend:latest && docker pull $CI_REGISTRY_IMAGE/frontend:latest"
-    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker-compose -f docker-compose.prod.yml up -d"
+    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "sudo docker pull $CI_REGISTRY_IMAGE/backend:latest && sudo docker pull $CI_REGISTRY_IMAGE/frontend:latest"
+    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "sudo docker-compose -f docker-compose.prod.yml up -d"
     - echo "Switching load balancer to Blue environment..."
     - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
   only:
@@ -87,7 +88,7 @@ rollback:
   stage: rollback
   script:
     - echo "Rolling back Green environment due to failure..."
-    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker-compose -f docker-compose.prod.yml down"
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "sudo docker-compose -f docker-compose.prod.yml down"
     - echo "Reverting load balancer to Blue environment..."
     - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
   when: on_failure
