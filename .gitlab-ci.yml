@@ -42,7 +42,7 @@ deploy-build:
   script:
     - echo "Building production Docker images..."
     - docker build -t $CI_REGISTRY_IMAGE/backend:latest -f ./backend/Dockerfile.prod ./backend
-    - docker build --progress=plain --log-level debug -t $CI_REGISTRY_IMAGE/frontend:latest -f ./frontend/Dockerfile.prod ./frontend
+    - docker build --progress=plain -t $CI_REGISTRY_IMAGE/frontend:latest -f ./frontend/Dockerfile.prod ./frontend
     - echo "Pushing Docker images to GitLab Registry..."
     - docker push $CI_REGISTRY_IMAGE/backend:latest
     - docker push $CI_REGISTRY_IMAGE/frontend:latest
