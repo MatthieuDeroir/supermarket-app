@@ -12,9 +12,6 @@ default:
   services:
     - docker:dind
 
-variables:
-  DOCKER_TLS_CERTDIR: ""
-
 before_script:
   - mkdir -p ~/.ssh
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
@@ -26,59 +23,73 @@ test-build:
   stage: test-build
   script:
     - echo "Building test environment..."
-    - docker build -t backend-dev -f ./backend/Dockerfile.dev ./backend
-    - docker build -t frontend-dev -f ./frontend/Dockerfile.dev ./frontend
+    - docker build -t my-app-backend-dev -f ./backend/Dockerfile.dev ./backend
+    - docker build -t my-app-frontend-dev -f ./frontend/Dockerfile.dev ./frontend
 
 # Stage 2: Run tests
 test:
   stage: test
   script:
     - echo "Running backend tests..."
-    - docker run --rm backend-dev deno test
+    - docker run --rm my-app-backend-dev deno test
     - echo "Running frontend tests..."
-    - docker run --rm frontend-dev npm test
+    - docker run --rm my-app-frontend-dev npm test
 
 # Stage 3: Build the prod environment for deployment
 deploy-build:
   stage: deploy-build
   script:
-    - echo "Building prod environment..."
+    - echo "Building production Docker images..."
     - docker build -t $CI_REGISTRY_IMAGE/backend:latest -f ./backend/Dockerfile.prod ./backend
     - docker build -t $CI_REGISTRY_IMAGE/frontend:latest -f ./frontend/Dockerfile.prod ./frontend
+    - echo "Pushing Docker images to GitLab Registry..."
     - docker push $CI_REGISTRY_IMAGE/backend:latest
     - docker push $CI_REGISTRY_IMAGE/frontend:latest
+  only:
+    - main
+  after_script:
+    - docker images
 
-# Stage 4: Deploy to Green
+# Stage 4: Deploy to Green environment
 deploy-green:
   stage: deploy-green
   script:
-    - echo "Deploying to Green..."
-    - ssh $DEPLOY_USER@$GREEN_SERVER_IP "docker pull $CI_REGISTRY_IMAGE/backend:latest && docker pull $CI_REGISTRY_IMAGE/frontend:latest"
-    - ssh $DEPLOY_USER@$GREEN_SERVER_IP "docker-compose -f docker-compose.prod.yml up -d"
+    - echo "Deploying to Green environment..."
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker pull $CI_REGISTRY_IMAGE/backend:latest && docker pull $CI_REGISTRY_IMAGE/frontend:latest"
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker-compose -f docker-compose.prod.yml up -d"
+  only:
+    - main
 
-# Stage 5: Test Green
+# Stage 5: Test Green environment
 test-green:
   stage: test-green
   script:
-    - echo "Testing Green environment health check..."
-    - curl -f http://$GREEN_SERVER_IP/health || exit 1
-    - echo "Green health check passed."
-  allow_failure: false
+    - echo "Performing health checks on Green environment..."
+    - curl -f http://$GREEN_SERVER_IP/health || (echo 'Green environment health check failed!' && exit 1)
+    - echo "Green environment is healthy."
+  only:
+    - main
 
-# Stage 6: Deploy to Blue
+# Stage 6: Deploy to Blue environment
 deploy-blue:
   stage: deploy-blue
   script:
-    - echo "Deploying to Blue..."
-    - ssh $DEPLOY_USER@$BLUE_SERVER_IP "docker pull $CI_REGISTRY_IMAGE/backend:latest && docker pull $CI_REGISTRY_IMAGE/frontend:latest"
-    - ssh $DEPLOY_USER@$BLUE_SERVER_IP "docker-compose -f docker-compose.prod.yml up -d"
-    - ssh $DEPLOY_USER@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
+    - echo "Deploying to Blue environment..."
+    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker pull $CI_REGISTRY_IMAGE/backend:latest && docker pull $CI_REGISTRY_IMAGE/frontend:latest"
+    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker-compose -f docker-compose.prod.yml up -d"
+    - echo "Switching load balancer to Blue environment..."
+    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
+  only:
+    - main
 
-# Stage 7: Rollback Green
+# Stage 7: Rollback in case of failure
 rollback:
   stage: rollback
   script:
-    - echo "Rolling back Green environment..."
-    - ssh $DEPLOY_USER@$GREEN_SERVER_IP "docker-compose -f docker-compose.prod.yml down"
-    - ssh $DEPLOY_USER@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
+    - echo "Rolling back Green environment due to failure..."
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker-compose -f docker-compose.prod.yml down"
+    - echo "Reverting load balancer to Blue environment..."
+    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
   when: on_failure
+  only:
+    - main
