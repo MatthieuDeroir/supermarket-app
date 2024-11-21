@@ -52,7 +52,7 @@ deploy-build:
     - echo "New tag= $NEW_TAG"
 
     # Create and push new Git tag
-    - git config --global user.email "ci@yourdomain.com"
+    - git config --global user.email "matthieu.deroir@epitech.eu"
     - git config --global user.name "CI Runner"
     - git tag "$NEW_TAG"
     - git push origin "$NEW_TAG"
