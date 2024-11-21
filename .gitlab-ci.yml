@@ -12,12 +12,13 @@ default:
   services:
     - docker:dind
 
+
 before_script:
   - mkdir -p ~/.ssh
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
   - chmod 600 ~/.ssh/id_rsa
   - ssh-keyscan -H $BLUE_SERVER_IP $GREEN_SERVER_IP $LOAD_BALANCER_IP >> ~/.ssh/known_hosts
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
 
 # Stage 1: Build the dev environment for testing
 test-build:
@@ -39,6 +40,8 @@ test:
 # Stage 3: Build the prod environment for deployment
 deploy-build:
   stage: deploy-build
+  before_script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   script:
     - echo "Building production Docker images..."
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest" -f ./backend/Dockerfile.prod ./backend
