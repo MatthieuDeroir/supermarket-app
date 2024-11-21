@@ -40,7 +40,7 @@ test:
 deploy-build:
   stage: deploy-build
   before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
   script:
     - echo "Building production Docker images..."
     - docker build -t $CI_REGISTRY_IMAGE/backend:latest -f ./backend/Dockerfile.prod ./backend
