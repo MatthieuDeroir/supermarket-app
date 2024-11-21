@@ -17,6 +17,7 @@ before_script:
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
   - chmod 600 ~/.ssh/id_rsa
   - ssh-keyscan -H $BLUE_SERVER_IP $GREEN_SERVER_IP $LOAD_BALANCER_IP >> ~/.ssh/known_hosts
+  - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin
 
 # Stage 1: Build the dev environment for testing
 test-build:
@@ -39,8 +40,6 @@ test:
 # Stage 3: Build the prod environment for deployment
 deploy-build:
   stage: deploy-build
-  before_script:
-    - docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
   script:
     - echo "Building production Docker images..."
     - docker build -t $CI_REGISTRY_IMAGE/backend:latest -f ./backend/Dockerfile.prod ./backend
