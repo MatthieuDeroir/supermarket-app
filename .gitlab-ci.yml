@@ -15,7 +15,7 @@ default:
 
 before_script:
   - mkdir -p ~/.ssh
-  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/gitlab_ci_key
   - chmod 600 ~/.ssh/id_rsa
   - ssh-keyscan -H $BLUE_SERVER_IP $GREEN_SERVER_IP $LOAD_BALANCER_IP >> ~/.ssh/known_hosts
 
