@@ -36,16 +36,16 @@ test:
     - echo "Running frontend tests..."
     - docker run --rm my-app-frontend-dev npm run test
 
-# Stage 3: Build and push production images to Docker Hub
+# Stage 3: Build the prod environment for deployment
 deploy-build:
   stage: deploy-build
   script:
     - echo "Building production Docker images..."
-    - docker build -t "$DOCKER_NAMESPACE/t-dev-700-backend:latest" -f ./backend/Dockerfile.prod ./backend
-    - docker build -t "$DOCKER_NAMESPACE/t-dev-700-frontend:latest" -f ./frontend/Dockerfile.prod ./frontend
+    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest" -f ./backend/Dockerfile.prod ./backend
+    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest" -f ./frontend/Dockerfile.prod ./frontend
     - echo "Pushing Docker images to Docker Hub..."
-    - docker push "$DOCKER_NAMESPACE/t-dev-700-backend:latest"
-    - docker push "$DOCKER_NAMESPACE/t-dev-700-frontend:latest"
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
   after_script:
     - docker images
 
@@ -54,7 +54,7 @@ deploy-green:
   stage: deploy-green
   script:
     - echo "Deploying to Green environment..."
-    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker pull $DOCKER_NAMESPACE/t-dev-700-backend:latest && docker pull $DOCKER_NAMESPACE/t-dev-700-frontend:latest"
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest && docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker-compose -f docker-compose.prod.yml up -d"
 
 # Stage 5: Test Green environment
@@ -70,7 +70,7 @@ deploy-blue:
   stage: deploy-blue
   script:
     - echo "Deploying to Blue environment..."
-    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker pull $DOCKER_NAMESPACE/t-dev-700-backend:latest && docker pull $DOCKER_NAMESPACE/t-dev-700-frontend:latest"
+    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest && docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
     - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker-compose -f docker-compose.prod.yml up -d"
     - echo "Switching load balancer to Blue environment..."
     - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
