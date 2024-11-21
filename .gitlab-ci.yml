@@ -43,14 +43,14 @@ deploy-build:
   script:
     - echo "Reading current version..."
     - PREVIOUS_VERSION=$(cat VERSION)
-    - echo "Previous version: $PREVIOUS_VERSION"
+    - echo "Previous version= $PREVIOUS_VERSION"
 
     # Increment version (patch update)
     - IFS='.' read -r MAJOR MINOR PATCH <<< "$PREVIOUS_VERSION"
     - PATCH=$((PATCH + 1))
     - NEW_VERSION="$MAJOR.$MINOR.$PATCH"
     - echo "$NEW_VERSION" > VERSION
-    - echo "New version: $NEW_VERSION"
+    - echo "New version= $NEW_VERSION"
 
     # Build and tag Docker images
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$NEW_VERSION" -f ./backend/Dockerfile.prod ./backend
