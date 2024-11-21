@@ -6,4 +6,4 @@ app.get("/", (c) => c.text("Hello Deno!"));
 
 Deno.serve({ port: 4000 }, app.fetch);
 
-app.get("/health", (c) => c.json({ status: "ok" }));
+app.get("/health", (c) => c.json({ status: 401 }));
