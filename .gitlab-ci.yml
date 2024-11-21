@@ -34,7 +34,7 @@ test:
     - echo "Running backend tests..."
     - docker run --rm my-app-backend-dev deno test
     - echo "Running frontend tests..."
-    - docker run --rm my-app-frontend-dev deno test
+    - docker run --rm my-app-frontend-dev npm test
 
 # Stage 3: Build the prod environment for deployment
 deploy-build:
