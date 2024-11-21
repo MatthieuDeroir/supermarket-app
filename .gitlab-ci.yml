@@ -55,9 +55,10 @@ deploy-build:
     # Commit and push the updated VERSION file
     - git config --global user.email "ci@yourdomain.com"
     - git config --global user.name "CI Runner"
+    - git checkout $CURRENT_BRANCH
     - git add VERSION
     - git commit -m "CI= Increment version to $NEW_VERSION"
-    - git push
+    - git push origin $CURRENT_BRANCH
 
     # Build and tag Docker images
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$NEW_VERSION" -f ./backend/Dockerfile.prod ./backend
