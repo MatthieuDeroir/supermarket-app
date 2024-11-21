@@ -43,13 +43,13 @@ deploy-build:
   script:
     - echo "Fetching latest Git tag..."
     - LATEST_TAG=$(git describe --tags --abbrev=0 || echo "0.0.0")
-    - echo "Latest tag: $LATEST_TAG"
+    - echo "Latest tag= $LATEST_TAG"
 
     # Increment version
     - IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_TAG"
     - PATCH=$((PATCH + 1))
     - NEW_TAG="$MAJOR.$MINOR.$PATCH"
-    - echo "New tag: $NEW_TAG"
+    - echo "New tag= $NEW_TAG"
 
     # Create and push new Git tag
     - git config --global user.email "ci@yourdomain.com"
