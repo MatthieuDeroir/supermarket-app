@@ -45,12 +45,20 @@ deploy-build:
     - PREVIOUS_VERSION=$(cat VERSION)
     - echo "Previous version= $PREVIOUS_VERSION"
 
-    # Increment version (patch update)
+    # Increment version
     - IFS='.' read -r MAJOR MINOR PATCH <<< "$PREVIOUS_VERSION"
     - PATCH=$((PATCH + 1))
     - NEW_VERSION="$MAJOR.$MINOR.$PATCH"
     - echo "$NEW_VERSION" > VERSION
     - echo "New version= $NEW_VERSION"
+
+    # Commit and push the updated VERSION file
+    - git config --global user.email "ci@yourdomain.com"
+    - git config --global user.name "CI Runner"
+    - git checkout -b update-version || git checkout update-version
+    - git add VERSION
+    - git commit -m "CI= Increment version to $NEW_VERSION"
+    - git push origin update-version || echo "Version branch already exists"
 
     # Build and tag Docker images
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$NEW_VERSION" -f ./backend/Dockerfile.prod ./backend
@@ -66,7 +74,8 @@ deploy-build:
 
   artifacts:
     paths:
-      - VERSION # Save the new version for subsequent stages
+      - VERSION
+      - PREVIOUS_VERSION
 
 # Stage 4: Deploy to Green environment
 deploy-green:
