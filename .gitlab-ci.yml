@@ -80,7 +80,7 @@ deploy-blue:
     - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker run -d --name backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
     - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker run -d --name frontend -p 80:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
     - echo "Switching load balancer to Blue environment..."
-    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
+#    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
 
 # Stage 7: Rollback in case of failure
 rollback:
@@ -90,5 +90,5 @@ rollback:
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker stop backend || true && docker stop frontend || true"
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker rm backend || true && docker rm frontend || true"
     - echo "Reverting load balancer to Blue environment..."
-    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
+#    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
   when: on_failure
