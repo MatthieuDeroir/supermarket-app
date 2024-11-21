@@ -1,12 +1,19 @@
-# Dockerfile.dev
+# Stage 1: Install dependencies and run dev server
 FROM node:20-alpine
 
 WORKDIR /app
 
+# Copy only package.json and package-lock.json first to leverage Docker layer caching
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application
 COPY . .
 
-RUN npm run dev
-
+# Expose the port used by the Next.js app
 EXPOSE 3000
 
+# Run the development server
 CMD ["npm", "run", "dev"]
