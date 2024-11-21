@@ -17,6 +17,9 @@ before_script:
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
   - chmod 600 ~/.ssh/id_rsa
   - ssh-keyscan -H $BLUE_SERVER_IP $GREEN_SERVER_IP $LOAD_BALANCER_IP >> ~/.ssh/known_hosts
+  - git config --global user.email "ci-runner@yourdomain.com"
+  - git config --global user.name "CI Runner"
+  - git remote set-url origin https://gitlab-ci-token:$CI_PUSH_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
 
 # Stage 1: Build the dev environment for testing
 test-build:
@@ -52,8 +55,6 @@ deploy-build:
     - echo "New tag= $NEW_TAG"
 
     # Create and push new Git tag
-    - git config --global user.email "matthieu.deroir@epitech.eu"
-    - git config --global user.name "CI Runner"
     - git tag "$NEW_TAG"
     - git push origin "$NEW_TAG"
 
@@ -68,10 +69,6 @@ deploy-build:
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$NEW_TAG"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
-
-  artifacts:
-    paths:
-      - LATEST_TAG
 
 # Stage 4: Deploy to Green environment
 deploy-green:
