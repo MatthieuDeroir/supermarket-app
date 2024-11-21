@@ -41,39 +41,44 @@ deploy-build:
   before_script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   script:
-    - echo "Reading current version..."
-    - PREVIOUS_VERSION=$(cat VERSION)
-    - echo "Previous version= $PREVIOUS_VERSION"
+    - echo "Fetching latest Git tag..."
+    - LATEST_TAG=$(git describe --tags --abbrev=0 || echo "0.0.0")
+    - echo "Latest tag: $LATEST_TAG"
 
-    # Increment version (patch update)
-    - IFS='.' read -r MAJOR MINOR PATCH <<< "$PREVIOUS_VERSION"
+    # Increment version
+    - IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST_TAG"
     - PATCH=$((PATCH + 1))
-    - NEW_VERSION="$MAJOR.$MINOR.$PATCH"
-    - echo "$NEW_VERSION" > VERSION
-    - echo "New version= $NEW_VERSION"
+    - NEW_TAG="$MAJOR.$MINOR.$PATCH"
+    - echo "New tag: $NEW_TAG"
+
+    # Create and push new Git tag
+    - git config --global user.email "ci@yourdomain.com"
+    - git config --global user.name "CI Runner"
+    - git tag "$NEW_TAG"
+    - git push origin "$NEW_TAG"
 
     # Build and tag Docker images
-    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$NEW_VERSION" -f ./backend/Dockerfile.prod ./backend
-    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$NEW_VERSION" -f ./frontend/Dockerfile.prod ./frontend
-    - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$NEW_VERSION" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
-    - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$NEW_VERSION" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
+    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$NEW_TAG" -f ./backend/Dockerfile.prod ./backend
+    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$NEW_TAG" -f ./frontend/Dockerfile.prod ./frontend
+    - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$NEW_TAG" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
+    - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$NEW_TAG" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
 
     # Push Docker images
-    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$NEW_VERSION"
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$NEW_TAG"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
-    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$NEW_VERSION"
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$NEW_TAG"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
 
   artifacts:
     paths:
-      - VERSION # Save the new version for subsequent stages
+      - LATEST_TAG
 
 # Stage 4: Deploy to Green environment
 deploy-green:
   stage: deploy-green
   script:
     - echo "Deploying to Green environment..."
-    - VERSION=$(cat VERSION)
+    - VERSION=$(git describe --tags --abbrev=0)
     - echo "Deploying version $VERSION to Green environment..."
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$VERSION &&
@@ -97,7 +102,7 @@ deploy-blue:
   stage: deploy-blue
   script:
     - echo "Deploying to Blue environment..."
-    - VERSION=$(cat VERSION)
+    - VERSION=$(git describe --tags --abbrev=0)
     - echo "Deploying version $VERSION to Blue environment..."
     - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$VERSION &&
@@ -113,14 +118,15 @@ rollback:
   stage: rollback
   script:
     - echo "Rolling back Green environment..."
-    - VERSION=$(cat VERSION) # Use the current VERSION
+    - PREVIOUS_TAG=$(git describe --tags $(git rev-list --tags --skip=1 --max-count=1))
+    - echo "Rolling back to version $PREVIOUS_TAG..."
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
       docker stop backend || true && docker stop frontend || true &&
       docker rm backend || true && docker rm frontend || true &&
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_VERSION &&
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_VERSION &&
-      docker run -d --name backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_VERSION &&
-      docker run -d --name frontend -p 80:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_VERSION
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG &&
+      docker run -d --name backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
+      docker run -d --name frontend -p 80:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG
       "
-    - echo "Rollback to version $PREVIOUS_VERSION completed."
+    - echo "Rollback to version $PREVIOUS_TAG completed."
   when: on_failure
