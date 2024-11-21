@@ -58,15 +58,15 @@ deploy-green:
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest && docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker stop backend || true && docker stop frontend || true"
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker rm backend || true && docker rm frontend || true"
-    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker run -d --name backend -p 8080:8080 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
-    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker run -d --name frontend -p 80:80 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker run -d --name backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "docker run -d --name frontend -p 80:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
 
 # Stage 5: Test Green environment
 test-green:
   stage: test-green
   script:
     - echo "Performing health checks on Green environment..."
-    - curl -f http://$GREEN_SERVER_IP/health || (echo 'Green environment health check failed!' && exit 1)
+    - curl -f http://$GREEN_SERVER_IP:4000/health || (echo 'Green environment health check failed!' && exit 1)
     - echo "Green environment is healthy."
 
 # Stage 6: Deploy to Blue environment
@@ -77,8 +77,8 @@ deploy-blue:
     - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest && docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
     - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker stop backend || true && docker stop frontend || true"
     - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker rm backend || true && docker rm frontend || true"
-    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker run -d --name backend -p 8080:8080 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
-    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker run -d --name frontend -p 80:80 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
+    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker run -d --name backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
+    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "docker run -d --name frontend -p 80:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
     - echo "Switching load balancer to Blue environment..."
     - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "/usr/local/bin/switch_env.sh blue"
 
