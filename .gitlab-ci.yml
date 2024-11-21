@@ -34,7 +34,7 @@ test:
     - echo "Running backend tests..."
     - docker run --rm my-app-backend-dev deno test
     - echo "Running frontend tests..."
-    - docker run --rm my-app-frontend-dev npm test
+    - docker run --rm my-app-frontend-dev npm run test
 
 # Stage 3: Build the prod environment for deployment
 deploy-build:
@@ -42,7 +42,7 @@ deploy-build:
   script:
     - echo "Building production Docker images..."
     - docker build -t $CI_REGISTRY_IMAGE/backend:latest -f ./backend/Dockerfile.prod ./backend
-    - docker build --progress=plainnode -v -t $CI_REGISTRY_IMAGE/frontend:latest -f ./frontend/Dockerfile.prod ./frontend
+    - docker build -t $CI_REGISTRY_IMAGE/frontend:latest -f ./frontend/Dockerfile.prod ./frontend
     - echo "Pushing Docker images to GitLab Registry..."
     - docker push $CI_REGISTRY_IMAGE/backend:latest
     - docker push $CI_REGISTRY_IMAGE/frontend:latest
