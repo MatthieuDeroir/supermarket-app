@@ -16,7 +16,7 @@ rollback:
       docker rm prod-backend || true &&
       docker rm prod-frontend || true &&
       docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
-      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG
+      docker run -d --name prod-frontend -p 80:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG
       "
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
@@ -25,7 +25,7 @@ rollback:
       docker stop dev-frontend || true &&
       docker rm dev-backend || true &&
       docker rm dev-frontend || true &&
-      docker run -d --name dev-backend -p 5000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
-      docker run -d --name dev-frontend -p 8080:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG
+      docker run -d --name dev-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
+      docker run -d --name dev-frontend -p 80:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG
       "
   when: on_failure
