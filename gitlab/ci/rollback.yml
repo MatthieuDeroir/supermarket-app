@@ -3,8 +3,6 @@ rollback:
   dependencies:
     - deploy-prod-backend
     - deploy-prod-frontend
-    - test-prod-backend
-    - test-prod-frontend
   script:
     - echo "Rolling back environments due to failure..."
     - PREVIOUS_TAG=$(git describe --tags $(git rev-list --tags --skip=1 --max-count=1))
