@@ -49,7 +49,7 @@ deploy-dev-frontend:
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest &&
       docker stop dev-frontend || true &&
       docker rm dev-frontend || true &&
-      docker run -d --name dev-frontend -p 80:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest
+      docker run -d --name dev-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest
       "
 
 test-dev-backend:
@@ -66,4 +66,4 @@ test-dev-frontend:
     - deploy-dev-frontend
   script:
     - echo "Testing frontend Dev environment on Load Balancer..."
-    - curl -f http://$LOAD_BALANCER_IP || (echo 'Frontend health check failed!' && exit 1)
+    - curl -f http://$LOAD_BALANCER_IP:3000 || (echo 'Frontend health check failed!' && exit 1)
