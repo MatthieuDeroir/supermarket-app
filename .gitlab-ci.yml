@@ -56,12 +56,14 @@ deploy-build:
     - echo "New tag= $NEW_TAG"
 
     # Check if tag exists
-    - if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
-      echo "Tag $NEW_TAG already exists. Skipping tagging.";
+    - |
+      if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
+        echo "Tag $NEW_TAG already exists. Skipping tagging."
       else
-      git tag "$NEW_TAG"
-      git push origin "$NEW_TAG"
+        git tag "$NEW_TAG"
+        git push origin "$NEW_TAG"
       fi
+
 
     # Create and push new Git tag
     - git tag "$NEW_TAG"
