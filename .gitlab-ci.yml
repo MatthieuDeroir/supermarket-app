@@ -22,6 +22,43 @@ before_script:
   - git remote set-url origin https://$CI_PUSH_USERNAME:$CI_PUSH_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
 
 
+# Stage 4: Deploy the Dev Environment
+deploy-dev:
+  stage: deploy-dev
+  dependencies:
+    - deploy-build
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H $GREEN_SERVER_IP >> ~/.ssh/known_hosts
+  script:
+    - echo "Deploying to Dev environment..."
+    - VERSION=$(cat new_tag.txt)  # Use the tag from the previous stage
+    - echo "Deploying version $VERSION to Dev environment..."
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$VERSION &&
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$VERSION &&
+      docker stop dev-backend || true &&
+      docker stop dev-frontend || true &&
+      docker rm dev-backend || true &&
+      docker rm dev-frontend || true &&
+      docker run -d --name dev-backend -p 5000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$VERSION &&
+      docker run -d --name dev-frontend -p 8080:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$VERSION
+      "
+
+# Stage 5: Test Dev Environment
+test-dev:
+  stage: test-dev
+  dependencies:
+    - deploy-dev
+  script:
+    - echo "Performing health checks on Dev environment..."
+    - curl -f http://$GREEN_SERVER_IP:5000/health || (echo 'Dev environment backend health check failed!' && exit 1)
+    - curl -f http://$GREEN_SERVER_IP:8080 || (echo 'Dev environment frontend health check failed!' && exit 1)
+    - echo "Dev environment is healthy."
+
+
 # Stage 1: Build the dev environment for testing
 test-build:
   stage: test-build
