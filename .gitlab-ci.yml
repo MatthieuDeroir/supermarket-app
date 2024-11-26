@@ -17,8 +17,6 @@ before_script:
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
   - chmod 600 ~/.ssh/id_rsa
   - ssh-keyscan -H $BLUE_SERVER_IP $GREEN_SERVER_IP $LOAD_BALANCER_IP >> ~/.ssh/known_hosts
-  - git config --global user.email "ci-runner@yourdomain.com"
-  - git config --global user.name "CI Runner"
   - git remote set-url origin https://matthieu.deroir@epitech.eu:$CI_PUSH_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
 
 
