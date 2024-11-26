@@ -62,10 +62,6 @@ deploy-build:
     - NEW_TAG="$MAJOR.$MINOR.$PATCH"
     - echo "New tag= $NEW_TAG"
 
-    # Create and push new tag
-    - git tag "$NEW_TAG"
-    - git push origin "$NEW_TAG"
-
     # Save the tag to a file for passing to the next stages
     - echo "$NEW_TAG" > new_tag.txt
 
