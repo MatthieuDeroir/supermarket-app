@@ -10,7 +10,7 @@ stages:
 default:
   image: docker:latest
   services:
-    - docker:dind
+    - docker:dind --tls=false --host=tcp://0.0.0.0:2375
 
 before_script:
   - mkdir -p ~/.ssh
