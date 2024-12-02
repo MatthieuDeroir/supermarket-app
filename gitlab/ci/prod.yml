@@ -1,5 +1,20 @@
 # prod.yml
 
+stages:
+  - build-prod-backend
+  - build-prod-frontend
+  - test
+  - push-prod
+  - deploy-prod-green
+  - test-request-prod-backend-green
+  - test-request-prod-frontend-green
+  - deploy-prod-blue
+  - test-request-prod-backend-blue
+  - test-request-prod-frontend-blue
+
+variables:
+  DOCKER_TLS_CERTDIR: ""  # Disable Docker-in-Docker TLS if not needed
+
 build-prod-backend:
   stage: build-prod-backend
   script:
@@ -13,32 +28,19 @@ build-prod-frontend:
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest" -f ./frontend/Dockerfile.prod ./frontend
 
 test-auto-prod-backend:
-  stage: test-auto-prod-backend
-  image: denoland/deno:latest
-  dependencies:
-    - build-prod-backend
+  stage: test
   script:
-    - echo "Running automated tests for Prod backend (Deno)..."
-    - cd backend
-    - deno test --allow-net
+    - echo "Running backend tests..."
+    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest" deno test
 
 test-auto-prod-frontend:
-  stage: test-auto-prod-frontend
-  dependencies:
-    - build-prod-frontend
+  stage: test
   script:
-    - echo "Running automated tests for Prod frontend..."
-    - cd frontend
-    - npm install
-    - npm test
+    - echo "Running frontend tests..."
+    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest" npm run test
 
 push-prod:
   stage: push-prod
-  dependencies:
-    - test-auto-prod-backend
-    - test-auto-prod-frontend
-  before_script:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   script:
     - echo "Pushing Prod images..."
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
@@ -46,13 +48,6 @@ push-prod:
 
 deploy-prod-green:
   stage: deploy-prod-green
-  dependencies:
-    - push-prod
-  before_script:
-    - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan -H $GREEN_SERVER_IP >> ~/.ssh/known_hosts
   script:
     - echo "Deploying to Green server..."
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
@@ -68,30 +63,18 @@ deploy-prod-green:
 
 test-request-prod-backend-green:
   stage: test-request-prod-backend-green
-  dependencies:
-    - deploy-prod-green
   script:
     - echo "Testing requests on Prod backend (Green)..."
     - curl -f http://$GREEN_SERVER_IP:4000/health || (echo 'Prod backend (Green) health check failed!' && exit 1)
 
 test-request-prod-frontend-green:
   stage: test-request-prod-frontend-green
-  dependencies:
-    - deploy-prod-green
   script:
     - echo "Testing requests on Prod frontend (Green)..."
     - curl -f http://$GREEN_SERVER_IP:3000 || (echo 'Prod frontend (Green) health check failed!' && exit 1)
 
 deploy-prod-blue:
   stage: deploy-prod-blue
-  dependencies:
-    - test-request-prod-backend-green
-    - test-request-prod-frontend-green
-  before_script:
-    - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan -H $BLUE_SERVER_IP >> ~/.ssh/known_hosts
   script:
     - echo "Deploying to Blue server..."
     - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "
@@ -107,16 +90,12 @@ deploy-prod-blue:
 
 test-request-prod-backend-blue:
   stage: test-request-prod-backend-blue
-  dependencies:
-    - deploy-prod-blue
   script:
     - echo "Testing requests on Prod backend (Blue)..."
     - curl -f http://$BLUE_SERVER_IP:4000/health || (echo 'Prod backend (Blue) health check failed!' && exit 1)
 
 test-request-prod-frontend-blue:
   stage: test-request-prod-frontend-blue
-  dependencies:
-    - deploy-prod-blue
   script:
     - echo "Testing requests on Prod frontend (Blue)..."
     - curl -f http://$BLUE_SERVER_IP:3000 || (echo 'Prod frontend (Blue) health check failed!' && exit 1)

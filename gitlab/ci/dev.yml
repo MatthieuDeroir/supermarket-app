@@ -1,5 +1,16 @@
 # dev.yml
 
+stages:
+  - build-dev-backend
+  - build-dev-frontend
+  - test
+  - deploy-dev
+  - test-request-dev-backend
+  - test-request-dev-frontend
+
+variables:
+  DOCKER_TLS_CERTDIR: ""  # Disable Docker-in-Docker TLS if not needed
+
 build-dev-backend:
   stage: build-dev-backend
   script:
@@ -13,42 +24,25 @@ build-dev-frontend:
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest" -f ./frontend/Dockerfile.dev ./frontend
 
 test-auto-dev-backend:
-  stage: test-auto-dev-backend
-  image: denoland/deno:latest
-  dependencies:
-    - build-dev-backend
+  stage: test
   script:
-    - echo "Running automated tests for Dev backend (Deno)..."
-    - cd backend
-    - deno test --allow-net
+    - echo "Running backend tests..."
+    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest" deno test
 
 test-auto-dev-frontend:
-  stage: test-auto-dev-frontend
-  dependencies:
-    - build-dev-frontend
+  stage: test
   script:
-    - echo "Running automated tests for Dev frontend..."
-    - cd frontend
-    - npm install
-    - npm test
+    - echo "Running frontend tests..."
+    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest" npm run test
 
 deploy-dev:
   stage: deploy-dev
-  dependencies:
-    - test-auto-dev-backend
-    - test-auto-dev-frontend
-  before_script:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan -H $LOAD_BALANCER_IP >> ~/.ssh/known_hosts
   script:
     - echo "Deploying Dev environment..."
-    # Push images
+    # Push images to Docker Registry
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
-    # Pull images on server
+    # Deploy to Load Balancer
     - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest &&
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest &&
@@ -62,16 +56,12 @@ deploy-dev:
 
 test-request-dev-backend:
   stage: test-request-dev-backend
-  dependencies:
-    - deploy-dev
   script:
     - echo "Testing requests on Dev backend..."
     - curl -f http://$LOAD_BALANCER_IP:4000/health || (echo 'Dev backend health check failed!' && exit 1)
 
 test-request-dev-frontend:
   stage: test-request-dev-frontend
-  dependencies:
-    - deploy-dev
   script:
     - echo "Testing requests on Dev frontend..."
     - curl -f http://$LOAD_BALANCER_IP:3000 || (echo 'Dev frontend health check failed!' && exit 1)

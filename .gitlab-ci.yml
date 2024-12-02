@@ -1,31 +1,24 @@
 stages:
-  - build-dev-backend
-  - build-dev-frontend
-  - test-auto-dev-backend
-  - test-auto-dev-frontend
-  - deploy-dev
-  - test-request-dev-backend
-  - test-request-dev-frontend
-  - build-prod-backend
-  - build-prod-frontend
-  - test-auto-prod-backend
-  - test-auto-prod-frontend
-  - push-prod
-  - deploy-prod-green
-  - test-request-prod-backend-green
-  - test-request-prod-frontend-green
-  - deploy-prod-blue
-  - test-request-prod-backend-blue
-  - test-request-prod-frontend-blue
+  - trigger-pipelines
   - build-mobile
   - test-auto-mobile
   - release
   - release-mobile
   - rollback
 
+trigger-dev-pipeline:
+  stage: trigger-pipelines
+  trigger:
+    include: '/gitlab/ci/dev.yml'
+    strategy: depend
+
+trigger-prod-pipeline:
+  stage: trigger-pipelines
+  trigger:
+    include: '/gitlab/ci/prod.yml'
+    strategy: depend
+
 include:
-  - '/gitlab/ci/dev.yml'
-  - '/gitlab/ci/prod.yml'
   - '/gitlab/ci/mobile.yml'
   - '/gitlab/ci/release.yml'
   - '/gitlab/ci/release-mobile.yml'
