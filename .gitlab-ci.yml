@@ -6,8 +6,6 @@ stages:
 
 trigger-dev:
   stage: trigger-dev
-  script:
-    - echo "Triggering Dev pipeline..."
   trigger:
     include:
       - local: '/gitlab/ci/dev.yml'
@@ -15,8 +13,6 @@ trigger-dev:
 
 trigger-prod-mobile:
   stage: trigger-prod-mobile
-  script:
-    - echo "Triggering Prod and Mobile pipelines..."
   trigger:
     include:
       - local: '/gitlab/ci/prod.yml'
@@ -25,8 +21,6 @@ trigger-prod-mobile:
 
 trigger-release:
   stage: release
-  script:
-    - echo "Triggering Release pipeline..."
   trigger:
     include:
       - local: '/gitlab/ci/release.yml'
@@ -34,8 +28,6 @@ trigger-release:
 
 trigger-rollback:
   stage: rollback
-  script:
-    - echo "Triggering Rollback pipeline..."
   trigger:
     include:
       - local: '/gitlab/ci/rollback.yml'
