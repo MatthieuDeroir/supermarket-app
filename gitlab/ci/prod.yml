@@ -4,9 +4,9 @@ stages:
 #  - test-prod
   - push-prod
   - deploy-prod-green
-  - test-request-prod-green
+  - validate-green
   - deploy-prod-blue
-  - test-request-prod-blue
+  - validate-blue
 
 variables:
   DOCKER_TLS_CERTDIR: ""  # Disable Docker-in-Docker TLS if not needed
@@ -63,14 +63,14 @@ deploy-prod-green:
       docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest
       "
 
-test-request-prod-backend-green:
-  stage: test-request-prod-green
+validate-backend-green:
+  stage: validate-green
   script:
     - echo "Testing requests on Prod backend (Green)..."
     - curl -f http://$GREEN_SERVER_IP:4000/health || (echo 'Prod backend (Green) health check failed!' && exit 1)
 
-test-request-prod-frontend-green:
-  stage: test-request-prod-green
+validate-frontend-green:
+  stage: validate-green
   script:
     - echo "Testing requests on Prod frontend (Green)..."
     - curl -f http://$GREEN_SERVER_IP:3000 || (echo 'Prod frontend (Green) health check failed!' && exit 1)
@@ -90,14 +90,14 @@ deploy-prod-blue:
       docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest
       "
 
-test-request-prod-backend-blue:
-  stage: test-request-prod-blue
+validate-backend-blue:
+  stage: validate-blue
   script:
     - echo "Testing requests on Prod backend (Blue)..."
     - curl -f http://$BLUE_SERVER_IP:4000/health || (echo 'Prod backend (Blue) health check failed!' && exit 1)
 
-test-request-prod-frontend-blue:
-  stage: test-request-prod-blue
+validate-frontend-blue:
+  stage: validate-blue
   script:
     - echo "Testing requests on Prod frontend (Blue)..."
     - curl -f http://$BLUE_SERVER_IP:3000 || (echo 'Prod frontend (Blue) health check failed!' && exit 1)
