@@ -1,26 +1,40 @@
-# Stage 1: Build the app
-FROM node:20-alpine AS builder
+# Stage 1: Base for dependencies and shared setup
+FROM node:20-alpine AS base
 
 WORKDIR /app
 
-# Copy only the files needed to install dependencies and build
+# Copy only the files needed to install dependencies
 COPY package.json package-lock.json ./
 RUN npm install
 
+# Copy all source files for later stages
 COPY . .
+
+# Stage 2: Run tests
+FROM base AS tester
+
+# Run tests during this stage
+CMD ["npm", "run", "test"]
+
+# Stage 3: Build the app
+FROM base AS builder
+
+# Build the application
 RUN NODE_OPTIONS="--max-old-space-size=1024" npm run build
 
-# Stage 2: Serve the app
+# Stage 4: Serve the app
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy built artifacts from builder
+# Copy built artifacts from the builder
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
 
+# Expose the port for the application
 EXPOSE 3000
 
+# Command to run the application
 CMD ["npm", "run", "start"]

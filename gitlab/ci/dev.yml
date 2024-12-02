@@ -1,9 +1,8 @@
-# dev.yml
-
 stages:
   - build-dev-backend
   - build-dev-frontend
-  - test
+  - test-backend
+  - test-frontend
   - deploy-dev
   - test-request-dev-backend
   - test-request-dev-frontend
@@ -23,26 +22,26 @@ build-dev-frontend:
     - echo "Building frontend for Dev environment..."
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest" -f ./frontend/Dockerfile.dev ./frontend
 
-test-auto-dev-backend:
-  stage: test
+test-backend:
+  stage: test-backend
   script:
-    - echo "Running backend tests..."
-    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest" deno test
+    - echo "Running backend tests during Dev pipeline..."
+    - docker build --target tester -t backend-tester -f ./backend/Dockerfile.dev ./backend
+    - docker run --rm backend-tester
 
-test-auto-dev-frontend:
-  stage: test
+test-frontend:
+  stage: test-frontend
   script:
-    - echo "Running frontend tests..."
-    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest" npm run test
+    - echo "Running frontend tests during Dev pipeline..."
+    - docker build --target tester -t frontend-tester -f ./frontend/Dockerfile.dev ./frontend
+    - docker run --rm frontend-tester
 
 deploy-dev:
   stage: deploy-dev
   script:
     - echo "Deploying Dev environment..."
-    # Push images to Docker Registry
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
-    # Deploy to Load Balancer
     - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest &&
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest &&

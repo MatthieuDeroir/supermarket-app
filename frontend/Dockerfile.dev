@@ -10,7 +10,11 @@ RUN npm install
 COPY . .
 RUN NODE_OPTIONS="--max-old-space-size=1024" npm run build
 
-# Stage 2: Serve the app
+# Stage 2: Run tests (dedicated testing stage)
+FROM builder AS tester
+CMD ["npm", "run", "test"]
+
+# Stage 3: Serve the app
 FROM node:20-alpine
 
 WORKDIR /app
