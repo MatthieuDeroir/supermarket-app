@@ -7,8 +7,6 @@ stages:
 
 trigger-dev:
   stage: dev
-  tags:
-    - main
   trigger:
     include:
       - local: '/gitlab/ci/dev.yml'
@@ -16,8 +14,6 @@ trigger-dev:
 
 trigger-prod:
   stage: prod
-  tags:
-    - main
   trigger:
     include:
       - local: '/gitlab/ci/prod.yml'
@@ -25,8 +21,6 @@ trigger-prod:
 
 trigger-mobile:
   stage: mobile
-  tags:
-    - main
   trigger:
     include:
       - local: '/gitlab/ci/mobile.yml'
@@ -34,8 +28,6 @@ trigger-mobile:
 
 trigger-release:
   stage: release
-  tags:
-    - main
   trigger:
     include:
       - local: '/gitlab/ci/release.yml'
@@ -43,8 +35,6 @@ trigger-release:
 
 trigger-rollback:
   stage: rollback
-  tags:
-    - main
   trigger:
     include:
       - local: '/gitlab/ci/rollback.yml'

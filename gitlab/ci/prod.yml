@@ -50,6 +50,8 @@ push-prod-frontend:
 
 deploy-prod-green:
   stage: deploy-prod-green
+  tags:
+    - prod
   script:
     - echo "Deploying to Green server..."
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
@@ -65,18 +67,24 @@ deploy-prod-green:
 
 validate-backend-green:
   stage: validate-green
+  tags:
+    - prod
   script:
     - echo "Testing requests on Prod backend (Green)..."
     - curl -f http://$GREEN_SERVER_IP:4000/health || (echo 'Prod backend (Green) health check failed!' && exit 1)
 
 validate-frontend-green:
   stage: validate-green
+  tags:
+    - prod
   script:
     - echo "Testing requests on Prod frontend (Green)..."
     - curl -f http://$GREEN_SERVER_IP:3000 || (echo 'Prod frontend (Green) health check failed!' && exit 1)
 
 deploy-prod-blue:
   stage: deploy-prod-blue
+  tags:
+    - prod
   script:
     - echo "Deploying to Blue server..."
     - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "
@@ -92,12 +100,16 @@ deploy-prod-blue:
 
 validate-backend-blue:
   stage: validate-blue
+  tags:
+    - prod
   script:
     - echo "Testing requests on Prod backend (Blue)..."
     - curl -f http://$BLUE_SERVER_IP:4000/health || (echo 'Prod backend (Blue) health check failed!' && exit 1)
 
 validate-frontend-blue:
   stage: validate-blue
+  tags:
+    - prod
   script:
     - echo "Testing requests on Prod frontend (Blue)..."
     - curl -f http://$BLUE_SERVER_IP:3000 || (echo 'Prod frontend (Blue) health check failed!' && exit 1)

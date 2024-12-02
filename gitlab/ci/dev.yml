@@ -9,30 +9,40 @@ variables:
 
 build-dev-backend:
   stage: build-dev
+  tags:
+    - dev
   script:
     - echo "Building backend for Dev environment..."
     - docker build -t backend-dev -f ./backend/Dockerfile.dev ./backend
 
 build-dev-frontend:
   stage: build-dev
+  tags:
+    - dev
   script:
     - echo "Building frontend for Dev environment..."
     - docker build -t frontend-dev -f ./frontend/Dockerfile.dev ./frontend
 
 test-backend:
   stage: test-dev
+  tags:
+    - dev
   script:
     - echo "Running backend tests during Dev pipeline..."
     - docker run --rm backend-dev deno test --allow-net --allow-read --allow-env
 
 test-frontend:
   stage: test-dev
+  tags:
+    - dev
   script:
     - echo "Running frontend tests during Dev pipeline..."
     - docker run --rm frontend-dev npm run test
 
 deploy-dev-backend:
   stage: deploy-dev
+  tags:
+    - dev
   script:
     - echo "Deploying backend for Dev environment..."
     - docker tag backend-dev "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
@@ -48,6 +58,8 @@ deploy-dev-backend:
 
 deploy-dev-frontend:
   stage: deploy-dev
+  tags:
+    - dev
   script:
     - echo "Deploying Dev environment..."
     - docker tag frontend-dev "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
@@ -61,12 +73,16 @@ deploy-dev-frontend:
 
 validate-backend-dev:
   stage: validate-dev
+  tags:
+    - dev
   script:
     - echo "Testing requests on Dev backend..."
     - curl -f http://$LOAD_BALANCER_IP:4000/health || (echo 'Dev backend health check failed!' && exit 1)
 
 validate-frontend-dev:
   stage: validate-dev
+  tags:
+    - dev
   script:
     - echo "Testing requests on Dev frontend..."
     - curl -f http://$LOAD_BALANCER_IP:3000 || (echo 'Dev frontend health check failed!' && exit 1)
