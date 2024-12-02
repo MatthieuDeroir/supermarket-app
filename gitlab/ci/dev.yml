@@ -2,7 +2,7 @@ stages:
   - build-dev
   - test-dev
   - deploy-dev
-  - test-request-dev
+  - validate-dev
 
 variables:
   DOCKER_TLS_CERTDIR: ""  # Disable Docker-in-Docker TLS if not needed
@@ -59,14 +59,14 @@ deploy-dev-frontend:
       docker run -d --name dev-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest
       "
 
-test-request-dev-backend:
-  stage: test-request-dev
+validate-backend-dev:
+  stage: validate-dev
   script:
     - echo "Testing requests on Dev backend..."
     - curl -f http://$LOAD_BALANCER_IP:4000/health || (echo 'Dev backend health check failed!' && exit 1)
 
-test-request-dev-frontend:
-  stage: test-request-dev
+validate-frontend-dev:
+  stage: validate-dev
   script:
     - echo "Testing requests on Dev frontend..."
     - curl -f http://$LOAD_BALANCER_IP:3000 || (echo 'Dev frontend health check failed!' && exit 1)
