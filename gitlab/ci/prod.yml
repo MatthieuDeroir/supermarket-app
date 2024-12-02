@@ -1,8 +1,9 @@
+# prod.yml
+
 stages:
   - build-prod-backend
   - build-prod-frontend
-  - test-backend
-  - test-frontend
+  - test
   - push-prod
   - deploy-prod-green
   - test-request-prod-backend-green
@@ -26,19 +27,17 @@ build-prod-frontend:
     - echo "Building frontend for Prod environment..."
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest" -f ./frontend/Dockerfile.prod ./frontend
 
-test-backend:
-  stage: test-backend
+test-auto-prod-backend:
+  stage: test
   script:
-    - echo "Running backend tests during Prod pipeline..."
-    - docker build --target tester -t backend-tester -f ./backend/Dockerfile.prod ./backend
-    - docker run --rm backend-tester
+    - echo "Running backend tests..."
+    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest" deno test
 
-test-frontend:
-  stage: test-frontend
+test-auto-prod-frontend:
+  stage: test
   script:
-    - echo "Running frontend tests during Prod pipeline..."
-    - docker build --target tester -t frontend-tester -f ./frontend/Dockerfile.prod ./frontend
-    - docker run --rm frontend-tester
+    - echo "Running frontend tests..."
+    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest" npm run test
 
 push-prod:
   stage: push-prod
@@ -47,4 +46,56 @@ push-prod:
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
 
-# Rest of the stages remain unchanged...
+deploy-prod-green:
+  stage: deploy-prod-green
+  script:
+    - echo "Deploying to Green server..."
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest &&
+      docker stop prod-backend || true &&
+      docker rm prod-backend || true &&
+      docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
+      docker stop prod-frontend || true &&
+      docker rm prod-frontend || true &&
+      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest
+      "
+
+test-request-prod-backend-green:
+  stage: test-request-prod-backend-green
+  script:
+    - echo "Testing requests on Prod backend (Green)..."
+    - curl -f http://$GREEN_SERVER_IP:4000/health || (echo 'Prod backend (Green) health check failed!' && exit 1)
+
+test-request-prod-frontend-green:
+  stage: test-request-prod-frontend-green
+  script:
+    - echo "Testing requests on Prod frontend (Green)..."
+    - curl -f http://$GREEN_SERVER_IP:3000 || (echo 'Prod frontend (Green) health check failed!' && exit 1)
+
+deploy-prod-blue:
+  stage: deploy-prod-blue
+  script:
+    - echo "Deploying to Blue server..."
+    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest &&
+      docker stop prod-backend || true &&
+      docker rm prod-backend || true &&
+      docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
+      docker stop prod-frontend || true &&
+      docker rm prod-frontend || true &&
+      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest
+      "
+
+test-request-prod-backend-blue:
+  stage: test-request-prod-backend-blue
+  script:
+    - echo "Testing requests on Prod backend (Blue)..."
+    - curl -f http://$BLUE_SERVER_IP:4000/health || (echo 'Prod backend (Blue) health check failed!' && exit 1)
+
+test-request-prod-frontend-blue:
+  stage: test-request-prod-frontend-blue
+  script:
+    - echo "Testing requests on Prod frontend (Blue)..."
+    - curl -f http://$BLUE_SERVER_IP:3000 || (echo 'Prod frontend (Blue) health check failed!' && exit 1)
