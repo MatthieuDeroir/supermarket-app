@@ -1,81 +1,91 @@
+# dev.yml
+
 build-dev-backend:
   stage: build-dev-backend
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
-  before_script:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   script:
-    - echo "Building backend Docker image for Dev environment..."
+    - echo "Building backend for Dev environment..."
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest" -f ./backend/Dockerfile.dev ./backend
-    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
 
 build-dev-frontend:
   stage: build-dev-frontend
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
-  before_script:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   script:
-    - echo "Building frontend Docker image for Dev environment..."
+    - echo "Building frontend for Dev environment..."
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest" -f ./frontend/Dockerfile.dev ./frontend
-    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
 
-deploy-dev-backend:
-  stage: deploy-dev-backend
+test-auto-dev-backend:
+  stage: test-auto-dev-backend
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   dependencies:
     - build-dev-backend
+  script:
+    - echo "Running automated tests for Dev backend..."
+    - cd backend
+    - npm install
+    - npm test
+
+test-auto-dev-frontend:
+  stage: test-auto-dev-frontend
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
-  before_script:
-    - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan -H $LOAD_BALANCER_IP >> ~/.ssh/known_hosts
-  script:
-    - echo "Deploying backend Dev environment on Load Balancer..."
-    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest &&
-      docker stop dev-backend || true &&
-      docker rm dev-backend || true &&
-      docker run -d --name dev-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest
-      "
-
-deploy-dev-frontend:
-  stage: deploy-dev-frontend
   dependencies:
     - build-dev-frontend
+  script:
+    - echo "Running automated tests for Dev frontend..."
+    - cd frontend
+    - npm install
+    - npm test
+
+deploy-dev:
+  stage: deploy-dev
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
+  dependencies:
+    - test-auto-dev-backend
+    - test-auto-dev-frontend
   before_script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan -H $LOAD_BALANCER_IP >> ~/.ssh/known_hosts
+    - ssh-keyscan -H $DEV_SERVER_IP >> ~/.ssh/known_hosts
   script:
-    - echo "Deploying frontend Dev environment on Load Balancer..."
-    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "
+    - echo "Deploying Dev environment..."
+    # Push images
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
+    # Pull images on server
+    - ssh $DEPLOY_USER_DEV@$DEV_SERVER_IP "
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest &&
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest &&
+      docker stop dev-backend || true &&
+      docker rm dev-backend || true &&
+      docker run -d --name dev-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest &&
       docker stop dev-frontend || true &&
       docker rm dev-frontend || true &&
       docker run -d --name dev-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest
       "
 
-test-dev-backend:
-  stage: test-dev-backend
-  dependencies:
-    - deploy-dev-backend
+test-request-dev-backend:
+  stage: test-request-dev-backend
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
+  dependencies:
+    - deploy-dev
   script:
-    - echo "Testing backend Dev environment on Load Balancer..."
-    - curl -f http://$LOAD_BALANCER_IP:4000/health || (echo 'Backend health check failed!' && exit 1)
+    - echo "Testing requests on Dev backend..."
+    - curl -f http://$DEV_SERVER_IP:4000/health || (echo 'Dev backend health check failed!' && exit 1)
 
-test-dev-frontend:
-  stage: test-dev-frontend
-  dependencies:
-    - deploy-dev-frontend
+test-request-dev-frontend:
+  stage: test-request-dev-frontend
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
+  dependencies:
+    - deploy-dev
   script:
-    - echo "Testing frontend Dev environment on Load Balancer..."
-    - curl -f http://$LOAD_BALANCER_IP:3000 || (echo 'Frontend health check failed!' && exit 1)
+    - echo "Testing requests on Dev frontend..."
+    - curl -f http://$DEV_SERVER_IP:3000 || (echo 'Dev frontend health check failed!' && exit 1)
