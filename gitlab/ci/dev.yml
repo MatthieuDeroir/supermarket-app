@@ -1,5 +1,7 @@
 build-dev-backend:
   stage: build-dev-backend
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   before_script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   script:
@@ -9,6 +11,8 @@ build-dev-backend:
 
 build-dev-frontend:
   stage: build-dev-frontend
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   before_script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   script:
@@ -20,6 +24,8 @@ deploy-dev-backend:
   stage: deploy-dev-backend
   dependencies:
     - build-dev-backend
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   before_script:
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
@@ -38,6 +44,8 @@ deploy-dev-frontend:
   stage: deploy-dev-frontend
   dependencies:
     - build-dev-frontend
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   before_script:
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
@@ -56,6 +64,8 @@ test-dev-backend:
   stage: test-dev-backend
   dependencies:
     - deploy-dev-backend
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   script:
     - echo "Testing backend Dev environment on Load Balancer..."
     - curl -f http://$LOAD_BALANCER_IP:4000/health || (echo 'Backend health check failed!' && exit 1)
@@ -64,6 +74,8 @@ test-dev-frontend:
   stage: test-dev-frontend
   dependencies:
     - deploy-dev-frontend
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   script:
     - echo "Testing frontend Dev environment on Load Balancer..."
     - curl -f http://$LOAD_BALANCER_IP:3000 || (echo 'Frontend health check failed!' && exit 1)
