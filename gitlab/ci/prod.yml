@@ -1,5 +1,4 @@
 # prod.yml
-
 stages:
   - build-prod-backend
   - build-prod-frontend

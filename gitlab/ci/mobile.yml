@@ -1,5 +1,3 @@
-# mobile.yml
-
 stages:
   - build-mobile
   - test-auto-mobile
