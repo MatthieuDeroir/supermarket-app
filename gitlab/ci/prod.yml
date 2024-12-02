@@ -11,6 +11,9 @@ stages:
   - deploy-prod-blue
   - test-request-prod-backend-blue
   - test-request-prod-frontend-blue
+  - release
+  - release-mobile
+  - rollback
 
 variables:
   DOCKER_TLS_CERTDIR: ""  # Disable Docker-in-Docker TLS if not needed
@@ -52,13 +55,13 @@ deploy-prod-green:
     - echo "Deploying to Green server..."
     - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest &&
+      docker pull $DOCKER_NAMESPACE/$DOCKER_repositoy-frontend:latest &&
       docker stop prod-backend || true &&
       docker rm prod-backend || true &&
       docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
       docker stop prod-frontend || true &&
       docker rm prod-frontend || true &&
-      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest
+      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_repositoy-frontend:latest
       "
 
 test-request-prod-backend-green:
@@ -79,13 +82,13 @@ deploy-prod-blue:
     - echo "Deploying to Blue server..."
     - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest &&
+      docker pull $DOCKER_NAMESPACE/$DOCKER_repositoy-frontend:latest &&
       docker stop prod-backend || true &&
       docker rm prod-backend || true &&
       docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
       docker stop prod-frontend || true &&
       docker rm prod-frontend || true &&
-      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest
+      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_repositoy-frontend:latest
       "
 
 test-request-prod-backend-blue:
@@ -99,3 +102,66 @@ test-request-prod-frontend-blue:
   script:
     - echo "Testing requests on Prod frontend (Blue)..."
     - curl -f http://$BLUE_SERVER_IP:3000 || (echo 'Prod frontend (Blue) health check failed!' && exit 1)
+
+release:
+  stage: release
+  dependencies:
+    - test-request-prod-backend-blue
+    - test-request-prod-frontend-blue
+  script:
+    - echo "Creating GitLab release..."
+    - export RELEASE_TAG=$(date +%Y.%m.%d.%H%M%S)
+    - git tag "$RELEASE_TAG"
+    - git push origin "$RELEASE_TAG"
+    - |
+      curl --request POST \
+           --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" \
+           --data "name=Release $RELEASE_TAG&tag_name=$RELEASE_TAG&description=Automated release $RELEASE_TAG" \
+           "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases"
+
+release-mobile:
+  stage: release-mobile
+  dependencies:
+    - test-auto-mobile
+  before_script:
+    - apt-get update && apt-get install -y jq
+  script: |
+    echo "Packaging and pushing APK to GitLab..."
+    cd mobile/android/app/build/outputs/apk/release/
+    cp app-release.apk "$CI_PROJECT_DIR"
+    cd "$CI_PROJECT_DIR"
+    curl --request POST \
+         --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" \
+         --form "file=@app-release.apk" \
+         "$CI_API_V4_URL/projects/$CI_PROJECT_ID/uploads" > upload_response.json
+    FILE_URL=$(jq -r '.url' upload_response.json)
+    echo "APK uploaded to GitLab: $FILE_URL"
+
+rollback:
+  stage: rollback
+  when: on_failure
+  dependencies:
+    - deploy-prod-blue
+  script:
+    - echo "Rolling back Green and Blue environments to previous DockerHub tag..."
+    - PREVIOUS_TAG=$(git describe --tags $(git rev-list --tags --skip=1 --max-count=1))
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG &&
+      docker stop prod-backend || true &&
+      docker rm prod-backend || true &&
+      docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
+      docker stop prod-frontend || true &&
+      docker rm prod-frontend || true &&
+      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG
+      "
+    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG &&
+      docker stop prod-backend || true &&
+      docker rm prod-backend || true &&
+      docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
+      docker stop prod-frontend || true &&
+      docker rm prod-frontend || true &&
+      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG
+      "

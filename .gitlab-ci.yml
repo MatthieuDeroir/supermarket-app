@@ -1,3 +1,5 @@
+# .gitlab-ci.yml
+
 stages:
   - trigger-pipelines
   - build-mobile
@@ -20,6 +22,3 @@ trigger-prod-pipeline:
 
 include:
   - '/gitlab/ci/mobile.yml'
-  - '/gitlab/ci/release.yml'
-  - '/gitlab/ci/release-mobile.yml'
-  - '/gitlab/ci/rollback.yml'

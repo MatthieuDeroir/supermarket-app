@@ -1,5 +1,9 @@
 # mobile.yml
 
+stages:
+  - build-mobile
+  - test-auto-mobile
+
 build-mobile:
   stage: build-mobile
   script:
