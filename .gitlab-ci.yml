@@ -1,21 +1,42 @@
-# .gitlab-ci.yml
-
 stages:
-  - trigger-pipelines
-  - build-mobile
-  - test-auto-mobile
+  - trigger-dev
+  - trigger-prod-mobile
+  - release
+  - rollback
 
-trigger-dev-pipeline:
-  stage: trigger-pipelines
+trigger-dev:
+  stage: trigger-dev
+  script:
+    - echo "Triggering Dev pipeline..."
   trigger:
-    include: '/gitlab/ci/dev.yml'
+    include:
+      - local: '/gitlab/ci/dev.yml'
     strategy: depend
 
-trigger-prod-pipeline:
-  stage: trigger-pipelines
+trigger-prod-mobile:
+  stage: trigger-prod-mobile
+  script:
+    - echo "Triggering Prod and Mobile pipelines..."
   trigger:
-    include: '/gitlab/ci/prod.yml'
+    include:
+      - local: '/gitlab/ci/prod.yml'
+      - local: '/gitlab/ci/mobile.yml'
     strategy: depend
 
-include:
-  - '/gitlab/ci/mobile.yml'
+trigger-release:
+  stage: release
+  script:
+    - echo "Triggering Release pipeline..."
+  trigger:
+    include:
+      - local: '/gitlab/ci/release.yml'
+    strategy: depend
+
+trigger-rollback:
+  stage: rollback
+  script:
+    - echo "Triggering Rollback pipeline..."
+  trigger:
+    include:
+      - local: '/gitlab/ci/rollback.yml'
+    strategy: depend

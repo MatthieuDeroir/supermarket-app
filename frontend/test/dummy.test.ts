@@ -1,4 +1,4 @@
-// dummy test file to make jest happy
+// ./frontend/test/dummy.test.ts
 test('dummy test', () => {
   expect(true).toBe(true);
 });
