@@ -14,32 +14,32 @@ build-dev-backend:
   stage: build-dev-backend
   script:
     - echo "Building backend for Dev environment..."
-    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest" -f ./backend/Dockerfile.dev ./backend
+    - docker build -t backend-dev -f ./backend/Dockerfile.dev ./backend
 
 build-dev-frontend:
   stage: build-dev-frontend
   script:
     - echo "Building frontend for Dev environment..."
-    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest" -f ./frontend/Dockerfile.dev ./frontend
+    - docker build -t frontend-dev -f ./frontend/Dockerfile.dev ./frontend
 
 test-backend:
   stage: test-backend
   script:
     - echo "Running backend tests during Dev pipeline..."
-    - docker build --target tester -t backend-tester -f ./backend/Dockerfile.dev ./backend
-    - docker run --rm backend-tester
+    - docker run --rm backend-dev deno test --allow-net --allow-read --allow-env
 
 test-frontend:
   stage: test-frontend
   script:
     - echo "Running frontend tests during Dev pipeline..."
-    - docker build --target tester -t frontend-tester -f ./frontend/Dockerfile.dev ./frontend
-    - docker run --rm frontend-tester
+    - docker run --rm frontend-dev npm run test
 
 deploy-dev:
   stage: deploy-dev
   script:
     - echo "Deploying Dev environment..."
+    - docker tag backend-dev "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
+    - docker tag frontend-dev "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
     - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "
