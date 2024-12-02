@@ -4,9 +4,6 @@ stages:
   - trigger-pipelines
   - build-mobile
   - test-auto-mobile
-  - release
-  - release-mobile
-  - rollback
 
 trigger-dev-pipeline:
   stage: trigger-pipelines
