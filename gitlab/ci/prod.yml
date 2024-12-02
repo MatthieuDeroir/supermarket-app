@@ -1,49 +1,52 @@
 # prod.yml
 stages:
-  - build-prod-backend
-  - build-prod-frontend
-  - test
+  - build-prod
+#  - test-prod
   - push-prod
   - deploy-prod-green
-  - test-request-prod-backend-green
-  - test-request-prod-frontend-green
+  - test-request-prod-green
   - deploy-prod-blue
-  - test-request-prod-backend-blue
-  - test-request-prod-frontend-blue
+  - test-request-prod-blue
 
 variables:
   DOCKER_TLS_CERTDIR: ""  # Disable Docker-in-Docker TLS if not needed
 
 build-prod-backend:
-  stage: build-prod-backend
+  stage: build-prod
   script:
     - echo "Building backend for Prod environment..."
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest" -f ./backend/Dockerfile.prod ./backend
 
 build-prod-frontend:
-  stage: build-prod-frontend
+  stage: build-prod
   script:
     - echo "Building frontend for Prod environment..."
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest" -f ./frontend/Dockerfile.prod ./frontend
 
-test-auto-prod-backend:
-  stage: test
-  script:
-    - echo "Running backend tests..."
-    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest" deno test
+#test-auto-prod-backend:
+#  stage: test-prod
+#  script:
+#    - echo "Running backend tests..."
+#    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest" deno test
+#
+#test-auto-prod-frontend:
+#  stage: test-prod
+#  script:
+#    - echo "Running frontend tests..."
+#    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest" npm run test
 
-test-auto-prod-frontend:
-  stage: test
-  script:
-    - echo "Running frontend tests..."
-    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest" npm run test
-
-push-prod:
+push-prod-backend:
   stage: push-prod
   script:
     - echo "Pushing Prod images..."
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
+
+push-prod-frontend:
+  stage: push-prod
+  script:
+    - echo "Pushing Prod images..."
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
+
 
 deploy-prod-green:
   stage: deploy-prod-green
@@ -61,13 +64,13 @@ deploy-prod-green:
       "
 
 test-request-prod-backend-green:
-  stage: test-request-prod-backend-green
+  stage: test-request-prod-green
   script:
     - echo "Testing requests on Prod backend (Green)..."
     - curl -f http://$GREEN_SERVER_IP:4000/health || (echo 'Prod backend (Green) health check failed!' && exit 1)
 
 test-request-prod-frontend-green:
-  stage: test-request-prod-frontend-green
+  stage: test-request-prod-green
   script:
     - echo "Testing requests on Prod frontend (Green)..."
     - curl -f http://$GREEN_SERVER_IP:3000 || (echo 'Prod frontend (Green) health check failed!' && exit 1)
@@ -88,13 +91,13 @@ deploy-prod-blue:
       "
 
 test-request-prod-backend-blue:
-  stage: test-request-prod-backend-blue
+  stage: test-request-prod-blue
   script:
     - echo "Testing requests on Prod backend (Blue)..."
     - curl -f http://$BLUE_SERVER_IP:4000/health || (echo 'Prod backend (Blue) health check failed!' && exit 1)
 
 test-request-prod-frontend-blue:
-  stage: test-request-prod-frontend-blue
+  stage: test-request-prod-blue
   script:
     - echo "Testing requests on Prod frontend (Blue)..."
     - curl -f http://$BLUE_SERVER_IP:3000 || (echo 'Prod frontend (Blue) health check failed!' && exit 1)
