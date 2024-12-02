@@ -14,13 +14,13 @@ build-dev-frontend:
 
 test-auto-dev-backend:
   stage: test-auto-dev-backend
+  image: denoland/deno:latest
   dependencies:
     - build-dev-backend
   script:
-    - echo "Running automated tests for Dev backend..."
+    - echo "Running automated tests for Dev backend (Deno)..."
     - cd backend
-    - npm install
-    - npm test
+    - deno test --allow-net
 
 test-auto-dev-frontend:
   stage: test-auto-dev-frontend
