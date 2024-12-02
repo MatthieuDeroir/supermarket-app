@@ -1,66 +1,71 @@
 stages:
-  - build-dev-backend
-  - build-dev-frontend
-  - test-backend
-  - test-frontend
+  - build-dev
+  - test-dev
   - deploy-dev
-  - test-request-dev-backend
-  - test-request-dev-frontend
+  - test-request-dev
 
 variables:
   DOCKER_TLS_CERTDIR: ""  # Disable Docker-in-Docker TLS if not needed
 
 build-dev-backend:
-  stage: build-dev-backend
+  stage: build-dev
   script:
     - echo "Building backend for Dev environment..."
     - docker build -t backend-dev -f ./backend/Dockerfile.dev ./backend
 
 build-dev-frontend:
-  stage: build-dev-frontend
+  stage: build-dev
   script:
     - echo "Building frontend for Dev environment..."
     - docker build -t frontend-dev -f ./frontend/Dockerfile.dev ./frontend
 
 test-backend:
-  stage: test-backend
+  stage: test-dev
   script:
     - echo "Running backend tests during Dev pipeline..."
     - docker run --rm backend-dev deno test --allow-net --allow-read --allow-env
 
 test-frontend:
-  stage: test-frontend
+  stage: test-dev
   script:
     - echo "Running frontend tests during Dev pipeline..."
     - docker run --rm frontend-dev npm run test
 
-deploy-dev:
+deploy-dev-backend:
   stage: deploy-dev
   script:
     - echo "Deploying Dev environment..."
     - docker tag backend-dev "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
-    - docker tag frontend-dev "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
-    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
     - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest &&
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest &&
       docker stop dev-backend || true &&
       docker rm dev-backend || true &&
       docker run -d --name dev-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest &&
+      "
+
+
+deploy-dev-frontend:
+  stage: deploy-dev
+  script:
+    - echo "Deploying Dev environment..."
+    - docker tag frontend-dev "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
+    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest &&
       docker stop dev-frontend || true &&
       docker rm dev-frontend || true &&
       docker run -d --name dev-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest
       "
 
 test-request-dev-backend:
-  stage: test-request-dev-backend
+  stage: test-request-dev
   script:
     - echo "Testing requests on Dev backend..."
     - curl -f http://$LOAD_BALANCER_IP:4000/health || (echo 'Dev backend health check failed!' && exit 1)
 
 test-request-dev-frontend:
-  stage: test-request-dev-frontend
+  stage: test-request-dev
   script:
     - echo "Testing requests on Dev frontend..."
     - curl -f http://$LOAD_BALANCER_IP:3000 || (echo 'Dev frontend health check failed!' && exit 1)
