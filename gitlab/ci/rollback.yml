@@ -1,29 +1,30 @@
+# rollback.yml
+
 rollback:
   stage: rollback
+  when: on_failure
   dependencies:
-    - deploy-prod-backend
-    - deploy-prod-frontend
+    - deploy-prod-blue
   script:
-    - echo "Rolling back environments due to failure..."
+    - echo "Rolling back Green and Blue environments to previous DockerHub tag..."
     - PREVIOUS_TAG=$(git describe --tags $(git rev-list --tags --skip=1 --max-count=1))
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG &&
+      docker stop prod-backend || true &&
+      docker rm prod-backend || true &&
+      docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
+      docker stop prod-frontend || true &&
+      docker rm prod-frontend || true &&
+      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG
+      "
     - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG &&
       docker stop prod-backend || true &&
-      docker stop prod-frontend || true &&
       docker rm prod-backend || true &&
-      docker rm prod-frontend || true &&
       docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
-      docker run -d --name prod-frontend -p 80:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG
+      docker stop prod-frontend || true &&
+      docker rm prod-frontend || true &&
+      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG
       "
-    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG &&
-      docker stop dev-backend || true &&
-      docker stop dev-frontend || true &&
-      docker rm dev-backend || true &&
-      docker rm dev-frontend || true &&
-      docker run -d --name dev-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
-      docker run -d --name dev-frontend -p 80:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG
-      "
-  when: on_failure

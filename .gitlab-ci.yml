@@ -1,19 +1,32 @@
 stages:
   - build-dev-backend
   - build-dev-frontend
-  - deploy-dev-backend
-  - deploy-dev-frontend
-  - test-dev-backend
-  - test-dev-frontend
+  - test-auto-dev-backend
+  - test-auto-dev-frontend
+  - deploy-dev
+  - test-request-dev-backend
+  - test-request-dev-frontend
   - build-prod-backend
   - build-prod-frontend
-  - deploy-prod-backend
-  - deploy-prod-frontend
-  - test-prod-backend
-  - test-prod-frontend
+  - test-auto-prod-backend
+  - test-auto-prod-frontend
+  - push-prod
+  - deploy-prod-green
+  - test-request-prod-backend-green
+  - test-request-prod-frontend-green
+  - deploy-prod-blue
+  - test-request-prod-backend-blue
+  - test-request-prod-frontend-blue
+  - build-mobile
+  - test-auto-mobile
+  - release
+  - release-mobile
   - rollback
 
 include:
   - '/gitlab/ci/dev.yml'
   - '/gitlab/ci/prod.yml'
+  - '/gitlab/ci/mobile.yml'
+  - '/gitlab/ci/release.yml'
+  - '/gitlab/ci/release-mobile.yml'
   - '/gitlab/ci/rollback.yml'

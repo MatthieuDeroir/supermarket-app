@@ -1,53 +1,122 @@
+# prod.yml
+
 build-prod-backend:
   stage: build-prod-backend
-  before_script:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   script:
-    - echo "Building backend Docker image for Prod environment..."
+    - echo "Building backend for Prod environment..."
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest" -f ./backend/Dockerfile.prod ./backend
-    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
 
 build-prod-frontend:
   stage: build-prod-frontend
+  script:
+    - echo "Building frontend for Prod environment..."
+    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest" -f ./frontend/Dockerfile.prod ./frontend
+
+test-auto-prod-backend:
+  stage: test-auto-prod-backend
+  dependencies:
+    - build-prod-backend
+  script:
+    - echo "Running automated tests for Prod backend..."
+    - cd backend
+    - npm install
+    - npm test
+
+test-auto-prod-frontend:
+  stage: test-auto-prod-frontend
+  dependencies:
+    - build-prod-frontend
+  script:
+    - echo "Running automated tests for Prod frontend..."
+    - cd frontend
+    - npm install
+    - npm test
+
+push-prod:
+  stage: push-prod
+  dependencies:
+    - test-auto-prod-backend
+    - test-auto-prod-frontend
   before_script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   script:
-    - echo "Building frontend Docker image for Prod environment..."
-    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest" -f ./frontend/Dockerfile.prod ./frontend
+    - echo "Pushing Prod images..."
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
 
-deploy-prod-backend:
-  stage: deploy-prod-backend
+deploy-prod-green:
+  stage: deploy-prod-green
   dependencies:
-    - build-prod-backend
+    - push-prod
   before_script:
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan -H $BLUE_SERVER_IP >> ~/.ssh/known_hosts
+    - ssh-keyscan -H $GREEN_SERVER_IP >> ~/.ssh/known_hosts
   script:
-    - echo "Deploying backend Prod environment..."
-    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "
+    - echo "Deploying to Green server..."
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest &&
       docker stop prod-backend || true &&
       docker rm prod-backend || true &&
-      docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest
-      "
-
-deploy-prod-frontend:
-  stage: deploy-prod-frontend
-  dependencies:
-    - build-prod-frontend
-  before_script:
-    - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan -H $BLUE_SERVER_IP >> ~/.ssh/known_hosts
-  script:
-    - echo "Deploying frontend Prod environment..."
-    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest &&
+      docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
       docker stop prod-frontend || true &&
       docker rm prod-frontend || true &&
       docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest
       "
+
+test-request-prod-backend-green:
+  stage: test-request-prod-backend-green
+  dependencies:
+    - deploy-prod-green
+  script:
+    - echo "Testing requests on Prod backend (Green)..."
+    - curl -f http://$GREEN_SERVER_IP:4000/health || (echo 'Prod backend (Green) health check failed!' && exit 1)
+
+test-request-prod-frontend-green:
+  stage: test-request-prod-frontend-green
+  dependencies:
+    - deploy-prod-green
+  script:
+    - echo "Testing requests on Prod frontend (Green)..."
+    - curl -f http://$GREEN_SERVER_IP:3000 || (echo 'Prod frontend (Green) health check failed!' && exit 1)
+
+deploy-prod-blue:
+  stage: deploy-prod-blue
+  dependencies:
+    - test-request-prod-backend-green
+    - test-request-prod-frontend-green
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H $BLUE_SERVER_IP >> ~/.ssh/known_hosts
+  script:
+    - echo "Deploying to Blue server..."
+    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest &&
+      docker stop prod-backend || true &&
+      docker rm prod-backend || true &&
+      docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
+      docker stop prod-frontend || true &&
+      docker rm prod-frontend || true &&
+      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest
+      "
+
+test-request-prod-backend-blue:
+  stage: test-request-prod-backend-blue
+  dependencies:
+    - deploy-prod-blue
+  script:
+    - echo "Testing requests on Prod backend (Blue)..."
+    - curl -f http://$BLUE_SERVER_IP:4000/health || (echo 'Prod backend (Blue) health check failed!' && exit 1)
+
+test-request-prod-frontend-blue:
+  stage: test-request-prod-frontend-blue
+  dependencies:
+    - deploy-prod-blue
+  script:
+    - echo "Testing requests on Prod frontend (Blue)..."
+    - curl -f http://$BLUE_SERVER_IP:3000 || (echo 'Prod frontend (Blue) health check failed!' && exit 1)

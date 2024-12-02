@@ -1,0 +1,19 @@
+# mobile.yml
+
+build-mobile:
+  stage: build-mobile
+  script:
+    - echo "Building mobile application (React Native)..."
+    - cd mobile
+    - npm install
+    - npm run android-release
+
+test-auto-mobile:
+  stage: test-auto-mobile
+  dependencies:
+    - build-mobile
+  script:
+    - echo "Running automated tests for mobile..."
+    - cd mobile
+    - npm install
+    - npm test

@@ -1,0 +1,15 @@
+# release-mobile.yml
+
+release-mobile:
+  stage: release-mobile
+  dependencies:
+    - test-auto-mobile
+  script:
+    - echo "Packaging and pushing APK to GitLab..."
+    - cd mobile/android/app/build/outputs/apk/release/
+    - cp app-release.apk $CI_PROJECT_DIR
+    - cd $CI_PROJECT_DIR
+    - curl --request POST --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" --form "file=@app-release.apk" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/uploads" > upload_response.json
+    - FILE_URL=$(cat upload_response.json | jq -r '.url')
+    - echo "APK uploaded to GitLab: $FILE_URL"
+

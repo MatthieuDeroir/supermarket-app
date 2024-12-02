@@ -2,24 +2,18 @@
 
 build-dev-backend:
   stage: build-dev-backend
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   script:
     - echo "Building backend for Dev environment..."
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest" -f ./backend/Dockerfile.dev ./backend
 
 build-dev-frontend:
   stage: build-dev-frontend
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   script:
     - echo "Building frontend for Dev environment..."
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest" -f ./frontend/Dockerfile.dev ./frontend
 
 test-auto-dev-backend:
   stage: test-auto-dev-backend
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   dependencies:
     - build-dev-backend
   script:
@@ -30,8 +24,6 @@ test-auto-dev-backend:
 
 test-auto-dev-frontend:
   stage: test-auto-dev-frontend
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   dependencies:
     - build-dev-frontend
   script:
@@ -42,8 +34,6 @@ test-auto-dev-frontend:
 
 deploy-dev:
   stage: deploy-dev
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   dependencies:
     - test-auto-dev-backend
     - test-auto-dev-frontend
@@ -52,14 +42,14 @@ deploy-dev:
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan -H $DEV_SERVER_IP >> ~/.ssh/known_hosts
+    - ssh-keyscan -H $LOAD_BALANCER_IP >> ~/.ssh/known_hosts
   script:
     - echo "Deploying Dev environment..."
     # Push images
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
     # Pull images on server
-    - ssh $DEPLOY_USER_DEV@$DEV_SERVER_IP "
+    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest &&
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest &&
       docker stop dev-backend || true &&
@@ -72,20 +62,16 @@ deploy-dev:
 
 test-request-dev-backend:
   stage: test-request-dev-backend
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   dependencies:
     - deploy-dev
   script:
     - echo "Testing requests on Dev backend..."
-    - curl -f http://$DEV_SERVER_IP:4000/health || (echo 'Dev backend health check failed!' && exit 1)
+    - curl -f http://$LOAD_BALANCER_IP:4000/health || (echo 'Dev backend health check failed!' && exit 1)
 
 test-request-dev-frontend:
   stage: test-request-dev-frontend
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
   dependencies:
     - deploy-dev
   script:
     - echo "Testing requests on Dev frontend..."
-    - curl -f http://$DEV_SERVER_IP:3000 || (echo 'Dev frontend health check failed!' && exit 1)
+    - curl -f http://$LOAD_BALANCER_IP:3000 || (echo 'Dev frontend health check failed!' && exit 1)
