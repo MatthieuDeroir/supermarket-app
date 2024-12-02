@@ -34,15 +34,16 @@ test-frontend:
 deploy-dev-backend:
   stage: deploy-dev
   script:
-    - echo "Deploying Dev environment..."
+    - echo "Deploying backend for Dev environment..."
     - docker tag backend-dev "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
     - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "
       docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest &&
       docker stop dev-backend || true &&
       docker rm dev-backend || true &&
-      docker run -d --name dev-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest &&
+      docker run -d --name dev-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest
       "
+
 
 
 deploy-dev-frontend:
