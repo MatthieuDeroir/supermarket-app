@@ -22,7 +22,6 @@ trigger-release:
   stage: release
   trigger:
     include:
-        - local: '/gitlab/ci/mobile.yml'
         - local: '/gitlab/ci/release.yml'
     strategy: depend
 
