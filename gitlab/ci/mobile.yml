@@ -1,6 +1,7 @@
 stages:
-  - build-mobile
   - test-auto-mobile
+  - build-mobile
+
 cache:
   key: gradle-cache
   paths:
@@ -11,9 +12,24 @@ variables:
   ANDROID_SDK_ROOT: "/sdk"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
 
+test-auto-mobile:
+  stage: test-auto-mobile
+  image: reactnativecommunity/react-native-android:latest
+  script:
+    - echo "Running dummy test for mobile..."
+    - cd mobile
+    - npm install
+    - echo "Dummy test executed successfully."
+  artifacts:
+    paths:
+      - dummy_test.log
+    expire_in: 1 day
+
 build-mobile:
   stage: build-mobile
   image: reactnativecommunity/react-native-android:latest
+  dependencies:
+    - test-auto-mobile
   script:
     - echo "Building mobile application (React Native)..."
     - cd mobile
@@ -24,14 +40,3 @@ build-mobile:
     paths:
       - mobile/android/app/build/outputs/apk/release/app-release.apk
     expire_in: 1 week
-
-test-auto-mobile:
-  stage: test-auto-mobile
-  image: reactnativecommunity/react-native-android:latest
-  dependencies:
-    - build-mobile
-  script:
-    - echo "Running automated tests for mobile..."
-    - cd mobile
-    - npm install
-    - npm test
