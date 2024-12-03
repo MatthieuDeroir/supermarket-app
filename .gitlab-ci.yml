@@ -27,6 +27,7 @@ trigger-release:
 
 trigger-rollback:
   stage: rollback
+  when: on_failure
   trigger:
     include:
       - local: '/gitlab/ci/rollback.yml'
