@@ -23,6 +23,7 @@ release:
   image: alpine:latest
   dependencies:
     - publish
+
   script:
     - apk add --no-cache curl jq
     - echo "Installing GitLab release CLI..."
