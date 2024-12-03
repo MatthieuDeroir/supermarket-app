@@ -11,6 +11,9 @@ before_script:
 variables:
   DOCKER_TLS_CERTDIR: ""  # Disable Docker-in-Docker TLS if not needed
 
+services:
+  - docker:20-dind
+
 build-dev-backend:
   stage: build-dev
   tags:
@@ -65,8 +68,10 @@ validate-backend-dev:
   stage: validate-dev
   tags:
     - dev
-  image: curlimages/curl:latest
+  image: docker:20.10.16-dind
   script:
+    - echo "Installing curl..."
+    - apk add --no-cache curl
     - echo "Testing requests on Dev backend..."
     - curl -f http://$LOAD_BALANCER_IP:4000/health || (echo 'Dev backend health check failed!' && exit 1)
 
@@ -74,7 +79,9 @@ validate-frontend-dev:
   stage: validate-dev
   tags:
     - dev
-  image: curlimages/curl:latest
+  image: docker:20.10.16-dind
   script:
+    - echo "Installing curl..."
+    - apk add --no-cache curl
     - echo "Testing requests on Dev frontend..."
     - curl -f http://$LOAD_BALANCER_IP:3000 || (echo 'Dev frontend health check failed!' && exit 1)
