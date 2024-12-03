@@ -7,11 +7,7 @@ stages:
 trigger-dev:
   stage: dev
   rules:
-    - if: '$CI_COMMIT_BRANCH == "dev"'
-      when: always
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: always
-    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_TAG'
       when: always
   trigger:
     include:
@@ -21,9 +17,7 @@ trigger-dev:
 trigger-prod:
   stage: prod
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: always
-    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH == "main"  || $CI_COMMIT_TAG'
       when: always
   trigger:
     include:
