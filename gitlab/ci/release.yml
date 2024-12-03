@@ -18,7 +18,6 @@ publish:reactnative:tag:
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+$/'
       when: always
-
 release_mobile_app:
   stage: release
   image: alpine:latest
@@ -30,19 +29,20 @@ release_mobile_app:
     - curl --location --output /usr/local/bin/release-cli "https://gitlab.com/api/v4/projects/gitlab-org%2Frelease-cli/packages/generic/release-cli/latest/release-cli-linux-amd64"
     - chmod +x /usr/local/bin/release-cli
     - echo "Uploading APK to GitLab..."
-    - curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-        --upload-file app-release.apk \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/reactnative/${CI_COMMIT_TAG}/app-release.apk" \
-        > upload_response.json
+    - |
+      curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+           --upload-file app-release.apk \
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/reactnative/${CI_COMMIT_TAG}/app-release.apk" \
+           > upload_response.json
     - FILE_URL=$(jq -r '.url' upload_response.json)
-    - if [ -z "$FILE_URL" ]; then echo "Error: Failed to upload APK." && exit 1; fi
-    - echo "APK uploaded successfully: $FILE_URL"
+    - '[ -z "$FILE_URL" ] && echo "Error: Failed to upload APK." && exit 1 || echo "APK uploaded successfully: $FILE_URL"'
     - echo "Creating GitLab release..."
-    - release-cli create \
-      --name "Release ${CI_COMMIT_TAG}" \
-      --tag-name "${CI_COMMIT_TAG}" \
-      --ref "${CI_COMMIT_SHA}" \
-      --assets-link '{"name":"Release APK", "url":"'${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/reactnative/${CI_COMMIT_TAG}/app-release.apk'", "link_type":"other"}'
+    - |
+      release-cli create \
+        --name "Release ${CI_COMMIT_TAG}" \
+        --tag-name "${CI_COMMIT_TAG}" \
+        --ref "${CI_COMMIT_SHA}" \
+        --assets-link '{"name":"Release APK", "url":"'${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/reactnative/${CI_COMMIT_TAG}/app-release.apk'", "link_type":"other"}'
     - echo "GitLab release created successfully!"
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+$/'
