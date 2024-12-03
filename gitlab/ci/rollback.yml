@@ -3,9 +3,10 @@ rollback-green:
   when: on_failure
   script:
     - echo "Rolling back Green environment to previous version..."
-    - PREVIOUS_TAG=$(docker image ls --filter=before="$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:green" --format "{{.Tag}}" | head -n 1)
-    - if [ -z "$PREVIOUS_TAG" ]; then echo "No previous tag found for rollback!"; exit 1; fi
-    - echo "Rolling back to previous tag: $PREVIOUS_TAG"
+    - >
+      PREVIOUS_TAG=$(docker image ls --filter=before="$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:green" --format "{{.Tag}}" | head -n 1) &&
+      if [ -z "$PREVIOUS_TAG" ]; then echo "No previous tag found for rollback!"; exit 1; fi &&
+      echo "Rolling back to previous tag: $PREVIOUS_TAG"
     - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:green"
     - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:green"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:green"
@@ -16,9 +17,10 @@ rollback-blue:
   when: on_failure
   script:
     - echo "Rolling back Blue environment to previous version..."
-    - PREVIOUS_TAG=$(docker image ls --filter=before="$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:blue" --format "{{.Tag}}" | head -n 1)
-    - if [ -z "$PREVIOUS_TAG" ]; then echo "No previous tag found for rollback!"; exit 1; fi
-    - echo "Rolling back to previous tag: $PREVIOUS_TAG"
+    - >
+      PREVIOUS_TAG=$(docker image ls --filter=before="$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:blue" --format "{{.Tag}}" | head -n 1) &&
+      if [ -z "$PREVIOUS_TAG" ]; then echo "No previous tag found for rollback!"; exit 1; fi &&
+      echo "Rolling back to previous tag: $PREVIOUS_TAG"
     - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:blue"
     - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:blue"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:blue"
