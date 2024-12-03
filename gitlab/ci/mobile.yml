@@ -1,26 +1,22 @@
 stages:
   - build-mobile
   - test-auto-mobile
+cache:
+  key: gradle-cache
+  paths:
+    - .gradle/
+    - mobile/android/.gradle/
 
 variables:
   ANDROID_SDK_ROOT: "/sdk"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
-  GRADLE_OPTS: "-Xmx2g -XX:MaxMetaspaceSize=512m"
-  DOCKER_TLS_CERTDIR: ""
-  DOCKER_HOST: "tcp://docker:2375"
-  DOCKER_DRIVER: overlay2
-
-services:
-  - docker:20-dind
-
-image: docker:20-dind
 
 build-mobile:
   stage: build-mobile
+  image: reactnativecommunity/react-native-android:latest
   script:
     - echo "Building mobile application (React Native)..."
     - cd mobile
-    - apk add --no-cache bash git curl openjdk11 npm  # Install required tools
     - npm install
     - npm run android-release
     - echo "APK built successfully."
@@ -31,11 +27,11 @@ build-mobile:
 
 test-auto-mobile:
   stage: test-auto-mobile
+  image: reactnativecommunity/react-native-android:latest
   dependencies:
     - build-mobile
   script:
     - echo "Running automated tests for mobile..."
     - cd mobile
-    - apk add --no-cache bash git curl openjdk11 npm  # Install required tools
     - npm install
     - npm test
