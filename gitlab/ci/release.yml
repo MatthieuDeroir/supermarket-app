@@ -83,6 +83,7 @@ release:
         release-cli create \
         --name "Release ${TAG_NAME}" \
         --tag-name "${TAG_NAME}" \
-        --ref "${CI_COMMIT_SHA}";
+        --ref "${CI_COMMIT_SHA}" \
+        --assets-link '{"name":"Release APK", "url":"'${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/trinity/${VERSION_TAG}/app-release.apk'", "link_type":"other"}';
     - echo "GitLab release created successfully!"
 
