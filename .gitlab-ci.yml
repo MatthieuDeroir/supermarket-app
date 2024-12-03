@@ -19,18 +19,12 @@ trigger-prod:
       - local: '/gitlab/ci/prod.yml'
     strategy: depend
 
-trigger-mobile:
-  stage: mobile
-  trigger:
-    include:
-      - local: '/gitlab/ci/mobile.yml'
-    strategy: depend
-
 trigger-release:
   stage: release
   trigger:
     include:
-      - local: '/gitlab/ci/release.yml'
+        - local: '/gitlab/ci/mobile.yml'
+        - local: '/gitlab/ci/release.yml'
     strategy: depend
 
 trigger-rollback:
