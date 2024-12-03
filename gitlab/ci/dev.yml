@@ -9,11 +9,6 @@ stages:
 variables:
   DOCKER_TLS_CERTDIR: ""  # Disable Docker-in-Docker TLS if not needed
 
-before_script:
-  - echo "Logging in to Docker..."
-  - echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
-
-
 build-dev-backend:
   stage: build-dev
   tags:
@@ -62,6 +57,10 @@ test-frontend:
 #      "
 deploy-dev-backend:
   stage: deploy-dev
+  before_script:
+    - echo "Logging in to Docker..."
+    - echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
   tags:
     - dev
   script:
