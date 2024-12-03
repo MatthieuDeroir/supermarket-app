@@ -5,10 +5,10 @@ stages:
 variables:
   ANDROID_SDK_ROOT: "/sdk"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+  GRADLE_OPTS: "-Xmx2g -XX:MaxMetaspaceSize=512m"
 
 build-mobile:
   stage: build-mobile
-  image: reactnativecommunity/react-native-android
   script:
     - echo "Building mobile application (React Native)..."
     - cd mobile

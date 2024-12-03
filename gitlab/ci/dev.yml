@@ -57,6 +57,9 @@ test-frontend:
 #      "
 deploy-dev-backend:
   stage: deploy-dev
+  before-script:
+    - echo "Logging into GitLab Container Registry..."
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   tags:
     - dev
   script:
