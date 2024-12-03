@@ -105,4 +105,4 @@ validate-frontend-dev:
     - dev
   script:
     - echo "Testing requests on Dev frontend..."
-    - curl -f http://$LOAD_BALANCER_IP:3000/home || (echo 'Dev frontend health check failed!' && exit 1)
+    - curl -f http://$LOAD_BALANCER_IP:3000 || (echo 'Dev frontend health check failed!' && exit 1)

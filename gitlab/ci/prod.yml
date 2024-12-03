@@ -61,4 +61,4 @@ validate-frontend-blue:
   stage: validate-blue
   script:
     - echo "Validating Blue frontend..."
-    - curl -f http://$BLUE_SERVER_IP:3000/home || (echo 'Blue frontend health check failed!' && exit 1)
+    - curl -f http://$BLUE_SERVER_IP:3000 || (echo 'Blue frontend health check failed!' && exit 1)
