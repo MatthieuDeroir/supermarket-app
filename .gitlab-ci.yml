@@ -7,8 +7,6 @@ stages:
 trigger-dev:
   stage: dev
   rules:
-    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_TAG'
-      when: always
   trigger:
     include:
       - local: '/gitlab/ci/dev.yml'
@@ -16,9 +14,6 @@ trigger-dev:
 
 trigger-prod:
   stage: prod
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"  || $CI_COMMIT_TAG'
-      when: always
   trigger:
     include:
       - local: '/gitlab/ci/prod.yml'
@@ -26,9 +21,6 @@ trigger-prod:
 
 trigger-release:
   stage: release
-  rules:
-    - if: '$CI_COMMIT_TAG'
-      when: always
   trigger:
     include:
         - local: '/gitlab/ci/release.yml'
@@ -36,9 +28,6 @@ trigger-release:
 
 trigger-rollback:
   stage: rollback
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_TAG'
-      when: on_failure
   when: on_failure
   trigger:
     include:
