@@ -22,7 +22,7 @@ release:
   stage: release
   image: alpine:latest
   dependencies:
-    - publish:reactnative:tag
+    - publish
   script:
     - apk add --no-cache curl jq
     - echo "Installing GitLab release CLI..."
