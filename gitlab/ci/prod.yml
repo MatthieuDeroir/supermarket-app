@@ -40,7 +40,7 @@ validate-frontend-green:
   stage: validate-green
   script:
     - echo "Validating Green frontend..."
-    - curl -f http://$GREEN_SERVER_IP:3000/home || (echo 'Green frontend health check failed!' && exit 1)
+    - curl -f http://$GREEN_SERVER_IP:3000 || (echo 'Green frontend health check failed!' && exit 1)
 
 push-prod-blue:
   stage: push-prod-blue
