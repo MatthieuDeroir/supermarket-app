@@ -1,115 +1,64 @@
-# prod.yml
 stages:
   - build-prod
-#  - test-prod
-  - push-prod
-  - deploy-prod-green
+  - push-prod-green
   - validate-green
-  - deploy-prod-blue
+  - push-prod-blue
   - validate-blue
 
 variables:
-  DOCKER_TLS_CERTDIR: ""  # Disable Docker-in-Docker TLS if not needed
+  DOCKER_TLS_CERTDIR: ""
 
 build-prod-backend:
   stage: build-prod
   script:
     - echo "Building backend for Prod environment..."
-    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest" -f ./backend/Dockerfile.prod ./backend
+    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:green" -f ./backend/Dockerfile.prod ./backend
 
 build-prod-frontend:
   stage: build-prod
   script:
     - echo "Building frontend for Prod environment..."
-    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest" -f ./frontend/Dockerfile.prod ./frontend
+    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:green" -f ./frontend/Dockerfile.prod ./frontend
 
-#test-auto-prod-backend:
-#  stage: test-prod
-#  script:
-#    - echo "Running backend tests..."
-#    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest" deno test
-#
-#test-auto-prod-frontend:
-#  stage: test-prod
-#  script:
-#    - echo "Running frontend tests..."
-#    - docker run --rm "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest" npm run test
-
-push-prod-backend:
-  stage: push-prod
+push-prod-green:
+  stage: push-prod-green
   script:
-    - echo "Pushing Prod images..."
+    - echo "Pushing Prod images with 'green' tag..."
+    - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:green" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:green"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest"
-
-push-prod-frontend:
-  stage: push-prod
-  script:
-    - echo "Pushing Prod images..."
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:green"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest"
-
-
-deploy-prod-green:
-  stage: deploy-prod-green
-  tags:
-    - prod
-  script:
-    - echo "Deploying to Green server..."
-    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest &&
-      docker stop prod-backend || true &&
-      docker rm prod-backend || true &&
-      docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
-      docker stop prod-frontend || true &&
-      docker rm prod-frontend || true &&
-      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest
-      "
 
 validate-backend-green:
   stage: validate-green
-  tags:
-    - prod
   script:
-    - echo "Testing requests on Prod backend (Green)..."
-    - curl -f http://$GREEN_SERVER_IP:4000/health || (echo 'Prod backend (Green) health check failed!' && exit 1)
+    - echo "Validating Green backend..."
+    - curl -f http://$GREEN_SERVER_IP:4000/health || (echo 'Green backend health check failed!' && exit 1)
 
 validate-frontend-green:
   stage: validate-green
-  tags:
-    - prod
   script:
-    - echo "Testing requests on Prod frontend (Green)..."
-    - curl -f http://$GREEN_SERVER_IP:3000/home || (echo 'Prod frontend (Green) health check failed!' && exit 1)
+    - echo "Validating Green frontend..."
+    - curl -f http://$GREEN_SERVER_IP:3000/home || (echo 'Green frontend health check failed!' && exit 1)
 
-deploy-prod-blue:
-  stage: deploy-prod-blue
-  tags:
-    - prod
+push-prod-blue:
+  stage: push-prod-blue
   script:
-    - echo "Deploying to Blue server..."
-    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest &&
-      docker stop prod-backend || true &&
-      docker rm prod-backend || true &&
-      docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:latest &&
-      docker stop prod-frontend || true &&
-      docker rm prod-frontend || true &&
-      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:latest
-      "
+    - echo "Pushing Prod images with 'blue' tag..."
+    - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:green" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:blue"
+    - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:green" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:blue"
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:blue"
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:blue"
 
 validate-backend-blue:
   stage: validate-blue
-  tags:
-    - prod
   script:
-    - echo "Testing requests on Prod backend (Blue)..."
-    - curl -f http://$BLUE_SERVER_IP:4000/health || (echo 'Prod backend (Blue) health check failed!' && exit 1)
+    - echo "Validating Blue backend..."
+    - curl -f http://$BLUE_SERVER_IP:4000/health || (echo 'Blue backend health check failed!' && exit 1)
 
 validate-frontend-blue:
   stage: validate-blue
-  tags:
-    - prod
   script:
-    - echo "Testing requests on Prod frontend (Blue)..."
-    - curl -f http://$BLUE_SERVER_IP:3000/home || (echo 'Prod frontend (Blue) health check failed!' && exit 1)
+    - echo "Validating Blue frontend..."
+    - curl -f http://$BLUE_SERVER_IP:3000/home || (echo 'Blue frontend health check failed!' && exit 1)

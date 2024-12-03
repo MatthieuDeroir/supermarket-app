@@ -1,30 +1,25 @@
-# rollback.yml
-
-rollback:
+rollback-green:
   stage: rollback
   when: on_failure
-  dependencies:
-    - deploy-prod-blue
   script:
-    - echo "Rolling back Green and Blue environments to previous DockerHub tag..."
-    - PREVIOUS_TAG=$(git describe --tags $(git rev-list --tags --skip=1 --max-count=1))
-    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG &&
-      docker stop prod-backend || true &&
-      docker rm prod-backend || true &&
-      docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
-      docker stop prod-frontend || true &&
-      docker rm prod-frontend || true &&
-      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG
-      "
-    - ssh $DEPLOY_USER_BLUE@$BLUE_SERVER_IP "
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG &&
-      docker stop prod-backend || true &&
-      docker rm prod-backend || true &&
-      docker run -d --name prod-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG &&
-      docker stop prod-frontend || true &&
-      docker rm prod-frontend || true &&
-      docker run -d --name prod-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG
-      "
+    - echo "Rolling back Green environment to previous version..."
+    - PREVIOUS_TAG=$(docker image ls --filter=before="$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:green" --format "{{.Tag}}" | head -n 1)
+    - if [ -z "$PREVIOUS_TAG" ]; then echo "No previous tag found for rollback!"; exit 1; fi
+    - echo "Rolling back to previous tag: $PREVIOUS_TAG"
+    - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:green"
+    - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:green"
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:green"
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:green"
+
+rollback-blue:
+  stage: rollback
+  when: on_failure
+  script:
+    - echo "Rolling back Blue environment to previous version..."
+    - PREVIOUS_TAG=$(docker image ls --filter=before="$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:blue" --format "{{.Tag}}" | head -n 1)
+    - if [ -z "$PREVIOUS_TAG" ]; then echo "No previous tag found for rollback!"; exit 1; fi
+    - echo "Rolling back to previous tag: $PREVIOUS_TAG"
+    - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:$PREVIOUS_TAG" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:blue"
+    - docker tag "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:$PREVIOUS_TAG" "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:blue"
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend:blue"
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:blue"
