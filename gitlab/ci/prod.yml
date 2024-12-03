@@ -7,6 +7,11 @@ stages:
 
 variables:
   DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_DRIVER: overlay2
+
+services:
+  - docker:20-dind
 
 build-prod-backend:
   stage: build-prod
@@ -34,12 +39,14 @@ validate-backend-green:
   stage: validate-green
   script:
     - echo "Validating Green backend..."
+    - apk add --no-cache curl
     - curl -f http://$GREEN_SERVER_IP:4000/health || (echo 'Green backend health check failed!' && exit 1)
 
 validate-frontend-green:
   stage: validate-green
   script:
     - echo "Validating Green frontend..."
+    - apk add --no-cache curl
     - curl -f http://$GREEN_SERVER_IP:3000 || (echo 'Green frontend health check failed!' && exit 1)
 
 push-prod-blue:
@@ -55,10 +62,12 @@ validate-backend-blue:
   stage: validate-blue
   script:
     - echo "Validating Blue backend..."
+    - apk add --no-cache curl
     - curl -f http://$BLUE_SERVER_IP:4000/health || (echo 'Blue backend health check failed!' && exit 1)
 
 validate-frontend-blue:
   stage: validate-blue
   script:
     - echo "Validating Blue frontend..."
+    - apk add --no-cache curl
     - curl -f http://$BLUE_SERVER_IP:3000 || (echo 'Blue frontend health check failed!' && exit 1)
