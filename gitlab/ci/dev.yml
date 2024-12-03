@@ -57,10 +57,6 @@ test-frontend:
 #      "
 deploy-dev-backend:
   stage: deploy-dev
-  before_script:
-    - echo "Logging in to Docker..."
-    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_TOKEN"
-
   tags:
     - dev
   script:
