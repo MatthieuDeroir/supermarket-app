@@ -1,10 +1,17 @@
-#mobile.yml
-
 image: reactnativecommunity/react-native:latest
 
 stages:
   - build-mobile
   - test-auto-mobile
+
+variables:
+  ANDROID_SDK_ROOT: "/sdk"
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+
+before_script:
+  # Install necessary Android SDK components
+  - sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0" "ndk;23.1.7779620"
+  - yes | sdkmanager --licenses
 
 build-mobile:
   stage: build-mobile
@@ -13,6 +20,11 @@ build-mobile:
     - cd mobile
     - npm install
     - npm run android-release
+    - echo "APK built successfully."
+  artifacts:
+    paths:
+      - mobile/android/app/build/outputs/apk/release/app-release.apk
+    expire_in: 1 week
 
 test-auto-mobile:
   stage: test-auto-mobile
