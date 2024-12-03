@@ -23,6 +23,7 @@ build-prod-backend:
 
 build-prod-frontend:
   stage: build-prod
+
   script:
     - echo "Building frontend for Prod environment..."
     - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:green" -f ./frontend/Dockerfile.prod ./frontend
