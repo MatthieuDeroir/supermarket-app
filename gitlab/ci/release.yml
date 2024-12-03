@@ -1,9 +1,14 @@
+#release.yml
+
+
 stages:
   - publish
   - release
 
 publish:
   stage: publish
+  dependencies:
+    - build-mobile
   image: alpine:latest
   script:
     - echo "Preparing React Native APK for release..."
