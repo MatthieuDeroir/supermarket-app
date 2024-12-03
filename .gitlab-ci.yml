@@ -5,19 +5,19 @@ stages:
   - release
   - rollback
 
-trigger-dev:
-  stage: dev
-  trigger:
-    include:
-      - local: '/gitlab/ci/dev.yml'
-    strategy: depend
-
-trigger-prod:
-  stage: prod
-  trigger:
-    include:
-      - local: '/gitlab/ci/prod.yml'
-    strategy: depend
+#trigger-dev:
+#  stage: dev
+#  trigger:
+#    include:
+#      - local: '/gitlab/ci/dev.yml'
+#    strategy: depend
+#
+#trigger-prod:
+#  stage: prod
+#  trigger:
+#    include:
+#      - local: '/gitlab/ci/prod.yml'
+#    strategy: depend
 
 trigger-mobile:
   stage: mobile
