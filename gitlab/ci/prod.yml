@@ -79,7 +79,7 @@ validate-frontend-green:
     - prod
   script:
     - echo "Testing requests on Prod frontend (Green)..."
-    - curl -f http://$GREEN_SERVER_IP:3000 || (echo 'Prod frontend (Green) health check failed!' && exit 1)
+    - curl -f http://$GREEN_SERVER_IP:3000/home || (echo 'Prod frontend (Green) health check failed!' && exit 1)
 
 deploy-prod-blue:
   stage: deploy-prod-blue
@@ -112,4 +112,4 @@ validate-frontend-blue:
     - prod
   script:
     - echo "Testing requests on Prod frontend (Blue)..."
-    - curl -f http://$BLUE_SERVER_IP:3000 || (echo 'Prod frontend (Blue) health check failed!' && exit 1)
+    - curl -f http://$BLUE_SERVER_IP:3000/home || (echo 'Prod frontend (Blue) health check failed!' && exit 1)
