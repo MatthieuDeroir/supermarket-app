@@ -1,3 +1,5 @@
+#dev.yml
+
 stages:
   - build-dev
   - test-dev
@@ -39,6 +41,20 @@ test-frontend:
     - echo "Running frontend tests during Dev pipeline..."
     - docker run --rm frontend-dev npm run test
 
+#deploy-dev-backend:
+#  stage: deploy-dev
+#  tags:
+#    - dev
+#  script:
+#    - echo "Deploying backend for Dev environment..."
+#    - docker tag backend-dev "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
+#    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
+#    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "
+#      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest &&
+#      docker stop dev-backend || true &&
+#      docker rm dev-backend || true &&
+#      docker run -d --name dev-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest
+#      "
 deploy-dev-backend:
   stage: deploy-dev
   tags:
@@ -47,29 +63,33 @@ deploy-dev-backend:
     - echo "Deploying backend for Dev environment..."
     - docker tag backend-dev "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
-    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest &&
-      docker stop dev-backend || true &&
-      docker rm dev-backend || true &&
-      docker run -d --name dev-backend -p 4000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest
-      "
 
 
+
+#deploy-dev-frontend:
+#  stage: deploy-dev
+#  tags:
+#    - dev
+#  script:
+#    - echo "Deploying Dev environment..."
+#    - docker tag frontend-dev "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
+#    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
+#    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "
+#      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest &&
+#      docker stop dev-frontend || true &&
+#      docker rm dev-frontend || true &&
+#      docker run -d --name dev-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest
+#      "
 
 deploy-dev-frontend:
   stage: deploy-dev
   tags:
     - dev
   script:
-    - echo "Deploying Dev environment..."
+    - echo "Deploying frontend for Dev environment..."
     - docker tag frontend-dev "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
-    - ssh $DEPLOY_USER_LOADB@$LOAD_BALANCER_IP "
-      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest &&
-      docker stop dev-frontend || true &&
-      docker rm dev-frontend || true &&
-      docker run -d --name dev-frontend -p 3000:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest
-      "
+
 
 validate-backend-dev:
   stage: validate-dev

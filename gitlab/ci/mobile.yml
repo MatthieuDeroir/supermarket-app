@@ -1,3 +1,5 @@
+#mobile.yml
+
 image: reactnativecommunity/react-native:latest
 
 stages:

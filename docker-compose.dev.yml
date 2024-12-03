@@ -1,19 +1,18 @@
-version: "3.8"
+version: '3.9'
 services:
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
-    volumes:
-      - ./backend:/app
     ports:
       - "4000:4000"
-
+    environment:
+      - NODE_ENV=development
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    volumes:
-      - ./frontend:/app
     ports:
       - "3000:3000"
+    environment:
+      - NODE_ENV=development

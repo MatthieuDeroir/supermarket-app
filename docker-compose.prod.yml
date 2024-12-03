@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.9'
 services:
   backend:
     build:
@@ -6,11 +6,13 @@ services:
       dockerfile: Dockerfile.prod
     ports:
       - "4000:4000"
-    command: deno run --allow-net --allow-read --allow-env server.ts
-
+    environment:
+      - NODE_ENV=production
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
     ports:
       - "3000:3000"
+    environment:
+      - NODE_ENV=production
