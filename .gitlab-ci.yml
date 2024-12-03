@@ -11,6 +11,8 @@ trigger-dev:
       when: always
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
+    - if: '$CI_COMMIT_TAG'
+      when: always
   trigger:
     include:
       - local: '/gitlab/ci/dev.yml'
@@ -22,7 +24,7 @@ trigger-prod:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
     - if: '$CI_COMMIT_TAG'
-      when: never
+      when: always
   trigger:
     include:
       - local: '/gitlab/ci/prod.yml'
