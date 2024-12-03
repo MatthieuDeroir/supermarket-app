@@ -5,6 +5,10 @@ stages:
   - push-prod-blue
   - validate-blue
 
+before_script:
+  - echo "Logging into GitLab Container Registry..."
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
 variables:
   DOCKER_TLS_CERTDIR: ""
   DOCKER_HOST: "tcp://docker:2375"
