@@ -2,7 +2,9 @@
   "tasks": {
     "dev": "deno run -A npm:next dev",
     "build": "deno run -A npm:next build",
-    "start": "deno run -A npm:next start"
+    "start": "deno run -A npm:next start",
+    "prepare": "deno run -A npm:husky install",
+    "createHuskyConfig": "deno run -A npm:husky add .husky/pre-commit 'deno task lint'"
   },
   "imports": {
     "next/": "npm:next/",

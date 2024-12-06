@@ -1,6 +1,3 @@
-// @deno-types="npm:@typescript-eslint/no-throw-literal"
-// @typescript-eslint/lines-between-class-members
-// @typescript-eslint/ban-types
 import React from 'react';
 import type { Metadata } from 'next';
 import './globals.css';
