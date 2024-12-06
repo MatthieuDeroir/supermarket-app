@@ -1,13 +1,18 @@
 {
-	"tasks": {
-		"dev": "deno run -A npm:next dev",
-		"build": "deno run -A npm:next build",
-		"start": "deno run -A npm:next start"
-	},
-	"imports": {
-		"next/": "npm:next/",
-		"react": "npm:react",
-		"react-dom": "npm:react-dom"
-	},
-	"lock": true
+  "tasks": {
+    "dev": "deno run -A npm:next dev",
+    "build": "deno run -A npm:next build",
+    "start": "deno run -A npm:next start"
+  },
+  "imports": {
+    "next/": "npm:next/",
+    "react": "npm:react",
+    "react-dom": "npm:react-dom"
+  },
+  "compilerOptions": {
+    "types": ["npm:@types/react"],
+    "jsx": "react-jsx",
+    "strict": true
+  },
+  "lock": true
 }
