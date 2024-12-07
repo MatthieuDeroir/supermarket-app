@@ -14,9 +14,10 @@
     "npm:@types/lodash@^4.17.13": "4.17.13",
     "npm:@types/node@^22.10.1": "22.10.1",
     "npm:@types/nprogress@~0.2.3": "0.2.3",
-    "npm:@types/react-dom@19": "19.0.0",
+    "npm:@types/react-dom@^19.0.1": "19.0.1",
     "npm:@types/react@*": "19.0.0",
     "npm:@types/react@19": "19.0.0",
+    "npm:@types/react@^19.0.1": "19.0.1",
     "npm:@typescript-eslint/eslint-plugin@^8.17.0": "8.17.0_@typescript-eslint+parser@8.17.0__eslint@9.16.0__typescript@5.7.2_eslint@9.16.0_typescript@5.7.2",
     "npm:@typescript-eslint/parser@^8.17.0": "8.17.0_eslint@9.16.0_typescript@5.7.2",
     "npm:autoprefixer@^10.4.20": "10.4.20_postcss@8.4.49",
@@ -548,7 +549,7 @@
       "dependencies": [
         "@babel/runtime",
         "@mui/material@6.1.10_@emotion+react@11.13.5__react@19.0.0_@emotion+styled@11.13.5__@emotion+react@11.13.5___react@19.0.0__react@19.0.0_@types+react@19.0.0_react@19.0.0_react-dom@19.0.0__react@19.0.0",
-        "@types/react",
+        "@types/react@19.0.0",
         "react@19.0.0"
       ]
     },
@@ -563,7 +564,7 @@
         "@mui/system@6.1.10_@emotion+react@11.13.5__react@19.0.0_@emotion+styled@11.13.5__@emotion+react@11.13.5___react@19.0.0__react@19.0.0_@types+react@19.0.0_react@19.0.0",
         "@mui/types",
         "@mui/utils@6.1.10_@types+react@19.0.0_react@19.0.0",
-        "@types/react",
+        "@types/react@19.0.0",
         "clsx@2.1.1",
         "prop-types",
         "react@19.0.0",
@@ -581,7 +582,7 @@
         "@mui/types",
         "@mui/utils@6.1.10_@types+react@19.0.0_react@19.0.0",
         "@popperjs/core",
-        "@types/react",
+        "@types/react@19.0.0",
         "@types/react-transition-group",
         "clsx@2.1.1",
         "csstype",
@@ -603,7 +604,7 @@
         "@mui/types",
         "@mui/utils@6.1.10_@types+react@19.0.0_react@18.3.1",
         "@popperjs/core",
-        "@types/react",
+        "@types/react@19.0.0",
         "@types/react-transition-group",
         "clsx@2.1.1",
         "csstype",
@@ -619,7 +620,7 @@
       "dependencies": [
         "@babel/runtime",
         "@mui/utils@6.1.10_@types+react@19.0.0_react@18.3.1",
-        "@types/react",
+        "@types/react@19.0.0",
         "prop-types",
         "react@18.3.1"
       ]
@@ -629,7 +630,7 @@
       "dependencies": [
         "@babel/runtime",
         "@mui/utils@6.1.10_@types+react@19.0.0_react@19.0.0",
-        "@types/react",
+        "@types/react@19.0.0",
         "prop-types",
         "react@19.0.0"
       ]
@@ -672,7 +673,7 @@
         "@mui/styled-engine@6.1.10_@emotion+react@11.13.5__react@19.0.0_@emotion+styled@11.13.5__@emotion+react@11.13.5___react@19.0.0__react@19.0.0_react@19.0.0",
         "@mui/types",
         "@mui/utils@6.1.10_@types+react@19.0.0_react@19.0.0",
-        "@types/react",
+        "@types/react@19.0.0",
         "clsx@2.1.1",
         "csstype",
         "prop-types",
@@ -689,7 +690,7 @@
         "@mui/styled-engine@6.1.10_@emotion+react@11.13.5__react@19.0.0__react@18.3.1_@emotion+styled@11.13.5__@emotion+react@11.13.5___react@19.0.0__react@19.0.0__@emotion+react@11.13.5___react@19.0.0___react@18.3.1__react@18.3.1_react@18.3.1",
         "@mui/types",
         "@mui/utils@6.1.10_@types+react@19.0.0_react@18.3.1",
-        "@types/react",
+        "@types/react@19.0.0",
         "clsx@2.1.1",
         "csstype",
         "prop-types",
@@ -699,7 +700,7 @@
     "@mui/types@7.2.19_@types+react@19.0.0": {
       "integrity": "sha512-6XpZEM/Q3epK9RN8ENoXuygnqUQxE+siN/6rGRi2iwJPgBUR25mphYQ9ZI87plGh58YoZ5pp40bFvKYOCDJ3tA==",
       "dependencies": [
-        "@types/react"
+        "@types/react@19.0.0"
       ]
     },
     "@mui/utils@6.1.10_@types+react@19.0.0_react@18.3.1": {
@@ -708,7 +709,7 @@
         "@babel/runtime",
         "@mui/types",
         "@types/prop-types",
-        "@types/react",
+        "@types/react@19.0.0",
         "clsx@2.1.1",
         "prop-types",
         "react@18.3.1",
@@ -721,7 +722,7 @@
         "@babel/runtime",
         "@mui/types",
         "@types/prop-types",
-        "@types/react",
+        "@types/react@19.0.0",
         "clsx@2.1.1",
         "prop-types",
         "react@19.0.0",
@@ -1002,20 +1003,26 @@
         "parchment"
       ]
     },
-    "@types/react-dom@19.0.0": {
-      "integrity": "sha512-1KfiQKsH1o00p9m5ag12axHQSb3FOU9H20UTrujVSkNhuCrRHiQWFqgEnTNK5ZNfnzZv8UWrnXVqCmCF9fgY3w==",
+    "@types/react-dom@19.0.1": {
+      "integrity": "sha512-hljHij7MpWPKF6u5vojuyfV0YA4YURsQG7KT6SzV0Zs2BXAtgdTxG6A229Ub/xiWV4w/7JL8fi6aAyjshH4meA==",
       "dependencies": [
-        "@types/react"
+        "@types/react@19.0.0"
       ]
     },
     "@types/react-transition-group@4.4.11": {
       "integrity": "sha512-RM05tAniPZ5DZPzzNFP+DmrcOdD0efDUxMy3145oljWSl3x9ZV5vhme98gTxFrj2lhXvmGNnUiuDyJgY9IKkNA==",
       "dependencies": [
-        "@types/react"
+        "@types/react@19.0.0"
       ]
     },
     "@types/react@19.0.0": {
       "integrity": "sha512-MY3oPudxvMYyesqs/kW1Bh8y9VqSmf+tzqw3ae8a9DZW68pUe3zAdHeI1jc6iAysuRdACnVknHP8AhwD4/dxtg==",
+      "dependencies": [
+        "csstype"
+      ]
+    },
+    "@types/react@19.0.1": {
+      "integrity": "sha512-YW6614BDhqbpR5KtUYzTA+zlA7nayzJRA9ljz9CQoxthR0sDisYZLuvSMsil36t4EH/uAt8T52Xb4sVw17G+SQ==",
       "dependencies": [
         "csstype"
       ]
@@ -4155,8 +4162,8 @@
         "npm:@types/lodash@^4.17.13",
         "npm:@types/node@^22.10.1",
         "npm:@types/nprogress@~0.2.3",
-        "npm:@types/react-dom@19",
-        "npm:@types/react@19",
+        "npm:@types/react-dom@^19.0.1",
+        "npm:@types/react@^19.0.1",
         "npm:@typescript-eslint/eslint-plugin@^8.17.0",
         "npm:@typescript-eslint/parser@^8.17.0",
         "npm:autoprefixer@^10.4.20",
