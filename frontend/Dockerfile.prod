@@ -1,37 +1,23 @@
-# Stage 1: Builder
 FROM denoland/deno:alpine as builder
 
 WORKDIR /app
 
-# Copy Deno configuration and essential files
 COPY deno.json deno.json
 COPY deno.lock deno.lock
 COPY package.json package.json
-
-# Cache dependencies and enable lifecycle scripts
-RUN deno cache deno.json
-RUN deno run -A npm:install --allow-scripts
-
-# Copy the rest of the project files for the build
 COPY . .
 
-# Build the Next.js application
-RUN deno run -A npm:next build
+RUN deno cache deno.json && deno run -A npm:next build
 
-# Stage 2: Production
 FROM denoland/deno:alpine
 
 WORKDIR /app
 
-# Copy build artifacts and runtime files from the builder stage
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/deno.json ./deno.json
-COPY --from=builder /app/node_modules ./node_modules
 
-# Expose the port used by the application
 EXPOSE 3000
 
-# Start the application
 CMD ["deno", "run", "-A", "npm:next", "start"]
