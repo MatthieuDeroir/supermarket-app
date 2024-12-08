@@ -1,0 +1,69 @@
+build-dev-backend:
+  stage: build-dev-backend
+  before_script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  script:
+    - echo "Building backend Docker image for Dev environment..."
+    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest" -f ./backend/Dockerfile.dev ./backend
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest"
+
+build-dev-frontend:
+  stage: build-dev-frontend
+  before_script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  script:
+    - echo "Building frontend Docker image for Dev environment..."
+    - docker build -t "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest" -f ./frontend/Dockerfile.dev ./frontend
+    - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest"
+
+deploy-dev-backend:
+  stage: deploy-dev-backend
+  dependencies:
+    - build-dev-backend
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H $GREEN_SERVER_IP >> ~/.ssh/known_hosts
+  script:
+    - echo "Deploying backend Dev environment..."
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest &&
+      docker stop dev-backend || true &&
+      docker rm dev-backend || true &&
+      docker run -d --name dev-backend -p 5000:4000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-backend-dev:latest
+      "
+
+deploy-dev-frontend:
+  stage: deploy-dev-frontend
+  dependencies:
+    - build-dev-frontend
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H $GREEN_SERVER_IP >> ~/.ssh/known_hosts
+  script:
+    - echo "Deploying frontend Dev environment..."
+    - ssh $DEPLOY_USER_GREEN@$GREEN_SERVER_IP "
+      docker pull $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest &&
+      docker stop dev-frontend || true &&
+      docker rm dev-frontend || true &&
+      docker run -d --name dev-frontend -p 8080:3000 $DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend-dev:latest
+      "
+
+test-dev-backend:
+  stage: test-dev-backend
+  dependencies:
+    - deploy-dev-backend
+  script:
+    - echo "Testing backend Dev environment..."
+    - curl -f http://$GREEN_SERVER_IP:5000/health || (echo 'Backend health check failed!' && exit 1)
+
+test-dev-frontend:
+  stage: test-dev-frontend
+  dependencies:
+    - deploy-dev-frontend
+  script:
+    - echo "Testing frontend Dev environment..."
+    - curl -f http://$GREEN_SERVER_IP:8080 || (echo 'Frontend health check failed!' && exit 1)
