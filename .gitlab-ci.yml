@@ -7,6 +7,8 @@ stages:
 trigger-dev:
   stage: dev
   rules:
+    - if: '$CI_COMMIT_TAG'
+      when: always
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"'
       when: always
   trigger:
@@ -17,7 +19,7 @@ trigger-dev:
 trigger-prod:
   stage: prod
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_COMMIT_TAG'
       when: always
   trigger:
     include:
@@ -27,7 +29,7 @@ trigger-prod:
 trigger-release:
   stage: release
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_COMMIT_TAG'
       when: always
   trigger:
     include:
@@ -37,7 +39,7 @@ trigger-release:
 trigger-rollback:
   stage: rollback
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_COMMIT_TAG'
       when: on_failure
   trigger:
     include:
