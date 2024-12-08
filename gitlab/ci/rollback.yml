@@ -1,5 +1,7 @@
+# rollback.yml
+
 rollback-green:
-  stage: rollback
+  stage: rollback-green
   when: on_failure
   script:
     - echo "Rolling back Green environment to previous version..."
@@ -13,7 +15,7 @@ rollback-green:
     - docker push "$DOCKER_NAMESPACE/$DOCKER_REPOSITORY-frontend:green"
 
 rollback-blue:
-  stage: rollback
+  stage: rollback-blue
   when: on_failure
   script:
     - echo "Rolling back Blue environment to previous version..."
