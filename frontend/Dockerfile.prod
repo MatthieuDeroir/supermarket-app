@@ -3,21 +3,17 @@ FROM denoland/deno:alpine as builder
 
 WORKDIR /app
 
-# Copy configuration files
+# Copy Deno configuration files
 COPY deno.json deno.json
 COPY deno.lock deno.lock
 COPY package.json package.json
 
-# Cache dependencies (to speed up builds)
+# Enable node_modules compatibility and install npm dependencies
 RUN deno cache deno.json
-
-# Copy the rest of the application
-COPY . .
-
-# Install npm modules required by Next.js
 RUN deno run -A npm:install
 
 # Build the Next.js application
+COPY . .
 RUN deno run -A npm:next build
 
 # Stage 2: Production
@@ -25,7 +21,7 @@ FROM denoland/deno:alpine
 
 WORKDIR /app
 
-# Copy build artifacts from builder stage
+# Copy build artifacts from the builder stage
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
