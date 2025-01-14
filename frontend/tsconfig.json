@@ -4,6 +4,10 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -18,10 +22,21 @@
         "name": "next"
       }
     ],
+    "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": ["./src*"],
+      "@common/*": ["./src/common/*"],
+      "@modules/*": ["./src/modules/*"]
+    },
+    "types": ["node", "react", "@mui/icons-material", "@mui/material"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "./.eslintrc.json",
+    "node_modules/*.d.ts",
+    "next.config.js"
+  ],
   "exclude": ["node_modules"]
 }
