@@ -2,7 +2,7 @@
 
 // === Hono ===
 export { Hono } from "https://deno.land/x/hono@v3.3.2/mod.ts";
-export type { Context, Handler } from "https://deno.land/x/hono@v3.3.2/mod.ts";
+export type { Context, Handler, Next } from "https://deno.land/x/hono@v3.3.2/mod.ts";
 
 
 // === PostgreSQL (deno-postgres) ===
@@ -25,11 +25,12 @@ export {
 
 // === JWT ===
 export {
-    decode,
-    sign,
-    verify
-} from "hono/jwt.ts";
+    jwt
+} from "hono/jwt";
 
+// === Bcrypt ===
+
+export { hash, compare } from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 
 
 
