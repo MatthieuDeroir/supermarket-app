@@ -1,10 +1,8 @@
 // modules/products/product.routes.ts
-import { Hono } from "../../deps.ts";
-import { createProductHandler, getProductHandler } from "./product.controller.ts";
+import { Hono } from "hono";
+import productController from "./product.controller.ts";
 
-const productRoutes = new Hono();
+const productRouter = new Hono();
+productRouter.route("/", productController);
 
-productRoutes.post("/", createProductHandler);
-productRoutes.get("/:id", getProductHandler);
-
-export default productRoutes;
+export default productRouter;

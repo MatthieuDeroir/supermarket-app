@@ -1,6 +1,7 @@
-// modules/stock/action.model.ts
-export interface Action {
-    actionId: number;
-    name: string;
-    description: string;
+// modules/carts/cart.model.ts
+export interface Cart {
+    [key: string]: unknown; // <= index signature
+    cartId: number;
+    userId: number;
+    createdAt: Date;
 }

@@ -1,16 +1,35 @@
-// config/database.ts
-import { Pool } from "https://deno.land/x/postgres@v0.17.0/mod.ts";
+// src/core/database.ts
+import { Client } from "https://deno.land/x/postgres@v0.17.0/mod.ts";
 
-// Création d'un pool de connexions PostgreSQL
-const POOL_CONNECTIONS = 3;
-const dbPool = new Pool({
-    hostname: "127.0.0.1",
-    port: 5432,
-    user: "postgres",
-    password: "postgres",  // à adapter
-    database: "t_dev_700_dev", // à adapter
-}, POOL_CONNECTIONS);
+/**
+ * Gère la connexion à la base de données PostgreSQL.
+ */
+export class Database {
+    private client: Client;
 
-export async function getDBClient() {
-    return await dbPool.connect();
+    constructor() {
+        this.client = new Client({
+            user: "postgres",
+            database: "t_dev_700_dev",
+            hostname: "127.0.0.1",
+            password: "postgres",
+            port: 5432
+        });
+    }
+
+    async connect(): Promise<void> {
+        await this.client.connect();
+    }
+
+    getClient(): Client {
+        return this.client;
+    }
+
+    async close(): Promise<void> {
+        await this.client.end();
+    }
 }
+
+// Instance partagée dans l'application
+const db = new Database();
+export default db;

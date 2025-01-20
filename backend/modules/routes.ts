@@ -1,14 +1,28 @@
-// backend/modules/routes.ts
-import ActionRoutes from "./actions/action.routes.ts";
-import AddressRoutes from "./addresses/address.routes.ts";
-import InvoiceRoutes from "./invoices/invoice.routes.ts";
-import LogRoutes from "./logs/log.routes.ts";
-import ProductRoutes from "./products/product.routes.ts";
-import RoleRoutes from "./roles/role.routes.ts";
-import StockTypeRoutes from "./stockTypes/stock.routes.ts";
-import TaxCategoryRoutes from "./taxCategories/tax.routes.ts";
-import UserRoutes from "./users/user.routes.ts";
+// modules/routes.ts
+import { Hono } from "hono";
 
+// Import des routeurs
+import addressesRouter from "./addresses/address.routes.ts";
+import cartRouter from "./carts/cart.routes.ts";
+import invoiceRouter from "./invoices/invoice.routes.ts";
+import categoryRouter from "./categories/category.routes.ts";
+import productRouter from "./products/product.routes.ts";
+import logRouter from "./logs/log.routes.ts";
+import promotionRouter from "./promotions/promotion.routes.ts";
+import roleRouter from "./roles/role.routes.ts";
+import userRouter from "./users/user.routes.ts";
 
+const routes = new Hono();
 
-export { ActionRoutes, AddressRoutes, InvoiceRoutes, LogRoutes, ProductRoutes, RoleRoutes, StockTypeRoutes, TaxCategoryRoutes, UserRoutes };
+// Monte chaque module sur son URL
+routes.route("/addresses", addressesRouter);
+routes.route("/carts", cartRouter);
+routes.route("/invoices", invoiceRouter);
+routes.route("/categories", categoryRouter);
+routes.route("/products", productRouter);
+routes.route("/logs", logRouter);
+routes.route("/promotions", promotionRouter);
+routes.route("/roles", roleRouter);
+routes.route("/users", userRouter);
+
+export default routes;

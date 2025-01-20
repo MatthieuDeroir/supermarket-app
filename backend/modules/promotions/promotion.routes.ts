@@ -1,16 +1,8 @@
-// modules/users/user.routes.ts
-import { Hono } from "../../deps.ts";
-import {
+// modules/promotions/promotion.routes.ts
+import { Hono } from "hono";
+import promotionController from "./promotion.controller.ts";
 
-} from "./stock.controller.ts";
+const promotionRouter = new Hono();
+promotionRouter.route("/", promotionController);
 
-const stockRoutes = new Hono();
-
-// GET /stocks/
-stockRoutes.get("/");
-
-// POST /stocks/
-stockRoutes.post("/");
-
-
-export default stockRoutes;
+export default promotionRouter;

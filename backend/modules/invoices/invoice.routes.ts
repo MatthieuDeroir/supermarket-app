@@ -1,9 +1,8 @@
 // modules/invoices/invoice.routes.ts
-import { Hono } from "../../deps.ts";
-import { createInvoiceHandler } from "./invoice.controller.ts";
+import { Hono } from "hono";
+import invoiceController from "./invoice.controller.ts";
 
-const invoiceRoutes = new Hono();
+const invoiceRouter = new Hono();
+invoiceRouter.route("/", invoiceController);
 
-invoiceRoutes.post("/", createInvoiceHandler);
-
-export default invoiceRoutes;
+export default invoiceRouter;

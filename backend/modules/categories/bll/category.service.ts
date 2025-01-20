@@ -1,16 +1,28 @@
-// modules/tax/bll/tax.service.ts
-import { TaxCategoryRepository } from "../dal/tax.repository.ts";
-import { TaxCategory } from "../tax.model.ts";
-import { TaxCategoryCreateDto } from "../dto/tax-create.dto.ts";
+// modules/categories/bll/category.service.ts
+import { Category } from "../category.model.ts";
+import categoryRepository from "../dal/category.repository.ts";
 
-export class TaxCategoryService {
-    constructor(private taxCategoryRepo: TaxCategoryRepository) {}
-
-    async createTaxCategory(dto: TaxCategoryCreateDto): Promise<TaxCategory> {
-        return await this.taxCategoryRepo.create(dto);
+class CategoryService {
+    async getAllCategories(): Promise<Category[]> {
+        return categoryRepository.findAll();
     }
 
-    async getAllTaxCategories(): Promise<TaxCategory[]> {
-        return await this.taxCategoryRepo.findAll();
+    async getCategoryById(categoryId: number): Promise<Category | null> {
+        return categoryRepository.findById(categoryId);
+    }
+
+    async createCategory(data: Omit<Category, "categoryId">): Promise<void> {
+        await categoryRepository.create(data);
+    }
+
+    async updateCategory(categoryId: number, data: Partial<Category>): Promise<void> {
+        await categoryRepository.update(categoryId, data);
+    }
+
+    async deleteCategory(categoryId: number): Promise<void> {
+        await categoryRepository.deleteById(categoryId);
     }
 }
+
+export const categoryService = new CategoryService();
+export default categoryService;

@@ -1,42 +1,45 @@
-import type { Context } from "../../deps.ts";
-import { RolesRepository } from "./dal/role.repository.ts";
-import { RolesService } from "./bll/role.service.ts";
-import { RoleCreateDto } from "./dto/role-create.dto.ts";
+// modules/roles/role.controller.ts
+import { Hono } from "hono";
+import { roleService } from "./bll/role.service.ts";
 
-const repo = new RolesRepository();
-const service = new RolesService(repo);
+const roleController = new Hono();
 
-export async function createRoleHandler(c: Context) {
-    const body = await c.req.json();
-    const dto = body as RoleCreateDto;
-    const role = await service.createRole(dto);
-    return c.json(role, 201);
-}
-
-export async function getRoleHandler(c: Context) {
-    const roleId = parseInt(c.req.param("id"), 10);
-    const role = await service.getRoleById(roleId);
-    if (!role) return c.text("Role not found", 404);
-    return c.json(role);
-}
-
-export async function getAllRolesHandler(c: Context) {
-    const roles = await service.getAllRoles();
+// GET /role
+roleController.get("/", async (c) => {
+    const roles = await roleService.getAllRoles();
     return c.json(roles);
-}
+});
 
-export async function updateRoleHandler(c: Context) {
-    const roleId = parseInt(c.req.param("id"), 10);
+// GET /role/:roleId
+roleController.get("/:roleId", async (c) => {
+    const roleId = Number(c.req.param("roleId"));
+    const role = await roleService.getRoleById(roleId);
+    if (!role) {
+        return c.json({ message: "Role not found" }, 404);
+    }
+    return c.json(role);
+});
+
+// POST /role
+roleController.post("/", async (c) => {
     const body = await c.req.json();
-    const dto = body as RoleCreateDto;
-    const updated = await service.updateRole(roleId, dto);
-    if (!updated) return c.text("Role not found", 404);
-    return c.json(updated);
-}
+    await roleService.createRole(body);
+    return c.json({ message: "Role created" }, 201);
+});
 
-export async function deleteRoleHandler(c: Context) {
-    const roleId = parseInt(c.req.param("id"), 10);
-    const success = await service.deleteRole(roleId);
-    if (!success) return c.text("Role not found", 404);
-    return c.text("Role deleted", 200);
-}
+// PUT /role/:roleId
+roleController.put("/:roleId", async (c) => {
+    const roleId = Number(c.req.param("roleId"));
+    const body = await c.req.json();
+    await roleService.updateRole(roleId, body);
+    return c.json({ message: "Role updated" });
+});
+
+// DELETE /role/:roleId
+roleController.delete("/:roleId", async (c) => {
+    const roleId = Number(c.req.param("roleId"));
+    await roleService.deleteRole(roleId);
+    return c.json({ message: "Role deleted" });
+});
+
+export default roleController;

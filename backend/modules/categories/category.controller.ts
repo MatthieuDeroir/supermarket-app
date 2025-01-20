@@ -1,27 +1,45 @@
-// modules/tax/tax.controller.ts
-import { Context } from "../../deps.ts";
-import { TaxCategoryRepository } from "./dal/tax.repository.ts";
-import { TaxCategoryService } from "./bll/tax.service.ts";
-import { TaxCategoryCreateDto } from "./dto/tax-create.dto.ts";
+// modules/categories/category.controller.ts
+import { Hono } from "hono";
+import { categoryService } from "./bll/category.service.ts";
 
-const repo = new TaxCategoryRepository();
-const service = new TaxCategoryService(repo);
+const categoryController = new Hono();
 
-export async function createTaxCategoryHandler(c: Context) {
-    try {
-        const body = await c.req.json();
-        const dto = body as TaxCategoryCreateDto;
-        const taxCategory = await service.createTaxCategory(dto);
-        return c.json(taxCategory, 201);
-    } catch (err) {
-        if (err instanceof Error) {
-            return c.text(err.message, 400);
-        }
-        return c.text("Unknown error", 500);
-    }
-}
-
-export async function getAllTaxCategoriesHandler(c: Context) {
-    const categories = await service.getAllTaxCategories();
+// GET /category
+categoryController.get("/", async (c) => {
+    const categories = await categoryService.getAllCategories();
     return c.json(categories);
-}
+});
+
+// GET /category/:categoryId
+categoryController.get("/:categoryId", async (c) => {
+    const categoryId = Number(c.req.param("categoryId"));
+    const category = await categoryService.getCategoryById(categoryId);
+    if (!category) {
+        return c.json({ message: "Category not found" }, 404);
+    }
+    return c.json(category);
+});
+
+// POST /category
+categoryController.post("/", async (c) => {
+    const body = await c.req.json();
+    await categoryService.createCategory(body);
+    return c.json({ message: "Category created" }, 201);
+});
+
+// PUT /category/:categoryId
+categoryController.put("/:categoryId", async (c) => {
+    const categoryId = Number(c.req.param("categoryId"));
+    const body = await c.req.json();
+    await categoryService.updateCategory(categoryId, body);
+    return c.json({ message: "Category updated" });
+});
+
+// DELETE /category/:categoryId
+categoryController.delete("/:categoryId", async (c) => {
+    const categoryId = Number(c.req.param("categoryId"));
+    await categoryService.deleteCategory(categoryId);
+    return c.json({ message: "Category deleted" });
+});
+
+export default categoryController;

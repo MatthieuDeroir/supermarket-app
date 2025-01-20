@@ -1,21 +1,28 @@
 // modules/logs/bll/log.service.ts
-import { LogRepository } from "../dal/log.repository.ts";
+import logRepository from "../dal/log.repository.ts";
 import { Log } from "../log.model.ts";
-import { LogCreateDto } from "../dto/log-create.dto.ts";
 
-export class LogService {
-    constructor(private logRepo: LogRepository) {}
-
-    async createLog(dto: LogCreateDto): Promise<Log> {
-        const log: Log = {
-            stockLogId: 0,
-            date: new Date(),
-            ...dto
-        };
-        return await this.logRepo.createLog(log);
+class LogService {
+    async getAllLogs(): Promise<Log[]> {
+        return logRepository.findAll();
     }
 
-    async getProductLogs(productId: string): Promise<Log[]> {
-        return await this.logRepo.findByProductId(productId);
+    async getLogById(logId: number): Promise<Log | null> {
+        return logRepository.findById(logId);
+    }
+
+    async createLog(data: Omit<Log, "logId">): Promise<void> {
+        await logRepository.create(data);
+    }
+
+    async updateLog(logId: number, data: Partial<Log>): Promise<void> {
+        await logRepository.update(logId, data);
+    }
+
+    async deleteLog(logId: number): Promise<void> {
+        await logRepository.deleteById(logId);
     }
 }
+
+export const logService = new LogService();
+export default logService;

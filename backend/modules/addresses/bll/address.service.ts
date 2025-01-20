@@ -1,53 +1,49 @@
-// modules/addresses/bll/addresses.service.ts
-
-import { AddressesRepository } from "../dal/address.repository.ts";
+import addressRepository from "../dal/address.repository.ts";
 import { Address } from "../address.model.ts";
-import { AddressCreateDto } from "../dto/address-create.dto.ts";
-import { AddressUpdateDto } from "../dto/address-update.dto.ts";
 
-export class AddressesService {
-    constructor(private repo: AddressesRepository) {}
-
-    async createAddress(dto: AddressCreateDto): Promise<Address> {
-        // Example: check if userId is valid, or if city is required, etc.
-        // For now, just pass it along:
-        const address: Address = {
-            addressId: 0,
-            userId: dto.userId,
-            addressLine1: dto.addressLine1,
-            addressLine2: dto.addressLine2,
-            addressComplement: dto.addressComplement,
-            zipCode: dto.zipCode,
-            city: dto.city,
-            country: dto.country,
-        };
-        return await this.repo.createAddress(address);
+/**
+ * Couche métier : applique des règles, validations, etc.
+ */
+class AddressService {
+    /**
+     * Récupère toutes les adresses
+     */
+    async getAllAddress(): Promise<Address[]> {
+        return await addressRepository.findAll();
     }
 
+    /**
+     * Récupère une adresse par son addressId
+     */
     async getAddressById(addressId: number): Promise<Address | null> {
-        return await this.repo.findById(addressId);
+        return await addressRepository.findById(addressId);
     }
 
-    async findAddressesByUser(userId: number): Promise<Address[]> {
-        return await this.repo.findByUserId(userId);
+    /**
+     * Crée une nouvelle adresse
+     */
+    async createAddress(data: Omit<Address, "addressId">): Promise<void> {
+        // Vous pouvez faire des validations ou nettoyages ici
+        // ex.: if (!data.city) throw new Error("City is required");
+        await addressRepository.create(data);
     }
 
-    async updateAddress(dto: AddressUpdateDto): Promise<Address | null> {
-        // We could do more checks, e.g. ensure address belongs to user, etc.
-        const address: Address = {
-            addressId: dto.addressId,
-            userId: dto.userId,
-            addressLine1: dto.addressLine1,
-            addressLine2: dto.addressLine2,
-            addressComplement: dto.addressComplement,
-            zipCode: dto.zipCode,
-            city: dto.city,
-            country: dto.country,
-        };
-        return await this.repo.updateAddress(address);
+    /**
+     * Met à jour une adresse existante
+     */
+    async updateAddress(addressId: number, data: Partial<Address>): Promise<void> {
+        // Règles métier éventuelles, validations, ...
+        await addressRepository.update(addressId, data);
     }
 
-    async deleteAddress(addressId: number): Promise<boolean> {
-        return await this.repo.deleteAddress(addressId);
+    /**
+     * Supprime une adresse (hard-delete)
+     */
+    async deleteAddress(addressId: number): Promise<void> {
+        await addressRepository.deleteById(addressId);
     }
 }
+
+// On exporte une instance unique
+export const addressService = new AddressService();
+export default addressService;

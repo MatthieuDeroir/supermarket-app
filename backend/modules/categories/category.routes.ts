@@ -1,10 +1,8 @@
-// modules/tax/tax-category.routes.ts
-import { Hono } from "../../deps.ts";
-import { createTaxCategoryHandler, getAllTaxCategoriesHandler } from "./tax.controller.ts";
+// modules/categories/category.routes.ts
+import { Hono } from "hono";
+import categoryController from "./category.controller.ts";
 
-const taxCategoryRoutes = new Hono();
+const categoryRouter = new Hono();
+categoryRouter.route("/", categoryController);
 
-taxCategoryRoutes.post("/", createTaxCategoryHandler);
-taxCategoryRoutes.get("/", getAllTaxCategoriesHandler);
-
-export default taxCategoryRoutes;
+export default categoryRouter;

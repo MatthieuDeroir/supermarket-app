@@ -1,10 +1,8 @@
 // modules/logs/log.routes.ts
-import { Hono } from "../../deps.ts";
-import { createLogHandler, getProductLogsHandler } from "./log.controller.ts";
+import { Hono } from "hono";
+import logController from "./log.controller.ts";
 
-const logRoutes = new Hono();
+const logRouter = new Hono();
+logRouter.route("/", logController);
 
-logRoutes.post("/", createLogHandler);
-logRoutes.get("/product/:productId", getProductLogsHandler);
-
-export default logRoutes;
+export default logRouter;

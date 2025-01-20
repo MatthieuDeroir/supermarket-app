@@ -1,6 +1,5 @@
-// modules/addresses/addresses.model.ts
-
 export interface Address {
+    [key: string]: unknown; // <= index signature
     addressId: number;
     userId?: number;
     addressLine1?: string;

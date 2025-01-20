@@ -1,24 +1,17 @@
-// modules/stock/dal/action.repository.ts
-import { getDBClient } from "../../../config/database.ts";
-import { Action } from "../action.model.ts";
+// modules/carts/dal/cart.repository.ts
+import { GenericRepository } from "../../generic.repository.ts";
+import { Cart } from "../cart.model.ts";
 
-export class ActionRepository {
-    async findAll(): Promise<Action[]> {
-        const client = await getDBClient();
-        try {
-            const result = await client.queryObject<{
-                action_id: number;
-                name: string;
-                description: string;
-            }>`SELECT * FROM actions`;
-
-            return result.rows.map(row => ({
-                actionId: row.action_id,
-                name: row.name,
-                description: row.description,
-            }));
-        } finally {
-            client.release();
-        }
+export class CartRepository extends GenericRepository<Cart> {
+    constructor() {
+        super({
+            tableName: "carts",    // Nom de la table dans votre DB
+            primaryKey: "cartId",  // PK
+        });
     }
+
+    // ... Méthodes spécifiques si besoin
 }
+
+const cartRepository = new CartRepository();
+export default cartRepository;

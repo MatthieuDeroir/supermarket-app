@@ -1,12 +1,10 @@
 // modules/logs/log.model.ts
 export interface Log {
-    stockLogId: number;
+    [key: string]: unknown; // <= index signature
+    logId: number;
     date: Date;
     userId: number;
     productId: string;
-    stockTypeId: number;
-    actionId: number;
     quantity: number;
-    operation: string;
     reason: string;
 }

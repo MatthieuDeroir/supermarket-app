@@ -1,28 +1,13 @@
-// modules/addresses/addresses.routes.ts
-import { Hono } from "../../deps.ts";
-import {
-    createAddressHandler,
-    getAddressHandler,
-    getAddressesForUserHandler,
-    updateAddressHandler,
-    deleteAddressHandler,
-} from "./address.controller.ts";
+import { Hono } from "hono";
+import addressController from "./address.controller.ts";
 
-const addressesRoutes = new Hono();
+/**
+ * On déclare un "router" Hono qui monte le contrôleur
+ * sur la racine "/"
+ */
+const addressRouter = new Hono();
 
-// POST /addresses
-addressesRoutes.post("/", createAddressHandler);
+// Tous les endpoints définis dans addressController sont montés sur "/"
+addressRouter.route("/", addressController);
 
-// GET /addresses/:id
-addressesRoutes.get("/:id", getAddressHandler);
-
-// GET /addresses/user/:userId
-addressesRoutes.get("/user/:userId", getAddressesForUserHandler);
-
-// PATCH /addresses/:id
-addressesRoutes.patch("/:id", updateAddressHandler);
-
-// DELETE /addresses/:id
-addressesRoutes.delete("/:id", deleteAddressHandler);
-
-export default addressesRoutes;
+export default addressRouter;

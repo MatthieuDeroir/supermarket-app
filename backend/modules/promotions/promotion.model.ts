@@ -1,6 +1,10 @@
-// modules/stock/stock.model.ts
-export interface StockType {
-    stockTypeId: number;
-    name: string;
-    description: string;
+// modules/promotions/promotion.model.ts
+export interface Promotion {
+    [key: string]: unknown; // <= index signature
+    promotionId: number;
+    productId: string;
+    pourcentage: number;
+    begingDate: Date;
+    endDate: Date;
+    active: boolean;
 }

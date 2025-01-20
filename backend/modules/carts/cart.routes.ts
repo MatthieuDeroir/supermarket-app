@@ -1,16 +1,8 @@
-// modules/users/user.routes.ts
-import { Hono } from "../../deps.ts";
-import {
+// modules/carts/cart.routes.ts
+import { Hono } from "hono";
+import cartController from "./cart.controller.ts";
 
-} from "./action.controller.ts";
+const cartRouter = new Hono();
+cartRouter.route("/", cartController);
 
-const actionRoutes = new Hono();
-
-// GET /actions/
-actionRoutes.get("/");
-
-// POST /actions/
-actionRoutes.post("/");
-
-
-export default actionRoutes;
+export default cartRouter;

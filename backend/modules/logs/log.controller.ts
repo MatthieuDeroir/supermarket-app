@@ -1,28 +1,45 @@
 // modules/logs/log.controller.ts
-import { Context } from "../../deps.ts";
-import { LogRepository } from "./dal/log.repository.ts";
-import { LogService } from "./bll/log.service.ts";
-import { LogCreateDto } from "./dto/log-create.dto.ts";
+import { Hono } from "hono";
+import { logService } from "./bll/log.service.ts";
 
-const repo = new LogRepository();
-const service = new LogService(repo);
+const logController = new Hono();
 
-export async function createLogHandler(c: Context) {
-    try {
-        const body = await c.req.json();
-        const dto = body as LogCreateDto;
-        const log = await service.createLog(dto);
-        return c.json(log, 201);
-    } catch (err) {
-        if (err instanceof Error) {
-            return c.text(err.message, 400);
-        }
-        return c.text("Unknown error", 500);
-    }
-}
-
-export async function getProductLogsHandler(c: Context) {
-    const productId = c.req.param("productId");
-    const logs = await service.getProductLogs(productId);
+// GET /log
+logController.get("/", async (c) => {
+    const logs = await logService.getAllLogs();
     return c.json(logs);
-}
+});
+
+// GET /log/:logId
+logController.get("/:logId", async (c) => {
+    const logId = Number(c.req.param("logId"));
+    const log = await logService.getLogById(logId);
+    if (!log) {
+        return c.json({ message: "Log not found" }, 404);
+    }
+    return c.json(log);
+});
+
+// POST /log
+logController.post("/", async (c) => {
+    const body = await c.req.json();
+    await logService.createLog(body);
+    return c.json({ message: "Log created" }, 201);
+});
+
+// PUT /log/:logId
+logController.put("/:logId", async (c) => {
+    const logId = Number(c.req.param("logId"));
+    const body = await c.req.json();
+    await logService.updateLog(logId, body);
+    return c.json({ message: "Log updated" });
+});
+
+// DELETE /log/:logId
+logController.delete("/:logId", async (c) => {
+    const logId = Number(c.req.param("logId"));
+    await logService.deleteLog(logId);
+    return c.json({ message: "Log deleted" });
+});
+
+export default logController;

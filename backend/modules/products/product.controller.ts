@@ -1,31 +1,45 @@
 // modules/products/product.controller.ts
-import { Context } from "../../deps.ts";
-import { ProductRepository } from "./dal/product.repository.ts";
-import { ProductService } from "./bll/product.service.ts";
-import { ProductCreateDto } from "./dto/product-create.dto.ts";
+import { Hono } from "hono";
+import { productService } from "./bll/product.service.ts";
 
-const repo = new ProductRepository();
-const service = new ProductService(repo);
+const productController = new Hono();
 
-export async function createProductHandler(c: Context) {
-    try {
-        const body = await c.req.json();
-        const dto = body as ProductCreateDto;
-        const product = await service.createProduct(dto);
-        return c.json(product, 201);
-    } catch (err) {
-        if (err instanceof Error) {
-            return c.text(err.message, 400);
-        }
-        return c.text("Unknown error", 500);
-    }
-}
+// GET /product
+productController.get("/", async (c) => {
+    const products = await productService.getAllProducts();
+    return c.json(products);
+});
 
-export async function getProductHandler(c: Context) {
-    const productId = c.req.param("id");
-    const product = await service.getProduct(productId);
+// GET /product/:productId
+productController.get("/:productId", async (c) => {
+    const productId = Number(c.req.param("productId"));  // <-- Convertir en number
+    const product = await productService.getProductById(productId);
     if (!product) {
-        return c.text("Product not found", 404);
+        return c.json({ message: "Product not found" }, 404);
     }
     return c.json(product);
-}
+});
+
+// POST /product
+productController.post("/", async (c) => {
+    const body = await c.req.json();
+    await productService.createProduct(body);
+    return c.json({ message: "Product created" }, 201);
+});
+
+// PUT /product/:productId
+productController.put("/:productId", async (c) => {
+    const productId = Number(c.req.param("productId"));
+    const body = await c.req.json();
+    await productService.updateProduct(productId, body);
+    return c.json({ message: "Product updated" });
+});
+
+// DELETE /product/:productId
+productController.delete("/:productId", async (c) => {
+    const productId = Number(c.req.param("productId"));
+    await productService.deleteProduct(productId);
+    return c.json({ message: "Product deleted" });
+});
+
+export default productController;
