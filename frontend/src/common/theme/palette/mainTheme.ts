@@ -12,7 +12,7 @@ const GREY = {
   600: '#637381',
   700: '#454F5B',
   800: '#212B36',
-  900: '#161C24',
+  900: '#152828',
   A100: '#D0D7DC',
   A200: '#A1AEBD',
   A400: '#657487',
@@ -20,28 +20,28 @@ const GREY = {
 };
 
 const PRIMARY = {
-  lighter: '#C8FACD',
-  light: '#78b1ef',
-  main: '#4c5cd4',
-  dark: '#4944a9',
-  darker: '#2c2760',
+  lighter: '#A3D9A5',
+  light: '#a7c9b1',
+  main: '#7C9784',
+  dark: '#3A5C51',
+  darker: '#152828',
   contrastText: '#FFFFFF',
 };
 
 const SECONDARY = {
-  lighter: '#D6E4FF',
-  light: '#84A9FF',
-  main: '#3366FF',
-  dark: '#1939B7',
-  darker: '#091A7A',
+  lighter: '#FBF7DC',
+  light: '#BCA580',
+  main: '#C46A23',
+  dark: '#6F350A',
+  darker: '#3e1d04',
   contrastText: '#fff',
 };
 
 const INFO = {
   lighter: '#CAFDF5',
   light: '#61F3F3',
-  main: '#00B8D9',
-  dark: '#006C9C',
+  main: '#50A6C2',
+  dark: '#31707E',
   darker: '#003768',
   contrastText: '#FFFFFF',
 };
@@ -49,8 +49,8 @@ const INFO = {
 const SUCCESS = {
   lighter: '#D8FBDE',
   light: '#86E8AB',
-  main: '#36B37E',
-  dark: '#1B806A',
+  main: '#A3D9A5',
+  dark: '#679B6A',
   darker: '#0A5554',
   contrastText: '#FFFFFF',
 };
@@ -58,8 +58,8 @@ const SUCCESS = {
 const WARNING = {
   lighter: '#FFF5CC',
   light: '#FFD666',
-  main: '#FFAB00',
-  dark: '#B76E00',
+  main: '#F4B400',
+  dark: '#C49000',
   darker: '#7A4100',
   contrastText: GREY[800],
 };
@@ -67,14 +67,14 @@ const WARNING = {
 const ERROR = {
   lighter: '#FFE9D5',
   light: '#FFAC82',
-  main: '#FF5630',
-  dark: '#B71D18',
+  main: '#E63946',
+  dark: '#9D2A2E',
   darker: '#7A0916',
   contrastText: '#FFFFFF',
 };
 
 const palette: CustomPalette = {
-  common: { black: '#000', white: '#fff' },
+  common: { black: '#152828', white: '#fff' },
   primary: PRIMARY,
   secondary: SECONDARY,
   info: INFO,
