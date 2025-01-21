@@ -1,7 +1,7 @@
 // modules/tax/tax.model.ts
 export interface Category {
     [key: string]: unknown; // <= index signature
-    taxCategoryId: number;
+    categoryId: number;
     value: number;
     description: string;
 }

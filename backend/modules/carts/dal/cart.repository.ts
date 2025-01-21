@@ -6,7 +6,7 @@ export class CartRepository extends GenericRepository<Cart> {
     constructor() {
         super({
             tableName: "carts",    // Nom de la table dans votre DB
-            primaryKey: "cartId",  // PK
+            primaryKey: "cart_id",  // PK
         });
     }
 

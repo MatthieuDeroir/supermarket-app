@@ -50,11 +50,14 @@ productController.post("/:productId/warehouse", async (c) => {
     const productId = Number(c.req.param("productId"));
     const { quantity } = await c.req.json();
 
+    const user_id : number = 1; // TODO: récupérer userId depuis le JWT
+
     try {
-        const updated = await productService.addToWarehouse(productId, quantity);
+
+        const updated = await productService.addToWarehouse(productId, quantity, user_id);
         return c.json(updated);
     } catch (err) {
-        return c.json({ message: err.message }, 400);
+        return c.json({ message: err }, 400);
     }
 });
 
@@ -66,11 +69,13 @@ productController.post("/:productId/shelf", async (c) => {
     const productId = Number(c.req.param("productId"));
     const { quantity } = await c.req.json();
 
+    const user_id : number = 1; // TODO: récupérer userId depuis le JWT
+
     try {
-        const updated = await productService.transferToShelf(productId, quantity);
+        const updated = await productService.transferToShelf(productId, quantity, user_id);
         return c.json(updated);
     } catch (err) {
-        return c.json({ message: err.message }, 400);
+        return c.json({ message: err }, 400);
     }
 });
 

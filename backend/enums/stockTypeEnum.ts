@@ -1,4 +1,7 @@
-enum StockTypeEnum {
+export enum StockTypeEnum {
+    WAREHOUSE,
     SHELF,
-    WAREHOUSE
+    CART,
+    BOUGHT,
+    THRASH,
 }
