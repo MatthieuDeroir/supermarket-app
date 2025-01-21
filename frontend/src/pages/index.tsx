@@ -1,9 +1,13 @@
 import { NextPage } from 'next';
+import Home from '@modules/home/Home';
+import { Box } from '@mui/material';
 
 const Index: NextPage = () => {
   return (
     <>
-      <h1>Hello World</h1>
+      <Box>
+        <Home />
+      </Box>
     </>
   );
 };
