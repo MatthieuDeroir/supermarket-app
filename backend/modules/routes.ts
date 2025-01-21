@@ -21,7 +21,7 @@ routes.route("/carts", cartRouter);
 routes.route("/invoices", invoiceRouter);
 routes.route("/categories", categoryRouter);
 routes.route("/products", productRouter);
-routes.route("/products/openfood", openfoodRouter);
+routes.route("/openfood", openfoodRouter);
 routes.route("/logs", logRouter);
 routes.route("/promotions", promotionRouter);
 routes.route("/roles", roleRouter);
