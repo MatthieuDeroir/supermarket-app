@@ -16,7 +16,7 @@ const Layout = (props: ILayoutProps) => {
   return (
     <div>
       <Head>
-        <title>{process.env.NEXT_PUBLIC_APP_TITLE}</title>
+        <title>GroceryFlow</title>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
       <Box
