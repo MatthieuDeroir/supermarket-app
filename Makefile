@@ -3,16 +3,16 @@
 ENV ?= dev
 
 build:
-	docker-compose -f docker-compose.$(ENV).yml build
+	docker compose -f docker-compose.$(ENV).yml build
 
 up:
-	docker-compose -f docker-compose.$(ENV).yml up -d
+	docker compose -f docker-compose.$(ENV).yml up -d
 
 down:
-	docker-compose -f docker-compose.$(ENV).yml down
+	docker compose -f docker-compose.$(ENV).yml down
 
 logs:
-	docker-compose -f docker-compose.$(ENV).yml logs -f
+	docker compose -f docker-compose.$(ENV).yml logs -f
 
 test-back:
 	docker exec -it my-app_backend_1 deno test
