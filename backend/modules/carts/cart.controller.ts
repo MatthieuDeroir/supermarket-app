@@ -1,6 +1,6 @@
 // modules/carts/cart.controller.ts
 import { Hono } from "hono";
-import { cartService } from "./bll/cart.service.ts";
+import cartService from "./bll/cart.service.ts";
 
 const cartController = new Hono();
 

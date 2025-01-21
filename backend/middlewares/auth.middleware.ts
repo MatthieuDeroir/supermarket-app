@@ -11,7 +11,7 @@ export class AuthMiddleware {
     private secret: CryptoKey;
 
     constructor() {
-        this.secret = null;
+        this.secret = "null";
     }
 
     async generateSecret(): Promise<void> {

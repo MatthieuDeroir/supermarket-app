@@ -7,6 +7,8 @@ const app = new Hono();
 
 app.get("/health", (c) => c.json({ status: "ok" }));
 
+app.get("/", (c) => c.json({ message: "dab" }));
+
 // Connexion DB
 await db.connect();
 
