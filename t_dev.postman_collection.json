@@ -1226,6 +1226,182 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "openfoodfact",
+			"item": [
+				{
+					"name": "Get Product by EAN and add it to Database",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/products/openfood?ean=3029330003533",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"products",
+								"openfood"
+							],
+							"query": [
+								{
+									"key": "ean",
+									"value": "3029330003533"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test\"\n}"
+						},
+						"url": {
+							"raw": "{{API_URL}}/auth/register",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"  pm.environment.set('JWT_TOKEN', jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test\"\n}"
+						},
+						"url": {
+							"raw": "{{API_URL}}/auth/login",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "paypal",
+			"item": [
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"invoiceId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{API_URL}}/paypal/create-order",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"paypal",
+								"create-order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Confirm Order",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/paypal/confirm?orderId=XXXX",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"paypal",
+								"confirm"
+							],
+							"query": [
+								{
+									"key": "orderId",
+									"value": "XXXX"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Payment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/paypal/cancel",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"paypal",
+								"cancel"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }

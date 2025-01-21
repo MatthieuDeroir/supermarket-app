@@ -10,9 +10,9 @@ productController.get("/", async (c) => {
     return c.json(products);
 });
 
-// GET /product/:productId
-productController.get("/:productId", async (c) => {
-    const productId = Number(c.req.param("productId"));  // <-- Convertir en number
+// GET /product/:product_id
+productController.get("/:product_id", async (c) => {
+    const productId = Number(c.req.param("product_id"));
     const product = await productService.getProductById(productId);
     if (!product) {
         return c.json({ message: "Product not found" }, 404);
@@ -27,19 +27,51 @@ productController.post("/", async (c) => {
     return c.json({ message: "Product created" }, 201);
 });
 
-// PUT /product/:productId
-productController.put("/:productId", async (c) => {
-    const productId = Number(c.req.param("productId"));
+// PUT /product/:product_id
+productController.put("/:product_id", async (c) => {
+    const productId = Number(c.req.param("product_id"));
     const body = await c.req.json();
     await productService.updateProduct(productId, body);
     return c.json({ message: "Product updated" });
 });
 
-// DELETE /product/:productId
-productController.delete("/:productId", async (c) => {
-    const productId = Number(c.req.param("productId"));
+// DELETE /product/:product_id
+productController.delete("/:product_id", async (c) => {
+    const productId = Number(c.req.param("product_id"));
     await productService.deleteProduct(productId);
     return c.json({ message: "Product deleted" });
+});
+
+/**
+ * POST /products/:productId/warehouse
+ * Body { "quantity": 50 }
+ */
+productController.post("/:productId/warehouse", async (c) => {
+    const productId = Number(c.req.param("productId"));
+    const { quantity } = await c.req.json();
+
+    try {
+        const updated = await productService.addToWarehouse(productId, quantity);
+        return c.json(updated);
+    } catch (err) {
+        return c.json({ message: err.message }, 400);
+    }
+});
+
+/**
+ * POST /products/:productId/shelf
+ * Body { "quantity": 20 }
+ */
+productController.post("/:productId/shelf", async (c) => {
+    const productId = Number(c.req.param("productId"));
+    const { quantity } = await c.req.json();
+
+    try {
+        const updated = await productService.transferToShelf(productId, quantity);
+        return c.json(updated);
+    } catch (err) {
+        return c.json({ message: err.message }, 400);
+    }
 });
 
 export default productController;

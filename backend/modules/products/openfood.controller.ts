@@ -1,3 +1,4 @@
+// modules/products/openfood.controller.ts
 import { Hono } from "hono";
 import { openFoodService } from "./bll/openfood.service.ts";
 

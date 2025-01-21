@@ -7,48 +7,48 @@ class OpenFoodService {
         // 1) Appel à l’API OFF
         const url = `https://world.openfoodfacts.org/api/v0/product/${ean}.json`;
         const res = await fetch(url);
-        if (!res.ok) {
-            return null;
-        }
+        if (!res.ok) return null;
+
         const data = await res.json();
-
         if (data.status !== 1) {
-            // signifie que le produit n’est pas trouvé
+            // produit non trouvé
             return null;
         }
 
-        // 2) Extraire les infos utiles
-        const productData = data.product;
+        // 2) Extraire les infos intéressantes
+        const offProduct = data.product;
 
-        // Par exemple, on récupère un nom, un brand, etc.
-        const productName = productData.product_name || "Unknown";
-        const brand = Array.isArray(productData.brands_tags) && productData.brands_tags.length > 0
-            ? productData.brands_tags[0]
-            : productData.brands || "Unknown";
+        const productName = offProduct.product_name || "Unknown";
+        const brand = Array.isArray(offProduct.brands_tags) && offProduct.brands_tags.length > 0
+            ? offProduct.brands_tags[0]
+            : (offProduct.brands || "Unknown");
 
-        // 3) Créer un "Product" interne
-        // => Adaptez selon votre schéma. On suppose productId est un auto-increment.
-        //    On met un "price" arbitraire à 0, etc. categoryId = 1 par défaut, etc.
-        //    Ajustez selon vos colonnes.
-        const product: Omit<Product, "product_id"> = {
-            price: 0,
+        const description = offProduct.generic_name || offProduct.ingredients_text || "No description";
+        const picture = offProduct.image_front_url || offProduct.image_url || "";
+        // On sérialise les nutriments si on veut tout garder
+        const nutritional = offProduct.nutriments ? JSON.stringify(offProduct.nutriments) : "";
+
+        // 3) Construire l'objet partiel (sans `product_id` qui est auto-incrément)
+        const newProduct: Partial<Product> = {
+            ean: ean,
+            name: productName,
+            brand,
+            description,
+            picture,
+            nutritional_information: nutritional,
+            price: 0,               // Par défaut
             stock_warehouse: 0,
             stock_shelf_bottom: 0,
             minimum_stock: 0,
             minimum_shelf_stock: 0,
-            category_id: 1, // par exemple
-            // Données custom
-            name: productName,       // si vous avez un champ "name" dans product.model.ts
-            brand: brand,            // si vous avez un champ "brand"
-            ean: ean,                // si vous tenez à stocker l’EAN en DB
-        } as any;
+            category_id: 1,         // Par exemple
+        };
 
-        // 4) Enregistrer ce produit dans la DB
-        const createdId = await productRepository.createReturningId(product);
+        // 4) Insérer en DB et récupérer product_id
+        const newId = await productRepository.createReturningId(newProduct);
 
-        // 5) Retourner le produit complet
-        // => On refait un findById pour choper le product créé, ou on assemble.
-        const created = await productRepository.findById(createdId);
+        // 5) Relire le produit complet
+        const created = await productRepository.findById(newId);
         return created;
     }
 }

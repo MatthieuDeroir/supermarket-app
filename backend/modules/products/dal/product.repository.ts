@@ -6,28 +6,30 @@ import { Product } from "../product.model.ts";
 export class ProductRepository extends GenericRepository<Product> {
     constructor() {
         super({
-            tableName: "Products",   // Nom de la table
-            primaryKey: "productId", // Nom de la PK (type number)
+            tableName: "products",      // Table en DB
+            primaryKey: "product_id",   // PK = product_id (snake_case)
         });
     }
 
+    /**
+     * Insère un produit et retourne son product_id.
+     */
     async createReturningId(data: Partial<Product>): Promise<number> {
         const client = db.getClient();
-        const columns = Object.keys(data);
+        const columns = Object.keys(data);   // ["ean", "name", "brand", ...]
         const values = Object.values(data);
 
         const placeholders = columns.map((_, i) => `$${i + 1}`).join(", ");
         const query = `
-      INSERT INTO products (${columns.join(", ")})
-      VALUES (${placeholders})
-      RETURNING product_id
-    `;
+            INSERT INTO products (${columns.join(", ")})
+            VALUES (${placeholders})
+            RETURNING product_id
+        `;
 
         const result = await client.queryObject<{ product_id: number }>({
             text: query,
             args: values,
         });
-
         return result.rows[0].product_id;
     }
 }
