@@ -8,6 +8,7 @@ import { Box, Checkbox, FormControlLabel, TextField } from '@mui/material';
 import { useForm, FormProvider } from 'react-hook-form';
 import useAuth from '@common/hooks/useAuth';
 import Image from 'next/image';
+import Routes from '@common/defs/routes/routes';
 
 interface LoginFormInputs {
   email: string;
@@ -31,7 +32,7 @@ const LoginForm = () => {
       if (response.success) {
         const storage = data.rememberMe ? localStorage : sessionStorage;
         storage.setItem('authToken', response.token);
-        window.location.href = '/';
+        window.location.href = Routes.Common.Home;
       }
     } catch (error) {
       console.error('Login failed', error);

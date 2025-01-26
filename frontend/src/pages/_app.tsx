@@ -15,33 +15,32 @@ import ProtectedRoute from '@common/components/ProtectedRoute';
 
 const App = ({ Component, pageProps, router }: AppProps) => {
   const authEnabled = process.env.NEXT_PUBLIC_AUTH_ENABLED;
-  const publicPages = ['/login', '/signup'];
+  const publicPages = ['/login', '/signup '];
   const isPublicPage = publicPages.includes(router.pathname);
+  const is404 = router.pathname === '/404';
+
+  if (is404) {
+    return <Component {...pageProps} />;
+  }
+
+  if (isPublicPage) {
+    return <Component {...pageProps} />;
+  }
+
   if (authEnabled === 'false') {
     return (
-      <>
-        {isPublicPage ? (
-          <Component {...pageProps} />
-        ) : (
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        )}
-      </>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
     );
   }
+
   return (
-    <>
-      {isPublicPage ? (
+    <ProtectedRoute>
+      <Layout>
         <Component {...pageProps} />
-      ) : (
-        <ProtectedRoute>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </ProtectedRoute>
-      )}
-    </>
+      </Layout>
+    </ProtectedRoute>
   );
 };
 
