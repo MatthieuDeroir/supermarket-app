@@ -11,12 +11,37 @@ import Layout from '@common/layout/Layout';
 import customShadows from '@common/theme/customShadows';
 import GlobalStyles from '@common/theme/GlobalStyles';
 import { frFR } from '@mui/material/locale';
+import ProtectedRoute from '@common/components/ProtectedRoute';
 
-const App = ({ Component, pageProps }: AppProps) => {
+const App = ({ Component, pageProps, router }: AppProps) => {
+  const authEnabled = process.env.NEXT_PUBLIC_AUTH_ENABLED;
+  const publicPages = ['/login', '/signup'];
+  const isPublicPage = publicPages.includes(router.pathname);
+  if (authEnabled === 'false') {
+    return (
+      <>
+        {isPublicPage ? (
+          <Component {...pageProps} />
+        ) : (
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        )}
+      </>
+    );
+  }
   return (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
+    <>
+      {isPublicPage ? (
+        <Component {...pageProps} />
+      ) : (
+        <ProtectedRoute>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ProtectedRoute>
+      )}
+    </>
   );
 };
 
