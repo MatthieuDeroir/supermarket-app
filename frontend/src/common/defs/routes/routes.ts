@@ -1,6 +1,6 @@
 const Common = {
   Home: '/',
-  Selles: '/selles',
+  Sales: '/sales',
   Promotions: '/promotions',
   Settings: '/settings',
   Account: '/account',

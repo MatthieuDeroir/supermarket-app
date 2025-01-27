@@ -79,7 +79,7 @@ const Topbar = () => {
       {
         icon: <CreditCardIcon />,
         itemLabel: 'Ventes',
-        itemLink: Routes.Common.Selles,
+        itemLink: Routes.Common.Sales,
       },
       {
         icon: <ShoppingCartIcon />,
