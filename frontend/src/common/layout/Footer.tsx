@@ -3,6 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import { Divider, List, ListItem, ListItemText, Typography, useMediaQuery } from '@mui/material';
 import { alpha, Box } from '@mui/system';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 
 interface FooterItemProps {
   label: string;
@@ -30,20 +31,43 @@ const Footer = () => {
       sx={{
         position: 'relative',
         zIndex: 100,
-        backgroundColor: 'primary.main',
+        backgroundColor: 'primary.dark',
         width: '100%',
-        paddingY: { xs: 2, md: 6 },
-        marginTop: 10,
+        paddingY: { xs: 1, md: 2 },
+        marginTop: 2,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         fontSize: '15px',
-        color: 'common.white',
+        color: 'secondary.lighter',
       }}
     >
       {(!isFooterItemsEven || mdScreen) && (
         <Box sx={{ marginBottom: 2 }}>
-          <Typography sx={{ color: 'text.secondary' }}>Logo</Typography>
+          <Image
+            src="/assets/images/GroceryFlowLOGO.webp"
+            alt="GroceryFlow"
+            width={500}
+            height={480}
+            style={{
+              cursor: 'pointer',
+              width: 45,
+              height: 'auto',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          />
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
+              flexGrow: 1,
+              display: { xs: 'block', md: 'none' },
+              color: 'secondary.lighter',
+            }}
+          >
+            GroceryFlow
+          </Typography>
         </Box>
       )}
       <Box sx={{ display: 'flex', marginBottom: { xs: 0, md: 1.7 } }}>
@@ -131,7 +155,30 @@ const Footer = () => {
                 paddingX: 4,
               }}
             >
-              <Typography sx={{ color: 'text.primary' }}>Logo</Typography>
+              <Image
+                src="/assets/images/GroceryFlowLOGO.webp"
+                alt="GroceryFlow"
+                width={500}
+                height={480}
+                style={{
+                  cursor: 'pointer',
+                  width: 45,
+                  height: 'auto',
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                }}
+              />
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{
+                  flexGrow: 1,
+                  display: 'block',
+                  color: 'secondary.lighter',
+                }}
+              >
+                GroceryFlow
+              </Typography>
             </Box>
             <List
               sx={{
