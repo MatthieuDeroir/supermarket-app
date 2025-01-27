@@ -1,0 +1,13 @@
+# Utiliser l'image officielle PostgreSQL
+FROM postgres:latest
+
+# Définir les variables d'environnement pour PostgreSQL
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=postgres
+ENV POSTGRES_DB=t_dev_700_dev
+
+# Exposer le port par défaut de PostgreSQL
+EXPOSE 5432
+
+# Commande par défaut pour démarrer PostgreSQL
+CMD ["postgres"]
