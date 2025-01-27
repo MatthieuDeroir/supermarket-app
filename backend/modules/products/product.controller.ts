@@ -23,7 +23,7 @@ productController.get("/:product_id", async (c) => {
 // POST /product
 productController.post("/", async (c) => {
     const body = await c.req.json();
-    await productService.createProduct(body);
+    await productService.createProduct(body, 1); // TODO: récupérer userId depuis le JWT
     return c.json({ message: "Product created" }, 201);
 });
 

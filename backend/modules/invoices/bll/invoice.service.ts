@@ -72,7 +72,7 @@ class InvoiceService {
         user: { user_id: unknown; name: unknown; email: string }
     }> {
         const invoice = await invoiceRepository.findById(invoiceId);
-        if (!invoice) return null;
+        if (!invoice) throw new Error("Invoice not found");
 
         const user = await userRepository.findById(invoice.user_id);
         const address = await addressRepository.findById(invoice.address_id);
@@ -132,7 +132,7 @@ class InvoiceService {
                     };
                 })
             );
-            result.push({
+            result.push(<InvoiceWithDetails>{
                 ...inv,
                 user: {
                     user_id: user?.user_id ?? 0,
