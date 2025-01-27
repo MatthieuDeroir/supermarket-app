@@ -1,67 +1,97 @@
-import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import {
   AppBar,
   Box,
-  Button,
   Container,
   Drawer,
   IconButton,
   List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Toolbar,
   Typography,
-  styled,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import Stack from '@mui/material/Stack';
-import { ArrowForwardIos } from '@mui/icons-material';
-
-interface TopbarItem {
-  label: string;
-  link?: string;
-  onClick?: () => void;
-  dropdown?: Array<{
-    label: string;
-    link?: string;
-    onClick?: () => void;
-  }>;
-}
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import Image from 'next/image';
+import Routes from '@common/defs/routes/routes';
+import LeftBar, { LeftBarProps } from '@common/layout/LeftBar';
+import HomeIcon from '@mui/icons-material/Home';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import LayersIcon from '@mui/icons-material/Layers';
+import InboxIcon from '@mui/icons-material/Inbox';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import SettingsIcon from '@mui/icons-material/Settings';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import AddIcon from '@mui/icons-material/Add';
 
 const Topbar = () => {
   const [showDrawer, setShowDrawer] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
 
-  const dropdownWidth = 137;
   const toggleSidebar = () => {
     setShowDrawer((oldValue) => !oldValue);
   };
-  const navItems: TopbarItem[] = [
-    {
-      label: 'Accueil',
-      link: '/',
-      onClick: () => router.push('/'),
-    },
-  ];
 
-  const toggleDropdown = () => {
-    setShowDropdown((oldValue) => !oldValue);
-  };
-
-  const onNavButtonClick = (item: TopbarItem) => {
-    if (item.dropdown) {
-      return toggleDropdown;
-    }
-    return () => {
-      setShowDrawer(false);
-      if (item.onClick) {
-        item.onClick();
-      }
-    };
+  const LeftBarItems: LeftBarProps = {
+    items: [
+      {
+        icon: <HomeIcon />,
+        itemLabel: 'Accueil',
+        itemLink: Routes.Common.Home,
+      },
+      {
+        icon: <AccountCircleIcon />,
+        itemLabel: 'Mon Compte',
+        itemLink: Routes.Common.Account,
+      },
+      {
+        icon: <DragIndicatorIcon />,
+        itemLabel: 'Stocks',
+        sousItems: [
+          {
+            icon: <LayersIcon />,
+            itemLabel: 'Entrepôt',
+            itemLink: Routes.Stocks.Entrepot,
+          },
+          {
+            icon: <LayersIcon />,
+            itemLabel: 'FDR',
+            itemLink: Routes.Stocks.FDR,
+          },
+          {
+            icon: <InboxIcon />,
+            itemLabel: 'Gestion des Stocks',
+            itemLink: Routes.Stocks.StocksManagment,
+          },
+          {
+            icon: <FilterAltIcon />,
+            itemLabel: 'Logs Stocks',
+            itemLink: Routes.Stocks.StocksLogs,
+          },
+          {
+            icon: <AddIcon />,
+            itemLabel: 'Ajouter Produit',
+            itemLink: Routes.Stocks.AddProduct,
+          },
+        ],
+      },
+      {
+        icon: <CreditCardIcon />,
+        itemLabel: 'Ventes',
+        itemLink: Routes.Common.Sales,
+      },
+      {
+        icon: <ShoppingCartIcon />,
+        itemLabel: 'Promotions',
+        itemLink: Routes.Common.Promotions,
+      },
+      {
+        icon: <SettingsIcon />,
+        itemLabel: 'Paramètres',
+        itemLink: Routes.Common.Settings,
+      },
+    ],
   };
 
   const router = useRouter();
@@ -70,161 +100,44 @@ const Topbar = () => {
       position="static"
       sx={{
         boxShadow: (theme) => theme.customShadows.z1,
-        backgroundColor: 'common.white',
+        backgroundColor: 'primary.dark',
       }}
     >
       <Container>
         <Toolbar sx={{ px: { xs: 0, sm: 0 } }}>
-          <Stack flexDirection="row" alignItems="center" flexGrow={1}>
-            <Typography sx={{ color: 'text.secondary' }}>Logo</Typography>
+          <Stack flexDirection="row" alignItems="center" flexGrow={1} gap={1}>
+            <Image
+              onClick={() => router.push(Routes.Common.Home)}
+              src="/assets/images/GroceryFlowLOGO.webp"
+              alt="GroceryFlow"
+              width={500}
+              height={480}
+              style={{ cursor: 'pointer', width: 50, height: 'auto' }}
+            />
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{
+                flexGrow: 1,
+                display: 'block',
+                color: 'secondary.lighter',
+              }}
+            >
+              GroceryFlow
+            </Typography>
           </Stack>
           <List sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
             <>
-              {navItems.map((item, index) => {
-                return (
-                  <ListItem
-                    key={index}
-                    sx={{
-                      width: 'fit-content',
-                    }}
-                  >
-                    <StyledListItemButton
-                      sx={{
-                        ...(router.pathname === item.link && {
-                          color: 'primary.main',
-                        }),
-                        ...(item.dropdown && {
-                          borderTopLeftRadius: 24,
-                          borderTopRightRadius: 24,
-                          borderBottomLeftRadius: 0,
-                          borderBottomRightRadius: 0,
-                          width: dropdownWidth,
-                          display: 'flex',
-                          alignItems: 'center',
-                          '&:hover': {
-                            backgroundColor: 'transparent',
-                            boxShadow: (theme) => theme.customShadows.z12,
-                            '.MuiTypography-root': {
-                              fontWeight: 'bold',
-                            },
-                            '.dropdown-menu': {
-                              visibility: 'visible',
-                            },
-                            '.MuiTouchRipple-child': {
-                              backgroundColor: 'transparent',
-                            },
-                          },
-                        }),
-                      }}
-                      onClick={onNavButtonClick(item)}
-                    >
-                      {!item.dropdown ? (
-                        <>{item.label}</>
-                      ) : (
-                        <>
-                          <ListItemText>{item.label}</ListItemText>
-                          <KeyboardArrowDown />
-                          <List
-                            className="dropdown-menu"
-                            sx={{
-                              backgroundColor: 'common.white',
-                              boxShadow: (theme) => theme.customShadows.z12,
-                              position: 'absolute',
-                              top: 48,
-                              left: 0,
-                              padding: 0,
-                              width: dropdownWidth,
-                              borderBottomLeftRadius: 24,
-                              borderBottomRightRadius: 24,
-                              visibility: 'hidden',
-                              zIndex: 1000000,
-                            }}
-                          >
-                            {item.dropdown.map((dropdownItem, dropdownItemIndex) => {
-                              return (
-                                <ListItem
-                                  key={dropdownItemIndex}
-                                  sx={{
-                                    padding: 0,
-                                  }}
-                                >
-                                  <ListItemButton
-                                    sx={{
-                                      display: 'flex',
-                                      gap: 1,
-                                      paddingX: 2,
-                                      paddingY: 1.5,
-                                      borderRadius: 0,
-                                      zIndex: 1000000,
-                                      '&:hover': {
-                                        backgroundColor: 'primary.dark',
-                                        color: 'primary.contrastText',
-                                      },
-                                      ...(item.dropdown?.length === dropdownItemIndex + 1 && {
-                                        borderBottomLeftRadius: 24,
-                                        borderBottomRightRadius: 24,
-                                      }),
-                                    }}
-                                    onClick={onNavButtonClick(dropdownItem)}
-                                  >
-                                    {dropdownItem.label}
-                                  </ListItemButton>
-                                </ListItem>
-                              );
-                            })}
-                          </List>
-                        </>
-                      )}
-                    </StyledListItemButton>
-                  </ListItem>
-                );
-              })}
-            </>
-
-            <>
-              <ListItem
-                sx={{
-                  width: 'fit-content',
-                }}
+              <IconButton
+                aria-label="Compte"
+                size="small"
+                onClick={() => router.push(Routes.Common.Account)}
               >
-                <StyledListItemButton
-                  onClick={() => router.push('/')}
-                  sx={{
-                    ...(router.pathname === '/' && {
-                      color: 'primary.main',
-                    }),
-                  }}
-                >
-                  Connexion
-                </StyledListItemButton>
-              </ListItem>
-              <ListItem
-                sx={{
-                  width: 'fit-content',
-                }}
-              >
-                <Button
-                  variant="contained"
-                  endIcon={
-                    <ArrowForwardIos
-                      fontSize="small"
-                      className="arrow-icon"
-                      sx={{ fontSize: '12px', transition: 'all, 0.15s' }}
-                    />
-                  }
-                  onClick={() => router.push('/')}
-                  sx={{
-                    display: { xs: 'none', md: 'flex' },
-                    '&:hover': {
-                      '.arrow-icon': {
-                        transform: 'translateX(0.25rem)',
-                      },
-                    },
-                  }}
-                >
-                  Inscription
-                </Button>
-              </ListItem>
+                <AccountCircleIcon
+                  fontSize="inherit"
+                  sx={{ color: 'primary.light', fontSize: 35 }}
+                />
+              </IconButton>
             </>
           </List>
           <IconButton
@@ -233,7 +146,7 @@ const Topbar = () => {
               display: { md: 'none', sm: 'flex' },
             }}
           >
-            <MenuIcon fontSize="medium" sx={{ color: 'grey.700' }} />
+            <MenuIcon fontSize="medium" sx={{ color: 'secondary.lighter' }} />
           </IconButton>
         </Toolbar>
       </Container>
@@ -250,172 +163,38 @@ const Topbar = () => {
           <Box
             sx={{
               padding: 4,
-              '.topbar-logo': {
-                width: '250px',
-              },
             }}
+            onClick={() => router.push(Routes.Common.Home)}
           >
-            <Typography sx={{ color: 'text.secondary' }}>Logo</Typography>
+            <Image
+              src="/assets/images/GroceryFlowLOGO.webp"
+              alt="GroceryFlow"
+              width={500}
+              height={480}
+              style={{
+                cursor: 'pointer',
+                width: 45,
+                height: 'auto',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }}
+            />
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{
+                flexGrow: 1,
+                display: { xs: 'block', md: 'none' },
+                color: 'common.black',
+              }}
+            >
+              GroceryFlow
+            </Typography>
           </Box>
-          {navItems.map((item, index) => {
-            return (
-              <ListItem
-                key={index}
-                disablePadding
-                sx={{
-                  ...(item.dropdown && {
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }),
-                }}
-              >
-                <ListItemButton
-                  onClick={!item.dropdown ? onNavButtonClick(item) : toggleDropdown}
-                  sx={{
-                    width: '100%',
-                  }}
-                >
-                  <ListItemText
-                    primaryTypographyProps={{
-                      ...(router.pathname === item.link && {
-                        color: 'primary.main',
-                      }),
-                    }}
-                  >
-                    {item.label}
-                  </ListItemText>
-                  {item.dropdown && (
-                    <ListItemIcon color="grey.800" sx={{ minWidth: 'unset' }}>
-                      <KeyboardArrowDown sx={{ color: 'grey.800' }} />
-                    </ListItemIcon>
-                  )}
-                </ListItemButton>
-                {item.dropdown && (
-                  <List
-                    sx={{
-                      width: '100%',
-                      transition: 'all, 0.2s',
-                      height: 0,
-                      paddingY: 0,
-                      ...(showDropdown && {
-                        height: `calc(${item.dropdown.length} * 48px)`,
-                      }),
-                    }}
-                    className="dropdown-list"
-                  >
-                    {item.dropdown.map((dropdownItem, dropdownItemIndex) => {
-                      return (
-                        <ListItem
-                          key={dropdownItemIndex}
-                          sx={{
-                            padding: 0,
-                            visibility: 'hidden',
-                            ...(showDropdown && {
-                              visibility: 'visible',
-                            }),
-                          }}
-                        >
-                          <ListItemButton
-                            onClick={onNavButtonClick(dropdownItem)}
-                            sx={{
-                              display: 'flex',
-                              gap: 1,
-                              paddingLeft: 4,
-                            }}
-                          >
-                            <ListItemText>{dropdownItem.label}</ListItemText>
-                          </ListItemButton>
-                        </ListItem>
-                      );
-                    })}
-                  </List>
-                )}
-              </ListItem>
-            );
-          })}
-          <ListItem key="profile" disablePadding>
-            <ListItemButton
-              onClick={() => router.push('/')}
-              sx={{
-                width: '100%',
-              }}
-            >
-              <ListItemText
-                primaryTypographyProps={{
-                  ...(router.pathname === '/' && {
-                    color: 'primary.main',
-                  }),
-                }}
-              >
-                Mon Profil
-              </ListItemText>
-            </ListItemButton>
-          </ListItem>
-          <>
-            <ListItem
-              disablePadding
-              sx={{
-                backgroundColor: 'transparent',
-                marginBottom: 3,
-              }}
-            >
-              <ListItemButton
-                onClick={() => {
-                  setShowDrawer(false);
-                  router.push('/');
-                }}
-              >
-                <ListItemText
-                  primaryTypographyProps={{
-                    ...(router.pathname === '/' && {
-                      color: 'primary.main',
-                    }),
-                  }}
-                >
-                  Connexion
-                </ListItemText>
-              </ListItemButton>
-            </ListItem>
-            <Button
-              variant="contained"
-              endIcon={
-                <ArrowForwardIos
-                  fontSize="small"
-                  className="arrow-icon"
-                  sx={{ fontSize: '12px', transition: 'all, 0.15s' }}
-                />
-              }
-              onClick={() => {
-                setShowDrawer(false);
-                router.push('/');
-              }}
-              sx={{
-                display: 'flex',
-                flex: 1,
-                width: 150,
-                '&:hover': {
-                  '.arrow-icon': {
-                    transform: 'translateX(0.25rem)',
-                  },
-                },
-              }}
-            >
-              Inscription
-            </Button>
-          </>
         </List>
+        <LeftBar items={LeftBarItems.items} />
       </Drawer>
     </AppBar>
   );
 };
-const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
-  color: theme.palette.grey[700],
-  borderRadius: theme.shape.borderRadius + 'px',
-  '&:hover': {
-    backgroundColor: 'transparent',
-  },
-  '.MuiTouchRipple-child': {
-    backgroundColor: theme.palette.primary.main,
-  },
-}));
 export default Topbar;
