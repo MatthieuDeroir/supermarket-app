@@ -43,22 +43,22 @@ const LoginForm = () => {
     <>
       <Box
         sx={{
-          padding: 2,
+          padding: 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           minHeight: '100vh',
           overflowY: 'auto',
-          gap: 2,
+          gap: 1,
         }}
       >
         <Box sx={{ maxWidth: '450px' }}>
           <Image
             src="/assets/images/GroceryFlowLOGO.webp"
             alt="GroceryFlow"
-            width={450}
-            height={420}
+            width={300}
+            height={280}
             style={{ margin: 'auto', display: 'block', width: '80%', height: 'auto' }}
           />
           <Typography
@@ -82,7 +82,7 @@ const LoginForm = () => {
         >
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <Grid container spacing={4} sx={{ padding: 5 }}>
+              <Grid container spacing={2} sx={{ padding: 2 }}>
                 <Grid item xs={12}>
                   <TextField
                     label="Email"
