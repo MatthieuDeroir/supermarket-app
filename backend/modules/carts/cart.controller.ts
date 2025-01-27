@@ -81,7 +81,9 @@ cartController.delete("/:cartId/lines/:cartLineId", async (c) => {
     const userId = 1;
 
     try {
+        console.log(`Removing CartLine ${cartLineId}`);
         await cartService.removeCartLine(cartLineId, userId);
+        console.log(`CartLine ${cartLineId} removed`);
         return c.json({ message: `CartLine ${cartLineId} removed` });
     } catch (err) {
         return c.json({ message: err }, 400);

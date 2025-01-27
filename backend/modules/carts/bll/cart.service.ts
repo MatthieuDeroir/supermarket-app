@@ -112,6 +112,7 @@ class CartService {
      * - Crée la cartLine
      * - Log l’opération
      */
+    // modules/carts/bll/cart.service.ts
     async addProductToCart(
         cartId: number,
         productId: number,
@@ -124,67 +125,84 @@ class CartService {
 
         // 1) Vérifier que le cart existe
         const cart = await cartRepository.findById(cartId);
-        console.log("cart", cart);
         if (!cart) {
             throw new Error(`Cart ${cartId} not found`);
         }
 
         // 2) Vérifier le produit + stock shelf
         const product = await productRepository.findById(productId);
-        console.log("product", product);
         if (!product) {
             throw new Error(`Product ${productId} not found`);
         }
 
         const availableShelf = product.stock_shelf_bottom ?? 0;
-        console.log("availableShelf", availableShelf);
         if (availableShelf < quantity) {
             throw new Error("Not enough stock on shelf");
         }
 
         // 3) Décrémenter stock_shelf_bottom
         const newShelf = availableShelf - quantity;
-        console.log("newShelf", newShelf);
         await productRepository.update(productId, { stock_shelf_bottom: newShelf });
 
-        // 4) Créer la cartLine
-        const cartLineData: Partial<CartLine> = {
-            cart_id : cartId,
-            product_id : String(productId),
-            quantity,
-            created_at: new Date(),
-        };
-        console.log("cartLineData", cartLineData);
-        await cartLineRepository.create(cartLineData)
+        // 4) Vérifier si une cartLine pour (cartId, productId) existe déjà
+        let existingLine = await cartLineRepository.findOneByCartAndProduct(cartId, productId);
 
-        console.log("cartLineData", cartLineData);
+        if (existingLine) {
+            // 4.a) Si elle existe, on incrémente la quantité
+            const oldQty = existingLine.quantity;
+            const newQty = oldQty + quantity;
 
-        // Retrouver la cartLine créée
-        // Option 1: createReturningId sur cartLine
-        // Option 2: findByCartId et filtrer
-        const lines = await cartLineRepository.findByCartId(cartId);
-        const newLine = lines.find(
-            (l) => l.productId === productId && l.quantity === quantity
-        )!;
+            await cartLineRepository.updateQuantity(existingLine.cart_line_id, newQty);
 
-        // 5) Log l’opération
-        await logService.createLog({
-            log_id: 0,
-            date: new Date(),
-            user_id : userId,
-            product_id : String(productId),
-            quantity,
-            reason: `Add product to cart #${cartId}`,
-            action: ActionTypeEnum.ADD_TO_CART,
-        });
+            // Relire la cartLine mise à jour
+            existingLine = await cartLineRepository.findById(existingLine.cart_line_id);
 
-        return newLine;
+            // 5) Log l’opération : on précise qu’on a ajouté `quantity` en plus
+            await logService.createLog({
+                date: new Date(),
+                user_id: userId,
+                product_id: productId,
+                quantity,
+                reason: `Add (increment) product in cart #${cartId}`,
+                action: ActionTypeEnum.ADD_TO_CART,
+            });
+
+            // On retourne la cartLine finalisée
+            return existingLine!;
+        } else {
+            // 4.b) Sinon, on crée une nouvelle cartLine
+            const cartLineData: Partial<CartLine> = {
+                cart_id: cartId,
+                product_id: productId,
+                quantity,
+                created_at: new Date(),
+            };
+            await cartLineRepository.create(cartLineData);
+
+            // Retrouver la cartLine créée (hypothèse : findOneByCartAndProduct)
+            const newLine = await cartLineRepository.findOneByCartAndProduct(cartId, productId);
+
+            // 5) Log l’opération
+            await logService.createLog({
+                log_id: 0,
+                date: new Date(),
+                user_id: userId,
+                product_id: String(productId),
+                quantity,
+                reason: `Add product to cart #${cartId}`,
+                action: ActionTypeEnum.ADD_TO_CART,
+            });
+
+            return newLine!;
+        }
     }
+
 
     /**
      * Retirer une cartLine du cart => rétablir la quantité sur shelf
      * puis supprimer la cartLine et log l’opération.
      */
+    // modules/carts/bll/cart.service.ts
     async removeCartLine(cartLineId: number, userId: number): Promise<void> {
         // 1) Retrouver la cartLine
         const cartLine = await cartLineRepository.findById(cartLineId);
@@ -192,17 +210,19 @@ class CartService {
             throw new Error(`CartLine ${cartLineId} not found`);
         }
 
-        const { productId, quantity } = cartLine;
+        // On récupère product_id et quantity
+        const { product_id, quantity } = cartLine;
+
         // 2) Retrouver le produit => ré-incrémenter shelf
-        // productId est un "number" si c'est ce que vous avez dans la DB
-        const product = await productRepository.findById(Number(productId));
+        const product = await productRepository.findById(product_id);
         if (!product) {
-            throw new Error(`Product ${productId} not found`);
+            throw new Error(`Product ${product_id} not found`);
         }
 
         const currentShelf = product.stock_shelf_bottom ?? 0;
         const newShelf = currentShelf + quantity;
-        await productRepository.update(Number(productId), {
+
+        await productRepository.update(product_id, {
             stock_shelf_bottom: newShelf,
         });
 
@@ -211,15 +231,15 @@ class CartService {
 
         // 4) Log l’opération
         await logService.createLog({
-            logId: 0,
             date: new Date(),
-            userId,
-            productId: String(productId),
+            user_id: userId,                      // l'utilisateur qui effectue l'opération
+            product_id: product_id.toString(),    // si log.table a product_id en string
             quantity,
             reason: `Remove cartLine #${cartLineId}`,
             action: ActionTypeEnum.REMOVE_FROM_CART,
         });
     }
+
 
 }
 
