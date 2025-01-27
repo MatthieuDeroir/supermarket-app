@@ -1,0 +1,1 @@
+TDEV700-38 :rocket: feat (backend): refactorisation de la base de données en prenant en compte les nouvelles fonctionnalités (cart et promotions) et les simplifications (stockType et Action retirés)
