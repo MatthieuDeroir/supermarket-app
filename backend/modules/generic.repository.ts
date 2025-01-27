@@ -7,7 +7,7 @@ export interface GenericRepositoryOptions<T> {
 }
 
 export class GenericRepository<T extends Record<string, unknown>> {
-    private tableName: string;
+    protected tableName: string;
     private primaryKey: keyof T;
 
     constructor(options: GenericRepositoryOptions<T>) {

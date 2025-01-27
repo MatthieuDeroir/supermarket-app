@@ -1,9 +1,9 @@
 // modules/carts/cartline.model.ts
 export interface CartLine {
     [key: string]: unknown; // <= index signature
-    cartLineId: number;
-    productId: string;   // ou number, selon votre schéma
+    cart_line_id: number;
+    product_id: number;   // ou number, selon votre schéma
     quantity: number;
-    cartId: number;      // clé étrangère vers Cart
+    cart_id: number;      // clé étrangère vers Cart
     createdAt: Date;
 }

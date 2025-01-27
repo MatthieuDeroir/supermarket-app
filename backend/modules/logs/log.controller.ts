@@ -42,4 +42,40 @@ logController.delete("/:logId", async (c) => {
     return c.json({ message: "Log deleted" });
 });
 
+logController.get("product/:productId", async (c) => {
+    const productId = Number(c.req.param("productId"));
+
+    try {
+        const logs = await logService.getLogsByProductId(productId);
+        return c.json(logs);
+    } catch(err) {
+        return c.json({ message: err }, 400);
+    }
+
+
+})
+
+// GET /log/product/:productId/daily?start=YYYY-MM-DD&end=YYYY-MM-DD
+logController.get("/product/:productId/daily", async (c) => {
+    const productId = Number(c.req.param("productId"));
+    const start = c.req.query("start");
+    const end = c.req.query("end");
+    if (!start || !end) {
+        return c.json({ message: "Missing start / end query param" }, 400);
+    }
+
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        return c.json({ message: "Invalid date format" }, 400);
+    }
+
+    try {
+        const history = await logService.getDailyStockHistory(productId, startDate, endDate);
+        return c.json(history);
+    } catch (err) {
+        return c.json({ message: err }, 400);
+    }
+});
+
 export default logController;

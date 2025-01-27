@@ -1,7 +1,9 @@
 // modules/carts/cart.model.ts
 export interface Cart {
     [key: string]: unknown; // <= index signature
-    cartId: number;
-    userId: number;
+    cart_id: number;
+    user_id: number;
+    payed: boolean;
     createdAt: Date;
+    payedAt?: Date | null;
 }

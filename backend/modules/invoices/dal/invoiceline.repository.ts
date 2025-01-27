@@ -1,21 +1,23 @@
-// modules/invoices/dal/invoiceline.repository.ts
 import { GenericRepository } from "../../generic.repository.ts";
 import { InvoiceLine } from "../invoiceline.model.ts";
 
 export class InvoiceLineRepository extends GenericRepository<InvoiceLine> {
     constructor() {
         super({
-            tableName: "invoicelines",
-            primaryKey: "invoiceLineId",
+            tableName: "invoice_lines",
+            primaryKey: "invoice_line_id",
         });
     }
 
-    async findByInvoiceId(invoiceId: number): Promise<InvoiceLine[]> {
+    /**
+     * Récupère toutes les lignes associées à une invoice
+     */
+    async findByInvoiceId(invoice_id: number): Promise<InvoiceLine[]> {
         const client = (await import("../../../config/database.ts")).default.getClient();
-        const query = `SELECT * FROM invoiceLines WHERE invoiceId = $1`;
+        const query = `SELECT * FROM invoice_lines WHERE invoice_id = $1`;
         const result = await client.queryObject<InvoiceLine>({
             text: query,
-            args: [invoiceId],
+            args: [invoice_id],
         });
         return result.rows;
     }

@@ -1,0 +1,11 @@
+{
+  "imports": {
+    "@modules/": "./modules/",
+    "@utils/": "./utils/",
+    "@config/": "./config/",
+    "@enums/": "./enums/",
+    "@middlewares/": "./middlewares/",
+    "@scripts/": "./scripts/",
+    "@tests/": "./tests/"
+  }
+}

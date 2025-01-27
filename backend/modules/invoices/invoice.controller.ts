@@ -1,45 +1,53 @@
-// modules/invoices/invoice.controller.ts
 import { Hono } from "hono";
 import { invoiceService } from "./bll/invoice.service.ts";
 
 const invoiceController = new Hono();
 
-// GET /invoice
+// GET /invoices
 invoiceController.get("/", async (c) => {
     const invoices = await invoiceService.getAllInvoices();
     return c.json(invoices);
 });
 
-// GET /invoice/:invoiceId
-invoiceController.get("/:invoiceId", async (c) => {
-    const invoiceId = Number(c.req.param("invoiceId"));
-    const invoice = await invoiceService.getInvoiceById(invoiceId);
+// GET /invoices/:invoice_id
+invoiceController.get("/:invoice_id", async (c) => {
+    const invoice_id = Number(c.req.param("invoice_id"));
+    const invoice = await invoiceService.getInvoiceById(invoice_id);
     if (!invoice) {
         return c.json({ message: "Invoice not found" }, 404);
     }
     return c.json(invoice);
 });
 
-// POST /invoice
+// GET /invoices/user/:user_id
+invoiceController.get("/user/:user_id", async (c) => {
+    const user_id = Number(c.req.param("user_id"));
+    const invoices = await invoiceService.getInvoicesByUserId(user_id);
+    return c.json(invoices);
+});
+
+// POST /invoices
 invoiceController.post("/", async (c) => {
     const body = await c.req.json();
     await invoiceService.createInvoice(body);
     return c.json({ message: "Invoice created" }, 201);
 });
 
-// PUT /invoice/:invoiceId
-invoiceController.put("/:invoiceId", async (c) => {
-    const invoiceId = Number(c.req.param("invoiceId"));
+// PUT /invoices/:invoice_id
+invoiceController.put("/:invoice_id", async (c) => {
+    const invoice_id = Number(c.req.param("invoice_id"));
     const body = await c.req.json();
-    await invoiceService.updateInvoice(invoiceId, body);
+    await invoiceService.updateInvoice(invoice_id, body);
     return c.json({ message: "Invoice updated" });
 });
 
-// DELETE /invoice/:invoiceId
-invoiceController.delete("/:invoiceId", async (c) => {
-    const invoiceId = Number(c.req.param("invoiceId"));
-    await invoiceService.deleteInvoice(invoiceId);
+// DELETE /invoices/:invoice_id
+invoiceController.delete("/:invoice_id", async (c) => {
+    const invoice_id = Number(c.req.param("invoice_id"));
+    await invoiceService.deleteInvoice(invoice_id);
     return c.json({ message: "Invoice deleted" });
 });
+
+
 
 export default invoiceController;
