@@ -10,6 +10,8 @@ export interface Log {
     productId: string;
     quantity: number;
     reason: string;
+    stock_warehouse_after?: number;       // état du stock en warehouse après mouvement
+    stock_shelf_bottom_after?: number;    // état du fond de rayon après mouvement
     action: ActionTypeEnum;
     stockType: StockTypeEnum;
 }

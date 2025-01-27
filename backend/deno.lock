@@ -432,6 +432,8 @@
     "https://deno.land/x/postgres@v0.17.0/utils/deferred.ts": "dd94f2a57355355c47812b061a51b55263f72d24e9cb3fdb474c7519f4d61083",
     "https://deno.land/x/postgres@v0.17.0/utils/utils.ts": "19c3527ddd5c6c4c49ae36397120274c7f41f9d3cbf479cb36065d23329e9f90",
     "https://esm.sh/bcrypt-ts@5.0.3": "9f0bdcf38ca8746ca016e75dbfd72263b1b26b19386c2f95dc823042b9817ef6",
+    "https://esm.sh/date-fns@2.30.0": "86c803098828885e7d88afa080c9545e51572c53d21b1333e0e24be6c0e52100",
+    "https://esm.sh/date-fns@2.30.0/denonext/date-fns.mjs": "ed6535a9106d2c525c0e7b0a7690445915d716880939e9a355e2666785fe498f",
     "https://esm.sh/v135/bcrypt-ts@5.0.3/denonext/bcrypt-ts.mjs": "ebcdefd11d997dafb17eb92b26a595c24cfa7cff0237aef11232ad4dadda8a9b"
   },
   "workspace": {

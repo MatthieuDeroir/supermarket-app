@@ -1,10 +1,9 @@
-// modules/invoices/invoiceline.model.ts
 export interface InvoiceLine {
-    [key: string]: unknown; // <= index signature
-    invoiceLineId: number;
-    productId: string; // ou number
+    [key: string]: unknown; // Index signature
+    invoice_line_id: number;
+    product_id: string; // Ou `number` selon votre schéma
     quantity: number;
     price: number;
-    invoiceId: number;  // clé étrangère
-    createdAt: Date;
+    invoice_id: number; // Clé étrangère
+    created_at: Date;
 }

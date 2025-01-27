@@ -5,8 +5,8 @@ import { User } from "../user.model.ts";
 export class UserRepository extends GenericRepository<User> {
     constructor() {
         super({
-            tableName: "Users",
-            primaryKey: "userId",
+            tableName: "users",
+            primaryKey: "user_id",
         });
     }
 

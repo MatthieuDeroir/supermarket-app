@@ -46,29 +46,31 @@ cartController.delete("/:cartId", async (c) => {
 cartController.post("/:cartId/pay", async (c) => {
     const cartId = Number(c.req.param("cartId"));
 
+
     // TODO: plus tard, récupérer userId depuis le JWT
     // ex.: const userId = c.get("userId");
     // Pour l'instant, on met un dummy
     const userId = 1; // ou parseInt(...) ?
+    const addressId = 2;
 
     try {
-        await cartService.payCart(cartId, userId);
+        await cartService.payCart(cartId, userId, addressId);
         return c.json({ message: `Cart ${cartId} paid` });
     } catch (err) {
         return c.json({ error: err }, 400);
     }
 });
 
-// POST /cart/:cartId/lines
-cartController.post("/:cartId/lines", async (c) => {
+// POST /carts/lines
+cartController.post("/lines", async (c) => {
     const cartId = Number(c.req.param("cartId"));
     const { productId, quantity } = await c.req.json();
-    console.log(productId, quantity, cartId);
+    console.log(productId, quantity);
     // plus tard, on récupérera userId depuis le JWT
     const userId = 1;
 
     try {
-        const newLine = await cartService.addProductToCart(cartId, productId, quantity, userId);
+        const newLine = await cartService.addProductToCart(productId, quantity, userId);
         return c.json(newLine, 201);
     } catch (err) {
         return c.json({ message: err }, 400);

@@ -5,8 +5,8 @@ import { Promotion } from "../promotion.model.ts";
 export class PromotionRepository extends GenericRepository<Promotion> {
     constructor() {
         super({
-            tableName: "Promotions",
-            primaryKey: "promotionId",
+            tableName: "promotions",
+            primaryKey: "promotion_id",
         });
     }
 }

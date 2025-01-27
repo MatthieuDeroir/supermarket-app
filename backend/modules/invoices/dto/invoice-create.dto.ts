@@ -3,7 +3,7 @@ export interface InvoiceCreateDto {
     userId: number;
     addressId: number;
     lines: {
-        productId: string;
+        productId: number;
         quantity: number;
     }[];
 }
