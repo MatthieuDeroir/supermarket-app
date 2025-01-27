@@ -225,6 +225,52 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Add Product to Cart",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"productId\": 15, \"quantity\": 1200}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/carts/lines",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"carts",
+								"lines"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pay Cart",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/carts/5/pay",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"carts",
+								"5",
+								"pay"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -278,15 +324,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"cart_id\": 1,\n  \"product_id\": 1,\n  \"quantity\": 2\n}"
+							"raw": "{\n  \"cart_id\": 1,\n  \"product_id\": 15,\n  \"quantity\": 16\n}"
 						},
 						"url": {
-							"raw": "{{API_URL}}/cart_lines",
+							"raw": "{{API_URL}}/lines",
 							"host": [
 								"{{API_URL}}"
 							],
 							"path": [
-								"cart_lines"
+								"lines"
 							]
 						}
 					},
@@ -325,13 +371,15 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/cart_lines/1",
+							"raw": "{{API_URL}}/carts/1/lines/4",
 							"host": [
 								"{{API_URL}}"
 							],
 							"path": [
-								"cart_lines",
-								"1"
+								"carts",
+								"1",
+								"lines",
+								"4"
 							]
 						}
 					},
@@ -587,12 +635,31 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/invoices/1",
+							"raw": "{{API_URL}}/invoices/5",
 							"host": [
 								"{{API_URL}}"
 							],
 							"path": [
 								"invoices",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Invoice by User ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/invoices/user/1",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"invoices",
+								"user",
 								"1"
 							]
 						}
@@ -780,6 +847,55 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Daily Stocks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/logs/product/15/daily?start=2025-01-01&end=2025-01-29\n",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"logs",
+								"product",
+								"15",
+								"daily"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "end",
+									"value": "2025-01-29\n"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Logs by Product ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/logs/product/15",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"logs",
+								"product",
+								"15"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -887,6 +1003,62 @@
 							"path": [
 								"products",
 								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Transfer Product to Shelf",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 15\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/products/15/shelf",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"products",
+								"15",
+								"shelf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Product to Warehouse",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 15\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/products/15/warehouse",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"products",
+								"15",
+								"warehouse"
 							]
 						}
 					},
@@ -1055,7 +1227,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Admin\"\n}"
+							"raw": "{\n  \"name\": \"Customer\"\n}"
 						},
 						"url": {
 							"raw": "{{API_URL}}/roles",
@@ -1236,18 +1408,17 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{API_URL}}/products/openfood?ean=3029330003533",
+							"raw": "{{API_URL}}/openfood?ean=54491472",
 							"host": [
 								"{{API_URL}}"
 							],
 							"path": [
-								"products",
 								"openfood"
 							],
 							"query": [
 								{
 									"key": "ean",
-									"value": "3029330003533"
+									"value": "54491472"
 								}
 							]
 						}
