@@ -58,34 +58,65 @@ const InfoProduit: React.FC<{ ean: string }> = ({ ean }) => {
   }
 
   return (
-    <Box>
-      <Typography variant="h2">{productData.name}</Typography>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        height: '100vh',
+        padding: 2,
+      }}
+    >
+      <Box
+        sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', maxWidth: '50%' }}
+      >
+        <Typography variant="h2">{productData.name}</Typography>
 
-      <Typography variant="h6">Prix :</Typography>
-      <Typography>{productData.price}</Typography>
+        <Typography variant="h6">Prix :</Typography>
+        <Typography>{productData.price}</Typography>
 
-      <Typography variant="h6">Marque :</Typography>
-      <Typography>{productData.brand}</Typography>
+        <Typography variant="h6">Marque :</Typography>
+        <Typography>{productData.brand}</Typography>
 
-      <Typography variant="h6">Catégorie :</Typography>
-      <Typography>{productData.category}</Typography>
+        <Typography variant="h6">Catégorie :</Typography>
+        <Typography>{productData.category}</Typography>
 
-      <Typography variant="h6">Informations nutritionnelles :</Typography>
-      <Typography>
-        {Object.entries(productData.nutritional_information)
-          .map(([key, value]) => `${key}: ${value}`)
-          .join(', ')}
-      </Typography>
+        <Typography variant="h6">Quantité disponible en stock :</Typography>
+        <Typography>{productData.available_quantity} unités</Typography>
 
-      <Typography variant="h6">Quantité disponible en stock :</Typography>
-      <Typography>{productData.available_quantity} unités</Typography>
+        <Typography variant="h6">EAN :</Typography>
+        <Typography>{productData.ean}</Typography>
+        <CodeBarre value={productData.ean} />
 
-      <Typography variant="h6">EAN :</Typography>
-      <Typography>{productData.ean}</Typography>
-      <CodeBarre value={productData.ean} />
-
-      <Typography variant="h6">Image :</Typography>
-      <Box component="img" src={productData.picture} alt={productData.name} width="300px" />
+        <Typography variant="h6">Informations nutritionnelles :</Typography>
+        <Typography
+          variant="subtitle2"
+          sx={{ maxWidth: '95%', wordWrap: 'break-word', fontSize: '0.75rem' }}
+        >
+          {Object.entries(productData.nutritional_information)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join(', ')}
+        </Typography>
+      </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexGrow: 1,
+        }}
+      >
+        <Box
+          component="img"
+          src={productData.picture}
+          alt={productData.name}
+          sx={{
+            maxHeight: '80vh',
+            maxWidth: '40%',
+            objectFit: 'contain',
+          }}
+        />
+      </Box>
     </Box>
   );
 };
