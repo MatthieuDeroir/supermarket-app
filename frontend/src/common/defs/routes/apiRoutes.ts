@@ -15,6 +15,17 @@ const ApiRoutes = {
     Update: (id: ID) => `/api/users/${id}/update`,
     Delete: (id: ID) => `/api/users/${id}/delete`,
   },
+  Products: {
+    GetAll: '/api/products',
+    GetById: (id: ID) => `/api/products/${id}`,
+    Update: (id: ID) => `/api/products/${id}/update`,
+    Delete: (id: ID) => `/api/products/${id}/delete`,
+    GetByEan: (ean: string) => `/api/products/ean/${ean}`,
+  },
+  KpiLogs: {
+    GetByProductEan: (ean: string, start: string, end: string) =>
+      `/api/logs/product/${ean}/daily?start=${start}&end=${end}`,
+  },
   // Add other routes as needed
 };
 

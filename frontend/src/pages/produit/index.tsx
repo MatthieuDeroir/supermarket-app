@@ -4,14 +4,17 @@ import StockKPI from '@modules/kpi/components/StockKPI';
 import FondRayonKPI from '@modules/kpi/components/FondRayonKPI';
 
 import { Box } from '@mui/material';
+import { Margin } from '@mui/icons-material';
 
 const Index: NextPage = () => {
   return (
     <Box>
-      <InfoProduit ean="" />
       <Box>
-        <StockKPI />
-        <FondRayonKPI />
+        <InfoProduit ean="" />
+      </Box>
+      <Box sx={{ marginTop: 4 }}>
+        <StockKPI ean="" />
+        <FondRayonKPI ean="" />
       </Box>
     </Box>
   );

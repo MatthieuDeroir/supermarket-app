@@ -1,6 +1,8 @@
 import { Box, Typography } from '@mui/material';
+import apiRoutes from '@common/defs/routes/apiRoutes';
 import React, { useEffect, useState } from 'react';
 import CodeBarre from './CodeBarre';
+import axios from 'axios';
 
 // Définition du type pour les données du produit
 interface ProductData {
@@ -18,39 +20,42 @@ const InfoProduit: React.FC<{ ean: string }> = ({ ean }) => {
   const [productData, setProductData] = useState<ProductData | null>(null);
 
   useEffect(() => {
-    // Tentative de récupération des données depuis l'API
-    fetch(`/API/Produit/${ean}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP : ${response.status}`);
+    const fetchProductByEan = async (ean: string) => {
+      try {
+        // Tentative de récupération des données via l'API
+        const response = await axios.get(apiRoutes.Products.GetByEan(ean));
+        if (response.status === 200) {
+          setProductData(response.data);
+        } else {
+          throw new Error('API non disponible');
         }
-        return response.json();
-      })
-      .then((data: ProductData) => {
-        setProductData(data);
-      })
-      .catch((error) => {
-        console.error('Erreur API, utilisation des données locales :', error);
-        // Fallback vers le fichier JSON local
-        import('../exempleProduit/exempleJSONProduit.json')
-          .then((localData) => {
-            // Transformation des données locales
-            const transformedData: ProductData = {
-              ean: localData.ean,
-              name: localData.name,
-              price: localData.price,
-              brand: localData.brand,
-              picture: localData.picture,
-              category: `Catégorie ID: ${localData.category_id}`,
-              nutritional_information: JSON.parse(localData.nutritional_information),
-              available_quantity: localData.stock_warehouse + localData.stock_shelf_bottom,
-            };
-            setProductData(transformedData);
-          })
-          .catch((localError) =>
-            console.error('Erreur lors du chargement du fichier JSON local :', localError),
-          );
-      });
+      } catch (error) {
+        console.error(
+          'Erreur lors de la récupération depuis l’API, utilisation des données locales',
+          error,
+        );
+
+        // Fallback : Chargement des données locales
+        try {
+          const localData = await import('../exempleProduit/exempleJSONProduit.json');
+          const transformedData: ProductData = {
+            ean: localData.ean,
+            name: localData.name,
+            price: localData.price,
+            brand: localData.brand,
+            picture: localData.picture,
+            category: `Catégorie ID: ${localData.category_id}`,
+            nutritional_information: JSON.parse(localData.nutritional_information),
+            available_quantity: localData.stock_warehouse + localData.stock_shelf_bottom,
+          };
+          setProductData(transformedData);
+        } catch (localError) {
+          console.error('Erreur lors du chargement des données locales', localError);
+        }
+      }
+    };
+
+    fetchProductByEan(ean);
   }, [ean]);
 
   if (!productData) {
@@ -68,7 +73,12 @@ const InfoProduit: React.FC<{ ean: string }> = ({ ean }) => {
       }}
     >
       <Box
-        sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', maxWidth: '50%' }}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          maxWidth: '50%',
+        }}
       >
         <Typography variant="h2">{productData.name}</Typography>
 
