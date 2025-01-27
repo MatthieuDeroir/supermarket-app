@@ -1,4 +1,5 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Icône pour le bouton d'expansion
 import apiRoutes from '@common/defs/routes/apiRoutes';
 import React, { useEffect, useState } from 'react';
 import CodeBarre from './CodeBarre';
@@ -98,15 +99,27 @@ const InfoProduit: React.FC<{ ean: string }> = ({ ean }) => {
         <Typography>{productData.ean}</Typography>
         <CodeBarre value={productData.ean} />
 
-        <Typography variant="h6">Informations nutritionnelles :</Typography>
-        <Typography
-          variant="subtitle2"
-          sx={{ maxWidth: '95%', wordWrap: 'break-word', fontSize: '0.75rem' }}
-        >
-          {Object.entries(productData.nutritional_information)
-            .map(([key, value]) => `${key}: ${value}`)
-            .join(', ')}
-        </Typography>
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1-content"
+            id="panel1-header"
+          >
+            <Typography component="span" variant="h6">
+              Informations nutritionnelles
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography
+              variant="subtitle2"
+              sx={{ maxWidth: '95%', wordWrap: 'break-word', fontSize: '0.75rem' }}
+            >
+              {Object.entries(productData.nutritional_information)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join(', ')}
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
       </Box>
       <Box
         sx={{
