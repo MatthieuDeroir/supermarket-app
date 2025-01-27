@@ -26,6 +26,7 @@ const ApiRoutes = {
     GetByProductEan: (ean: string, start: string, end: string) =>
       `/api/logs/product/${ean}/daily?start=${start}&end=${end}`,
   },
+
   // Add other routes as needed
 };
 
