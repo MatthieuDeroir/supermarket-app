@@ -1,5 +1,5 @@
 import { Box, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ArrowDownwardIcon from '@mui/icons-material/ExpandMore';
 import PromotionArticle from '@modules/produit/promotionArticle/promotionArticle';
 import PrixComponent from '@modules/produit/prixComponent/prixComponent';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
@@ -68,23 +68,22 @@ const InfoProduit: React.FC<{ ean: string }> = ({ ean }) => {
   }
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', justifyContent: 'space-evenly', width: '100%', padding: 2 }}>
       <Box
         sx={{
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          height: '100vh',
-          width: '50%',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          flex: 1,
           padding: 2,
+          gap: 2,
         }}
       >
         <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center',
-            maxWidth: '50%',
+            justifyContent: 'start',
           }}
         >
           <Typography variant="h2">{productData.name}</Typography>
@@ -104,7 +103,7 @@ const InfoProduit: React.FC<{ ean: string }> = ({ ean }) => {
 
           <Accordion>
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
+              expandIcon={<ArrowDownwardIcon />}
               aria-controls="panel1-content"
               id="panel1-header"
             >
@@ -126,26 +125,38 @@ const InfoProduit: React.FC<{ ean: string }> = ({ ean }) => {
         </Box>
       </Box>
       <Box>
-        <PrixComponent price={productData.price} category={productData.category} />
-        <PromotionArticle productId={productData.product_id} price={productData.price} />
         <Box
           sx={{
             display: 'flex',
-            justifyContent: 'center',
+            flexDirection: 'column',
+            justifyContent: 'start',
             alignItems: 'center',
-            flexGrow: 1,
+            flex: 1,
+            padding: 2,
+            gap: 2,
           }}
         >
+          <PrixComponent price={productData.price} category={productData.category} />
+          <PromotionArticle productId={productData.product_id} price={productData.price} />
           <Box
-            component="img"
-            src={productData.picture}
-            alt={productData.name}
             sx={{
-              maxHeight: '80vh',
-              maxWidth: '40%',
-              objectFit: 'contain',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexGrow: 1,
             }}
-          />
+          >
+            <Box
+              component="img"
+              src={productData.picture}
+              alt={productData.name}
+              sx={{
+                maxHeight: '80vh',
+                maxWidth: '40%',
+                objectFit: 'contain',
+              }}
+            />
+          </Box>
         </Box>
       </Box>
     </Box>
