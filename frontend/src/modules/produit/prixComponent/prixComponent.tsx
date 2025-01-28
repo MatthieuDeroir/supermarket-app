@@ -58,7 +58,6 @@ const PrixComponent: React.FC<PrixComponentProps> = ({ price, category }) => {
     fetchCategories();
   }, [category]);
 
-  // ✅ Conversion sécurisée du prix
   const parsedPrice = parseFloat(price) || 0;
   const parsedTva = selectedTva !== '-' ? selectedTva : 0;
   const priceHT = parsedTva ? (parsedPrice / (1 + parsedTva / 100)).toFixed(2) : '-';
@@ -66,7 +65,6 @@ const PrixComponent: React.FC<PrixComponentProps> = ({ price, category }) => {
   return (
     <Box>
       <Box display="flex" gap={2} justifyContent="center">
-        {/* Prix TTC */}
         <TextField
           label="Prix TTC"
           variant="outlined"
@@ -79,11 +77,14 @@ const PrixComponent: React.FC<PrixComponentProps> = ({ price, category }) => {
             '& .MuiInputBase-input.Mui-disabled': { WebkitTextFillColor: 'black' },
             '& .MuiInputLabel-root.Mui-disabled': { color: 'black' },
           }}
-          InputProps={{ endAdornment: <InputAdornment position="end">€</InputAdornment> }}
+          slotProps={{
+            input: {
+              endAdornment: <InputAdornment position="end">€</InputAdornment>,
+            },
+          }}
           disabled
         />
 
-        {/* Sélection de la TVA */}
         <TextField
           label="TVA"
           variant="outlined"
@@ -109,7 +110,6 @@ const PrixComponent: React.FC<PrixComponentProps> = ({ price, category }) => {
           )}
         </TextField>
 
-        {/* Prix HT */}
         <TextField
           label="Prix HT"
           variant="outlined"
@@ -122,7 +122,11 @@ const PrixComponent: React.FC<PrixComponentProps> = ({ price, category }) => {
             '& .MuiInputBase-input.Mui-disabled': { WebkitTextFillColor: 'black' },
             '& .MuiInputLabel-root.Mui-disabled': { color: 'black' },
           }}
-          InputProps={{ endAdornment: <InputAdornment position="end">€</InputAdornment> }}
+          slotProps={{
+            input: {
+              endAdornment: <InputAdornment position="end">€</InputAdornment>,
+            },
+          }}
           disabled
         />
       </Box>
