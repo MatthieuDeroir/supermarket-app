@@ -1,6 +1,7 @@
 import { Box, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import PromotionArticle from '../promotionArticle/promotionArticle';
+import PromotionArticle from '@modules/produit/promotionArticle/promotionArticle';
+import PrixComponent from '@modules/produit/prixComponent/prixComponent';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 import React, { useEffect, useState } from 'react';
 import CodeBarre from './CodeBarre';
@@ -13,7 +14,7 @@ interface ProductData {
   price: string;
   brand: string;
   picture: string;
-  category: string;
+  category: number;
   nutritional_information: Record<string, string | number>;
   available_quantity: number;
   product_id: number;
@@ -47,7 +48,7 @@ const InfoProduit: React.FC<{ ean: string }> = ({ ean }) => {
             price: localData.price,
             brand: localData.brand,
             picture: localData.picture,
-            category: `Catégorie ID: ${localData.category_id}`,
+            category: localData.category_id,
             nutritional_information: JSON.parse(localData.nutritional_information),
             available_quantity: localData.stock_warehouse + localData.stock_shelf_bottom,
             product_id: localData.product_id,
@@ -94,9 +95,6 @@ const InfoProduit: React.FC<{ ean: string }> = ({ ean }) => {
           <Typography variant="h6">Marque :</Typography>
           <Typography variant="body1">{productData.brand}</Typography>
 
-          <Typography variant="h6">Catégorie :</Typography>
-          <Typography>{productData.category}</Typography>
-
           <Typography variant="h6">Quantité disponible en stock :</Typography>
           <Typography>{productData.available_quantity} unités</Typography>
 
@@ -128,6 +126,7 @@ const InfoProduit: React.FC<{ ean: string }> = ({ ean }) => {
         </Box>
       </Box>
       <Box>
+        <PrixComponent price={productData.price} category={productData.category} />
         <PromotionArticle productId={productData.product_id} price={productData.price} />
         <Box
           sx={{

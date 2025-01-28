@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Checkbox, TextField, Button } from '@mui/material';
+import { Box, Typography, Checkbox, TextField, Button, InputAdornment } from '@mui/material';
 import { useRouter } from 'next/router';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 
@@ -119,6 +119,11 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId, price }) => {
                   color: 'black',
                 },
               }}
+              slotProps={{
+                input: {
+                  endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                },
+              }}
               disabled
             />
             <TextField
@@ -138,6 +143,11 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId, price }) => {
                 },
                 '& .MuiInputLabel-root.Mui-disabled': {
                   color: 'black',
+                },
+              }}
+              slotProps={{
+                input: {
+                  endAdornment: <InputAdornment position="end">€</InputAdornment>,
                 },
               }}
               disabled

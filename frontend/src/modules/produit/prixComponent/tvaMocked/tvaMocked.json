@@ -1,0 +1,27 @@
+[
+  {
+    "taxCategoryId": 1,
+    "value": 0.2,
+    "description": "Taux standard de TVA"
+  },
+  {
+    "taxCategoryId": 2,
+    "value": 0.1,
+    "description": "Taux réduit pour produits alimentaires"
+  },
+  {
+    "taxCategoryId": 3,
+    "value": 0.05,
+    "description": "Taux super-réduit pour biens essentiels"
+  },
+  {
+    "taxCategoryId": 4,
+    "value": 0.0,
+    "description": "Exonéré de TVA"
+  },
+  {
+    "taxCategoryId": 5,
+    "value": 0.15,
+    "description": "Taux intermédiaire pour services spécifiques"
+  }
+]
