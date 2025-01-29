@@ -1,14 +1,12 @@
 {
   "tasks": {
-    "dev": "deno run --watch --env=.env main.ts",
+    "dev": "deno run --watch main.ts",
     "build": "deno compile main.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
     "hono": "npm:hono@^4.6.9",
     "pg": "npm:pg@^8.13.1",
-    "websocket": "npm:websocket@^1.0.35",
-    "paypal-rest-sdk": "npm:paypal-rest-sdk@^1.8.1"
-  },
-  "importMap": "./import_map.json"
+    "paypal-rest-sdk": "npm:paypal-rest-sdk@^1.8.1",
+  }
 }
