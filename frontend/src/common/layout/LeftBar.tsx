@@ -74,7 +74,7 @@ const LeftBar: React.FC<LeftBarProps> = ({ items }) => {
                 {item.sousItems.map((sousItem) => (
                   <StyledListItem
                     key={sousItem.itemLabel}
-                    onClick={() => router.push(Routes.Common.Account)}
+                    onClick={() => router.push(sousItem.itemLink ? sousItem.itemLink : '/')}
                     selected={window.location.pathname === sousItem.itemLink}
                     sx={{ pl: 6 }}
                   >

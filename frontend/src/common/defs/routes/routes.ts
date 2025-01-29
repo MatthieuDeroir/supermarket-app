@@ -8,9 +8,9 @@ const Common = {
 };
 
 const Stocks = {
-  Entrepot: '/entrepot',
-  FDR: '/fdr',
-  StocksManagment: '/stocks-managment',
+  Entrepot: '/allStockProduct',
+  FDR: '/allShelfProduct',
+  StocksManagment: '/allProduct',
   StocksLogs: '/stocks-logs',
   AddProduct: '/add-product',
 };
