@@ -1,10 +1,19 @@
-import { Box, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Button,
+} from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ExpandMore';
 import PromotionArticle from '@modules/produit/promotionArticle/promotionArticle';
 import PrixComponent from '@modules/produit/prixComponent/prixComponent';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 import React, { useEffect, useState } from 'react';
 import CodeBarre from './CodeBarre';
+import { useRouter } from 'next/router';
+import AddIcon from '@mui/icons-material/Add';
 import axios from 'axios';
 
 // Définition du type pour les données du produit
@@ -22,6 +31,7 @@ interface ProductData {
 
 const InfoProduit: React.FC<{ ean: string }> = ({ ean }) => {
   const [productData, setProductData] = useState<ProductData | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProductByEan = async (ean: string) => {
@@ -63,6 +73,11 @@ const InfoProduit: React.FC<{ ean: string }> = ({ ean }) => {
     fetchProductByEan(ean);
   }, [ean]);
 
+  const handleOrderProduct = () => {
+    // router.push(`/${ean}`);
+    alert('Fonctionnalité non implémentée');
+  };
+
   if (!productData) {
     return <Typography>Chargement des informations du produit...</Typography>;
   }
@@ -86,7 +101,29 @@ const InfoProduit: React.FC<{ ean: string }> = ({ ean }) => {
             justifyContent: 'start',
           }}
         >
-          <Typography variant="h2">{productData.name}</Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 2,
+            }}
+          >
+            <Typography variant="h2">{productData.name}</Typography>
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: '#A3D9A5',
+                color: '#008000',
+                fontSize: '0.8rem',
+                minWidth: '40px',
+                padding: '5px',
+              }}
+              onClick={handleOrderProduct}
+            >
+              <AddIcon />
+            </Button>
+          </Box>
 
           <Typography variant="h6">Prix :</Typography>
           <Typography>{productData.price}</Typography>
