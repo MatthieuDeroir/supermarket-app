@@ -1,19 +1,19 @@
 import { Hono } from "hono";
 import { PaymentService } from "./bll/payment.service.ts";
 
-const router = new Hono();
+const paymentRouter = new Hono();
 
-router.post("/create-payment", async (c) => {
+paymentRouter.get("/create-payment/:idCart", async (c) => {
   try {
-    const body = await c.req.json();
-    const result = await PaymentService.createPayment(body);
+    const idCart = c.req.url.searchParams.get("idCart");
+    const result = await PaymentService.createPayment(idCart);
     return c.json(result);
   } catch (err) {
     return c.json({ error: err.message }, 400);
   }
 });
 
-router.post("/execute-payment", async (c) => {
+paymentRouter.post("/execute-payment", async (c) => {
   try {
     const body = await c.req.json();
     const result = await PaymentService.executePayment(body);
@@ -23,4 +23,4 @@ router.post("/execute-payment", async (c) => {
   }
 });
 
-export default router;
+export default paymentRouter;

@@ -47,6 +47,21 @@ class CartService {
         await cartRepository.deleteById(cartId);
     }
 
+    async getTotalAmount(cartId: number): Promise<number> {
+        const cart = await cartRepository.findById(cartId);
+        if (!cart) throw new Error(`Cart ${cartId} not found`);
+
+        const lines = await cartLineRepository.findByCartId(cartId);
+        let total = 0;
+        for (const line of lines) {
+            const product = await productRepository.findById(line.product_id);
+            if (!product) throw new Error(`Product ${line.product_id} not found`);
+            total += product.price * line.quantity;
+        }
+
+        return total;
+    }
+
     /**
      * Ajouter un produit au cart => RETRAIT TEMPORAIRE du shelf.
      * Si aucun panier non payé n'existe pour l'utilisateur, il est créé automatiquement.
