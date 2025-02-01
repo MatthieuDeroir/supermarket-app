@@ -14,6 +14,10 @@ class ProductService {
         return productRepository.findById(product_id);
     }
 
+    async getProductByEAN(ean: string): Promise<Product | null> {
+        return productRepository.findByEAN(ean);
+    }
+
     /**
      * Crée un nouveau produit (PK auto-incrémentée dans votre DB).
      * @param data - champs du produit (sans product_id)
