@@ -25,6 +25,20 @@ export class LogRepository extends GenericRepository<Log> {
         return result.rows;
     }
 
+    async findByUserId(userId: number): Promise<Log[]> {
+        const client = db.getClient();
+        const query = `
+            SELECT *
+            FROM logs
+            WHERE user_id = $1
+        `;
+        const result = await client.queryObject<Log>({
+            text: query,
+            args: [userId],
+        });
+        return result.rows;
+    }
+
     async findLogsForProductBetween(productId: number, startDate: Date, endDate: Date): Promise<Log[]> {
         const client = db.getClient();
         const query = `
