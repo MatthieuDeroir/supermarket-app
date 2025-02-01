@@ -1,5 +1,5 @@
 import { NextPage } from 'next';
-import Home from '@modules/home/Home';
+import Home from '@//modules/home/Dashboard';
 import { Box } from '@mui/material';
 
 const Index: NextPage = () => {
