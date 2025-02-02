@@ -5,7 +5,7 @@ export class CategoryRepository extends GenericRepository<Category> {
     constructor() {
         super({
             tableName: "categories",
-            primaryKey: "categoryId",
+            primaryKey: "category_id",
         });
     }
 }

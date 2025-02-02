@@ -7,8 +7,8 @@ export interface GenericRepositoryOptions<T> {
 }
 
 export class GenericRepository<T extends Record<string, unknown>> {
-    private tableName: string;
-    private primaryKey: keyof T;
+    protected tableName: string;
+    protected primaryKey: keyof T;
 
     constructor(options: GenericRepositoryOptions<T>) {
         this.tableName = options.tableName;

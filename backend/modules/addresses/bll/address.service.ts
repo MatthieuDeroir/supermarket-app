@@ -45,5 +45,5 @@ class AddressService {
 }
 
 // On exporte une instance unique
-export const addressService = new AddressService();
+const addressService = new AddressService();
 export default addressService;

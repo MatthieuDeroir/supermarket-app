@@ -1,19 +1,10 @@
-enum ActionTypeEnum {
-    TRANSFER_TO_SHELF ,
-    TRANSFER_TO_WAREHOUSE,
-    TRANSFER_TO_TRASH,
-    ADD_TO_CART,
-    REMOVE_FROM_CART,
-    CHECKOUT,
-    CANCEL_CHECKOUT,
-    ADD_NEW_PRODUCT,
-    REMOVE_PRODUCT,
-    UPDATE_PRODUCT,
-    ADD_CATEGORY,
-    REMOVE_CATEGORY,
-    UPDATE_CATEGORY,
-    ADD_USER,
-    REMOVE_USER,
-    UPDATE_USER,
-}
+// modules/logs/action-type.enum.ts
 
+export enum ActionTypeEnum {
+    ADD_TO = "ADD_TO",
+    REMOVE_FROM = "REMOVE_FROM",
+    PAYED = "PAYED",
+    UPDATE = "UPDATE",
+    CREATE = "CREATE",
+    DELETE = "DELETE",
+}

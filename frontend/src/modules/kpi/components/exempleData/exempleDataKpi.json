@@ -1,0 +1,157 @@
+[
+  {
+    "date": "2024-12-27T00:00:00.000Z",
+    "stockWarehouse": 561,
+    "stockShelfBottom": 3
+  },
+  {
+    "date": "2024-12-28T00:00:00.000Z",
+    "stockWarehouse": 464,
+    "stockShelfBottom": 100
+  },
+  {
+    "date": "2024-12-29T00:00:00.000Z",
+    "stockWarehouse": 464,
+    "stockShelfBottom": 95
+  },
+  {
+    "date": "2024-12-30T00:00:00.000Z",
+    "stockWarehouse": 464,
+    "stockShelfBottom": 90
+  },
+  {
+    "date": "2024-12-31T00:00:00.000Z",
+    "stockWarehouse": 464,
+    "stockShelfBottom": 89
+  },
+  {
+    "date": "2025-01-02T00:00:00.000Z",
+    "stockWarehouse": 464,
+    "stockShelfBottom": 63
+  },
+  {
+    "date": "2025-01-03T00:00:00.000Z",
+    "stockWarehouse": 464,
+    "stockShelfBottom": 17
+  },
+  {
+    "date": "2025-01-04T00:00:00.000Z",
+    "stockWarehouse": 436,
+    "stockShelfBottom": 45
+  },
+  {
+    "date": "2025-01-05T00:00:00.000Z",
+    "stockWarehouse": 436,
+    "stockShelfBottom": 30
+  },
+  {
+    "date": "2025-01-06T00:00:00.000Z",
+    "stockWarehouse": 436,
+    "stockShelfBottom": 20
+  },
+  {
+    "date": "2025-01-07T00:00:00.000Z",
+    "stockWarehouse": 436,
+    "stockShelfBottom": 17
+  },
+  {
+    "date": "2025-01-08T00:00:00.000Z",
+    "stockWarehouse": 352,
+    "stockShelfBottom": 101
+  },
+  {
+    "date": "2025-01-09T00:00:00.000Z",
+    "stockWarehouse": 352,
+    "stockShelfBottom": 100
+  },
+  {
+    "date": "2025-01-10T00:00:00.000Z",
+    "stockWarehouse": 352,
+    "stockShelfBottom": 92
+  },
+  {
+    "date": "2025-01-11T00:00:00.000Z",
+    "stockWarehouse": 852,
+    "stockShelfBottom": 83
+  },
+  {
+    "date": "2025-01-12T00:00:00.000Z",
+    "stockWarehouse": 852,
+    "stockShelfBottom": 66
+  },
+  {
+    "date": "2025-01-13T00:00:00.000Z",
+    "stockWarehouse": 852,
+    "stockShelfBottom": 57
+  },
+  {
+    "date": "2025-01-14T00:00:00.000Z",
+    "stockWarehouse": 852,
+    "stockShelfBottom": 56
+  },
+  {
+    "date": "2025-01-15T00:00:00.000Z",
+    "stockWarehouse": 852,
+    "stockShelfBottom": 48
+  },
+  {
+    "date": "2025-01-16T00:00:00.000Z",
+    "stockWarehouse": 852,
+    "stockShelfBottom": 33
+  },
+  {
+    "date": "2025-01-17T00:00:00.000Z",
+    "stockWarehouse": 852,
+    "stockShelfBottom": 23
+  },
+  {
+    "date": "2025-01-18T00:00:00.000Z",
+    "stockWarehouse": 852,
+    "stockShelfBottom": 105
+  },
+  {
+    "date": "2025-01-19T00:00:00.000Z",
+    "stockWarehouse": 770,
+    "stockShelfBottom": 88
+  },
+  {
+    "date": "2025-01-20T00:00:00.000Z",
+    "stockWarehouse": 770,
+    "stockShelfBottom": 59
+  },
+  {
+    "date": "2025-01-21T00:00:00.000Z",
+    "stockWarehouse": 770,
+    "stockShelfBottom": 52
+  },
+  {
+    "date": "2025-01-22T00:00:00.000Z",
+    "stockWarehouse": 770,
+    "stockShelfBottom": 33
+  },
+  {
+    "date": "2025-01-23T00:00:00.000Z",
+    "stockWarehouse": 598,
+    "stockShelfBottom": 105
+  },
+  {
+    "date": "2025-01-24T00:00:00.000Z",
+    "stockWarehouse": 598,
+    "stockShelfBottom": 87
+  },
+  {
+    "date": "2025-01-25T00:00:00.000Z",
+    "stockWarehouse": 598,
+    "stockShelfBottom": 80
+  },
+  {
+    "date": "2025-01-26T00:00:00.000Z",
+    "stockWarehouse": 598,
+    "stockShelfBottom": 65
+  },
+  {
+    "date": "2025-01-27T00:00:00.000Z",
+    "stockWarehouse": 598,
+    "stockShelfBottom": 50
+  }
+]

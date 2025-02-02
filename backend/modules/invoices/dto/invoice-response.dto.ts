@@ -8,7 +8,7 @@ export interface InvoiceResponseDto {
 
 export interface InvoiceLineResponseDto {
     invoiceLineId: number;
-    productId: string;
+    productId: number;
     quantity: number;
     price: number;
     createdAt: string;

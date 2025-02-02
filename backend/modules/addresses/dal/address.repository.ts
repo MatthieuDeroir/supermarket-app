@@ -7,8 +7,8 @@ import { Address } from "../address.model.ts";
 export class AddressRepository extends GenericRepository<Address> {
     constructor() {
         super({
-            tableName: "Addresses",
-            primaryKey: "addressId", // <-- la PK
+            tableName: "addresses",
+            primaryKey: "address_id", // <-- la PK
         });
     }
 

@@ -5,8 +5,8 @@ import { Role } from "../role.model.ts";
 export class RoleRepository extends GenericRepository<Role> {
     constructor() {
         super({
-            tableName: "Roles",
-            primaryKey: "roleId",
+            tableName: "roles",
+            primaryKey: "role_id",
         });
     }
 }
