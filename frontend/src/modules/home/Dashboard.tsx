@@ -2,13 +2,20 @@ import { Box, Typography, Grid } from '@mui/material';
 import React from 'react';
 import InfoCard from '@modules/home/components/InfoCard';
 import DashboardCard from '@modules/home/components/DashboardCard';
+import ApiRoutes, { makeApiRequest } from '@//common/defs/routes/apiRoutes';
+import { Product } from '@common/defs/types/produit';
 
 const Dashboard: React.FC = () => {
+  const [totalUsers, setTotalUsers] = React.useState(0);
+  const [totalProductsStock, setTotalProductsStock] = React.useState(0);
+  const [totalProductsFDR, setTotalProductsFDR] = React.useState(0);
+  const [totalCA, setTotalCA] = React.useState(0);
+
   const infoCards = [
-    { title: 'Users Total', value: 114 },
-    { title: "Produits dans l'entrepôt", value: '8.236' },
-    { title: 'Produits dans le FDR', value: '2.352' },
-    { title: "Chiffre d'affaire du mois", value: '8K' },
+    { title: 'Users Total', value: totalUsers },
+    { title: "Produits dans l'entrepôt", value: totalProductsStock },
+    { title: 'Produits dans le FDR', value: totalProductsFDR },
+    { title: "Chiffre d'affaire du mois", value: totalCA + ' €' },
   ];
 
   const dashboardCards = [
@@ -29,6 +36,32 @@ const Dashboard: React.FC = () => {
     { name: 'Planning des Siestes', url: '#', image: '' },
     { name: 'Code Confidentiel', url: '#', image: '' },
   ];
+
+  const fetchTotalUsers = async () => {
+    const response = await makeApiRequest(ApiRoutes.Users.GetAll);
+    setTotalUsers(response.length);
+  };
+  const fetchTotalProductsStock = async () => {
+    const response = await makeApiRequest(ApiRoutes.Products.GetAll);
+    const productsInStock: number = response.filter(
+      (product: Product) => product.stock_warehouse > 0,
+    ).length;
+    setTotalProductsStock(productsInStock);
+  };
+
+  const fetchTotalProductsFDR = async () => {
+    const response = await makeApiRequest(ApiRoutes.Products.GetAll);
+    const productsInFDR: number = response.filter(
+      (product: Product) => product.stock_shelf_bottom > 0,
+    ).length;
+    setTotalProductsFDR(productsInFDR);
+  };
+
+  React.useEffect(() => {
+    fetchTotalUsers();
+    fetchTotalProductsStock();
+    fetchTotalProductsFDR();
+  }, []);
 
   return (
     <Box>

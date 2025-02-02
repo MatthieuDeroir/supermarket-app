@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosHeaders } from 'axios';
+import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { ID } from '@common/defs/types/id';
 
 const ApiURL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -15,6 +15,7 @@ const ApiRoutes = {
   Users: {
     GetAll: '/users',
     GetById: (id: ID) => `/users/${id}`,
+    Create: '/users',
     Update: (id: ID) => `/users/${id}`,
     Delete: (id: ID) => `/users/${id}`,
   },

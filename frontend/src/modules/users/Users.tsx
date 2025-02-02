@@ -4,8 +4,8 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { User } from '@common/defs/types/user';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
-import UserDetailsModal from '@modules/users/components/UserDetailsModal';
 import { useRouter } from 'next/router';
+import AddIcon from '@mui/icons-material/Add';
 
 const Users: React.FC = () => {
   const router = useRouter();
@@ -19,18 +19,11 @@ const Users: React.FC = () => {
 
   type Role = {
     role_id: number;
-    nom: string;
+    name: string;
   };
 
   const [rows, setRows] = useState<UserRow[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-
-  const handleShowUser = (user: User) => {
-    setSelectedUser(user);
-    setShowModal(true);
-  };
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', flex: 2, headerAlign: 'center', align: 'center' },
@@ -84,7 +77,7 @@ const Users: React.FC = () => {
         >
           <IconButton
             onClick={() => {
-              router.push(`/user/${params.row.id}`);
+              router.push(`/users/${params.row.id}`);
             }}
             size="small"
           >
@@ -95,19 +88,29 @@ const Users: React.FC = () => {
     },
   ];
 
-  const fetchAllUsers = async () => {
+  const fetchRoles = async () => {
     try {
       const rolesResponse = await makeApiRequest(apiRoutes.Roles.GetAll);
-      const rolesData = Array.isArray(rolesResponse) ? rolesResponse : [];
-      setRoles(rolesData);
+      return Array.isArray(rolesResponse) ? rolesResponse : [];
+    } catch (error) {
+      console.error('Erreur lors de la récupération des rôles', error);
+      return [];
+    }
+  };
+
+  const fetchUsers = async (rolesData: Role[]) => {
+    try {
       const response = await makeApiRequest(apiRoutes.Users.GetAll);
+      console.log('roles', rolesData);
+      console.log('roles useEffect', roles);
+      console.log('response', response);
       if (Array.isArray(response)) {
         const mappedData = response.map((item: User, index) => ({
           id: item.user_id ?? `temp-${index}`,
           nom: `${item.first_name ?? 'Pas de prénom'} ${item.last_name ?? 'Pas de nom'}`,
           email: item.email ?? 'Pas d’email',
           motDePasse: item.password ?? 'Pas de mot de passe',
-          role: rolesData.find((role) => role.role_id === item.role_id)?.nom ?? 'N/A',
+          role: rolesData.find((role) => role.role_id === item.role_id)?.name ?? 'N/A',
         }));
 
         setRows(mappedData);
@@ -115,8 +118,14 @@ const Users: React.FC = () => {
         throw new Error('API non disponible');
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération des données de l’API', error);
+      console.error('Erreur lors de la récupération des utilisateurs', error);
     }
+  };
+
+  const fetchAllUsers = async () => {
+    const rolesData = await fetchRoles();
+    setRoles(rolesData);
+    await fetchUsers(rolesData);
   };
 
   useEffect(() => {
@@ -126,19 +135,18 @@ const Users: React.FC = () => {
   return (
     <>
       <Box sx={{ height: 600, width: '100%' }}>
-        <Typography variant="h3">Utilisateurs</Typography>
+        <Box mb={2}>
+          <Typography variant="h3">Utilisateurs</Typography>
+          <IconButton
+            onClick={() => router.push('/users/add')}
+            size="small"
+            sx={{ float: 'right', backgroundColor: 'primary.light', borderRadius: 1 }}
+          >
+            <AddIcon sx={{ color: 'primary.dark' }} />
+          </IconButton>
+        </Box>
         <DataGrid rows={rows} columns={columns} />
       </Box>
-      {selectedUser && (
-        <UserDetailsModal
-          user={selectedUser}
-          show={showModal}
-          onHide={() => {
-            setShowModal(false);
-            setSelectedUser(null);
-          }}
-        />
-      )}
     </>
   );
 };
