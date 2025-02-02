@@ -20,6 +20,12 @@ import authController from "./auth/auth.controller.ts";/**/
 // Import du middleware d'auth
 import { authMiddleware } from "../middlewares/auth.middleware.ts";
 
+// Import du controlleur d'auth
+import authController from "./auth/auth.controller.ts";
+
+// Import du middleware d'auth
+import { authMiddleware } from "../middlewares/auth.middleware.ts";
+
 const routes = new Hono();
 
 /**
