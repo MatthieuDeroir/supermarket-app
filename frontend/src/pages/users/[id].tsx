@@ -158,7 +158,7 @@ const UserPage = () => {
                 onChange={(e) => setUser({ ...user, email: e.target.value })}
               />
             </Grid>
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <TextField
                 fullWidth
                 label="Mot de passe"
@@ -176,7 +176,7 @@ const UserPage = () => {
                   ),
                 }}
               />
-            </Grid>
+            </Grid> */}
           </Grid>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>

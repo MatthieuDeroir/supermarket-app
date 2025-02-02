@@ -29,9 +29,7 @@ const LoginForm = () => {
     try {
       const response = await login(data);
 
-      if (response.success) {
-        const storage = data.rememberMe ? localStorage : sessionStorage;
-        storage.setItem('authToken', response.token);
+      if (response.success && localStorage.getItem('authToken')) {
         window.location.href = Routes.Common.Home;
       }
     } catch (error) {

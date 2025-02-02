@@ -30,32 +30,32 @@ const Users: React.FC = () => {
     { field: 'nom', headerName: 'Nom', flex: 2, headerAlign: 'center', align: 'center' },
     { field: 'email', headerName: 'Email', flex: 2, headerAlign: 'center', align: 'center' },
     { field: 'role', headerName: 'Rôle', flex: 2, headerAlign: 'center', align: 'center' },
-    {
-      field: 'motDePasse',
-      headerName: 'Mot de passe',
-      flex: 2,
-      headerAlign: 'center',
-      align: 'center',
-      filterable: false,
-      sortable: false,
-      disableColumnMenu: true,
-      renderCell: (params) => (
-        <Typography
-          sx={{ cursor: 'pointer' }}
-          onClick={() => {
-            const newRows = rows.map((row) => {
-              if (row.id === params.row.id) {
-                return { ...row, afficherMotDePasse: !row.afficherMotDePasse };
-              }
-              return row;
-            });
-            setRows(newRows);
-          }}
-        >
-          {params.row.afficherMotDePasse ? params.row.motDePasse : '••••••••'}
-        </Typography>
-      ),
-    },
+    // {
+    //   field: 'motDePasse',
+    //   headerName: 'Mot de passe',
+    //   flex: 2,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    //   filterable: false,
+    //   sortable: false,
+    //   disableColumnMenu: true,
+    //   renderCell: (params) => (
+    //     <Typography
+    //       sx={{ cursor: 'pointer' }}
+    //       onClick={() => {
+    //         const newRows = rows.map((row) => {
+    //           if (row.id === params.row.id) {
+    //             return { ...row, afficherMotDePasse: !row.afficherMotDePasse };
+    //           }
+    //           return row;
+    //         });
+    //         setRows(newRows);
+    //       }}
+    //     >
+    //       {params.row.afficherMotDePasse ? params.row.motDePasse : '••••••••'}
+    //     </Typography>
+    //   ),
+    // },
     {
       field: 'action',
       headerName: 'Actions',

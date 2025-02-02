@@ -142,7 +142,7 @@ const CreateUserPage = () => {
               helperText={errors.email}
             />
           </Grid>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <TextField
               fullWidth
               required
@@ -160,7 +160,7 @@ const CreateUserPage = () => {
                 ),
               }}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
 
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>

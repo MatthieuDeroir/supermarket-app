@@ -15,6 +15,7 @@ const ApiRoutes = {
   Users: {
     GetAll: '/users',
     GetById: (id: ID) => `/users/${id}`,
+    Create: '/users',
     Update: (id: ID) => `/users/${id}`,
     Delete: (id: ID) => `/users/${id}`,
   },
@@ -126,7 +127,7 @@ const api: AxiosInstance = axios.create();
 
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     if (token) {
       config.headers.set('Authorization', `Bearer ${token}`);
     }
