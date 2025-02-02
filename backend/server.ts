@@ -7,13 +7,13 @@ import getEnv from './utils/getEnv.ts';
 const app = new Hono();
 
 app.use(
-    '/*',
-    cors({
-      origin: getEnv('FRONT_URL'),
-      maxAge: 600,
-      credentials: true,
-    })
-  );
+  '/*',
+  cors({
+    origin: getEnv('FRONT_URL'),
+    maxAge: 600,
+    credentials: true,
+  })
+);
 
 app.get('/health', (c) => c.json({ status: 'ok' }));
 

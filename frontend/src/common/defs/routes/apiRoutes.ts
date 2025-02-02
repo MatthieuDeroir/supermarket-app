@@ -1,120 +1,123 @@
-import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosHeaders } from 'axios';
+import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { ID } from '@common/defs/types/id';
+
+const ApiURL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const ApiRoutes = {
   Auth: {
-    Login: '/api/auth/login',
-    Register: '/api/auth/register',
-    Logout: '/api/auth/logout',
-    Me: '/api/auth/me',
-    RequestPasswordReset: '/api/auth/request-password-reset',
-    ResetPassword: '/api/auth/reset-password',
+    Login: '/auth/login',
+    Register: '/auth/register',
+    Logout: '/auth/logout',
+    Me: '/auth/me',
+    RequestPasswordReset: '/auth/request-password-reset',
+    ResetPassword: '/auth/reset-password',
   },
   Users: {
-    GetAll: '/api/users',
-    GetById: (id: ID) => `/api/users/${id}`,
-    Update: (id: ID) => `/api/users/${id}/update`,
-    Delete: (id: ID) => `/api/users/${id}/delete`,
+    GetAll: '/users',
+    GetById: (id: ID) => `/users/${id}`,
+    Create: '/users',
+    Update: (id: ID) => `/users/${id}`,
+    Delete: (id: ID) => `/users/${id}`,
   },
   Products: {
-    GetAll: '/api/products',
-    GetById: (id: ID) => `/api/products/${id}`,
-    Update: (id: ID) => `/api/products/${id}/update`,
-    Delete: (id: ID) => `/api/products/${id}/delete`,
-    GetByEan: (ean: string) => `/api/products/ean/${ean}`,
+    GetAll: '/products',
+    GetById: (id: ID) => `/products/${id}`,
+    Update: (id: ID) => `/products/${id}/update`,
+    Delete: (id: ID) => `/products/${id}/delete`,
+    GetByEan: (ean: string) => `/products/ean/${ean}`,
   },
   KpiLogs: {
     GetByProductEan: (ean: string, start: string, end: string) =>
-      `/api/logs/product/${ean}/daily?start=${start}&end=${end}`,
+      `/logs/product/${ean}/daily?start=${start}&end=${end}`,
   },
   Addresses: {
     // Added from Postman collection
-    GetAll: '/api/addresses',
-    GetById: (id: ID) => `/api/addresses/${id}`,
-    Create: '/api/addresses',
-    Update: (id: ID) => `/api/addresses/${id}`,
-    Delete: (id: ID) => `/api/addresses/${id}`,
+    GetAll: '/addresses',
+    GetById: (id: ID) => `/addresses/${id}`,
+    Create: '/addresses',
+    Update: (id: ID) => `/addresses/${id}`,
+    Delete: (id: ID) => `/addresses/${id}`,
   },
   Carts: {
     // Added from Postman collection
-    GetAll: '/api/carts',
-    GetById: (id: ID) => `/api/carts/${id}`,
-    Create: '/api/carts',
-    Update: (id: ID) => `/api/carts/${id}`,
-    Delete: (id: ID) => `/api/carts/${id}`,
-    AddProduct: '/api/carts/lines',
-    Pay: (id: ID) => `/api/carts/${id}/pay`,
+    GetAll: '/carts',
+    GetById: (id: ID) => `/carts/${id}`,
+    Create: '/carts',
+    Update: (id: ID) => `/carts/${id}`,
+    Delete: (id: ID) => `/carts/${id}`,
+    AddProduct: '/carts/lines',
+    Pay: (id: ID) => `/carts/${id}/pay`,
   },
   CartLines: {
     // Added from Postman collection
-    GetAll: '/api/cart_lines',
-    GetById: (id: ID) => `/api/cart_lines/${id}`,
-    Create: '/api/lines', // Keep as /lines to match your API
-    Update: (id: ID) => `/api/cart_lines/${id}`,
-    Delete: (cartId: ID, lineId: ID) => `/api/carts/${cartId}/lines/${lineId}`,
+    GetAll: '/cart_lines',
+    GetById: (id: ID) => `/cart_lines/${id}`,
+    Create: '/lines', // Keep as /lines to match your API
+    Update: (id: ID) => `/cart_lines/${id}`,
+    Delete: (cartId: ID, lineId: ID) => `/carts/${cartId}/lines/${lineId}`,
   },
   Categories: {
     // Added from Postman collection
-    GetAll: '/api/categories',
-    GetById: (id: ID) => `/api/categories/${id}`,
-    Create: '/api/categories',
-    Update: (id: ID) => `/api/categories/${id}`,
-    Delete: (id: ID) => `/api/categories/${id}`,
+    GetAll: '/categories',
+    GetById: (id: ID) => `/categories/${id}`,
+    Create: '/categories',
+    Update: (id: ID) => `/categories/${id}`,
+    Delete: (id: ID) => `/categories/${id}`,
   },
   InvoiceLines: {
     // Added from Postman collection
-    GetAll: '/api/invoice_lines',
-    GetById: (id: ID) => `/api/invoice_lines/${id}`,
-    Create: '/api/invoice_lines',
-    Update: (id: ID) => `/api/invoice_lines/${id}`,
-    Delete: (id: ID) => `/api/invoice_lines/${id}`,
+    GetAll: '/invoice_lines',
+    GetById: (id: ID) => `/invoice_lines/${id}`,
+    Create: '/invoice_lines',
+    Update: (id: ID) => `/invoice_lines/${id}`,
+    Delete: (id: ID) => `/invoice_lines/${id}`,
   },
   Invoices: {
     // Added from Postman collection
-    GetAll: '/api/invoices',
-    GetById: (id: ID) => `/api/invoices/${id}`,
-    GetByUserId: (userId: ID) => `/api/invoices/user/${userId}`,
-    Create: '/api/invoices',
-    Update: (id: ID) => `/api/invoices/${id}`,
-    Delete: (id: ID) => `/api/invoices/${id}`,
+    GetAll: '/invoices',
+    GetById: (id: ID) => `/invoices/${id}`,
+    GetByUserId: (userId: ID) => `/invoices/user/${userId}`,
+    Create: '/invoices',
+    Update: (id: ID) => `/invoices/${id}`,
+    Delete: (id: ID) => `/invoices/${id}`,
   },
   Logs: {
     // Added from Postman collection
-    GetAll: '/api/logs',
-    GetById: (id: ID) => `/api/logs/${id}`,
-    Create: '/api/logs',
-    Update: (id: ID) => `/api/logs/${id}`,
-    Delete: (id: ID) => `/api/logs/${id}`,
+    GetAll: '/logs',
+    GetById: (id: ID) => `/logs/${id}`,
+    Create: '/logs',
+    Update: (id: ID) => `/logs/${id}`,
+    Delete: (id: ID) => `/logs/${id}`,
     GetDailyStocks: (productId: ID, start: string, end: string) =>
-      `/api/logs/product/${productId}/daily?start=${start}&end=${end}`,
-    GetByProductId: (productId: ID) => `/api/logs/product/${productId}`,
+      `/logs/product/${productId}/daily?start=${start}&end=${end}`,
+    GetByProductId: (productId: ID) => `/logs/product/${productId}`,
   },
   Promotions: {
     // Added from Postman collection
-    GetAll: '/api/promotions',
-    GetById: (id: ID) => `/api/promotions/${id}`,
-    GetByProductId: (productId: ID) => `/api/promotions/product/${productId}`,
-    Create: '/api/promotions',
-    Update: (id: ID) => `/api/promotions/${id}`,
-    Delete: (id: ID) => `/api/promotions/${id}`,
+    GetAll: '/promotions',
+    GetById: (id: ID) => `/promotions/${id}`,
+    GetByProductId: (productId: ID) => `/promotions/product/${productId}`,
+    Create: '/promotions',
+    Update: (id: ID) => `/promotions/${id}`,
+    Delete: (id: ID) => `/promotions/${id}`,
   },
   Roles: {
     // Added from Postman collection
-    GetAll: '/api/roles',
-    GetById: (id: ID) => `/api/roles/${id}`,
-    Create: '/api/roles',
-    Update: (id: ID) => `/api/roles/${id}`,
-    Delete: (id: ID) => `/api/roles/${id}`,
+    GetAll: '/roles',
+    GetById: (id: ID) => `/roles/${id}`,
+    Create: '/roles',
+    Update: (id: ID) => `/roles/${id}`,
+    Delete: (id: ID) => `/roles/${id}`,
   },
   OpenFoodFact: {
     // Added from Postman collection
-    GetProductByEan: (ean: string) => `/api/openfood?ean=${ean}`,
+    GetProductByEan: (ean: string) => `/openfood?ean=${ean}`,
   },
   Paypal: {
     // Added from Postman collection
-    CreateOrder: '/api/paypal/create-order',
-    ConfirmOrder: (orderId: string) => `/api/paypal/confirm?orderId=${orderId}`,
-    CancelPayment: '/api/paypal/cancel',
+    CreateOrder: '/paypal/create-order',
+    ConfirmOrder: (orderId: string) => `/paypal/confirm?orderId=${orderId}`,
+    CancelPayment: '/paypal/cancel',
   },
 };
 
@@ -140,7 +143,7 @@ export const makeApiRequest = async (
   data: any = null,
   ...args: any
 ) => {
-  const url = typeof route === 'function' ? route(...args) : route;
+  const url = `${ApiURL}${typeof route === 'function' ? route(...args) : route}`;
   try {
     const response = await api({
       method: method.toLowerCase(),

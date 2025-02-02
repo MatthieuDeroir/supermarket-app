@@ -1,23 +1,37 @@
 import { ID } from '@common/defs/types/id';
 
+// modules/users/user.model.ts
 export interface User {
-  id: ID;
-  name: string;
+  user_id: ID;
   email: string;
-  role?: ROLE[];
-  Permissions?: Permission[];
-  avatarUrl?: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date | null;
+  role_id: number;
 }
 
-export enum ROLE {
-  ADMIN = 'admin',
-  USER = 'user',
-}
+// export interface User {
+//   id: ID;
+//   name: string;
+//   email: string;
+//   role?: ROLE[];
+//   Permissions?: Permission[];
+//   avatarUrl?: string;
+//   createdAt: Date;
+//   updatedAt: Date;
+// }
 
-export interface Permission {
-  entity: string;
-  action: string;
-  entityId?: ID;
-}
+// export enum ROLE {
+//   ADMIN = 'admin',
+//   USER = 'user',
+// }
+
+// export interface Permission {
+//   entity: string;
+//   action: string;
+//   entityId?: ID;
+// }

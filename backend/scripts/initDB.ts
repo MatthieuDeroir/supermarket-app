@@ -1,5 +1,6 @@
 // scripts/initDB.ts
 import db from "../config/database.ts";
+import 'https://deno.land/std@0.223.0/dotenv/load.ts';
 import { join } from "https://deno.land/std@0.203.0/path/mod.ts"; // pour manipuler les chemins
 
 /**
