@@ -2,6 +2,14 @@
 import { Hono } from "hono";
 import cartService from "./bll/cart.service.ts";
 
+// Au tout début de votre fichier product.controller.ts (ou dans un fichier d'inclusion global)
+declare module "hono" {
+    interface ContextVariableMap {
+        userId: number;
+    }
+}
+
+
 const cartController = new Hono();
 
 /**

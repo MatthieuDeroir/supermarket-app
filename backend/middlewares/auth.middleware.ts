@@ -3,6 +3,13 @@ import type { Context, Next } from "hono";
 import { verify } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
 import { createHmacKeyFromString } from "../utils/cryptoKeyHelper.ts";
 
+// Au tout début de votre fichier product.controller.ts (ou dans un fichier d'inclusion global)
+declare module "hono" {
+    interface ContextVariableMap {
+        userId: number;
+    }
+}
+
 const secretStr = Deno.env.get("JWT_SECRET") ?? "NO_SECRET";
 const keyPromise = createHmacKeyFromString(secretStr, "HS256");
 
