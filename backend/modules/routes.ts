@@ -13,9 +13,29 @@ import promotionRouter from "./promotions/promotion.routes.ts";
 import roleRouter from "./roles/role.routes.ts";
 import userRouter from "./users/user.routes.ts";
 
+// Import du controlleur d'auth
+// import authController from "./auth/auth.controller.ts";/**/
+
+// Import du middleware d'auth
+// import { authMiddleware } from "../middlewares/auth.middleware.ts";
+
 const routes = new Hono();
 
-// Monte chaque module sur son URL
+/**
+ * 1) On monte d’abord la route d’auth.
+ *    => Elle n’aura pas le middleware d’auth
+ */
+// routes.route("/auth", authController);
+
+/**
+ * 2) On applique notre middleware sur toutes les routes suivantes (*).
+ *    => Tout ce qui n’a pas déjà matché /auth passera par le middleware.
+ */
+// routes.use("*", authMiddleware);/**/
+
+/**
+ * 3) On monte toutes les autres routes
+ */
 routes.route("/addresses", addressesRouter);
 routes.route("/carts", cartRouter);
 routes.route("/invoices", invoiceRouter);

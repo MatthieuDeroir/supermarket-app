@@ -1009,56 +1009,140 @@
 					"response": []
 				},
 				{
-					"name": "Transfer Product to Shelf",
+					"name": "Add to Warehouse",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"quantity\": 15\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"raw": "{\n    \"quantity\": 50\n}"
 						},
 						"url": {
-							"raw": "{{API_URL}}/products/15/shelf",
+							"raw": "{{API_URL}}/products/15/add-to-warehouse",
 							"host": [
 								"{{API_URL}}"
 							],
 							"path": [
 								"products",
 								"15",
-								"shelf"
+								"add-to-warehouse"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Add Product to Warehouse",
+					"name": "Transfer from Warehouse to Shelf",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"quantity\": 15\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"raw": "{\n    \"quantity\": 20\n}"
 						},
 						"url": {
-							"raw": "{{API_URL}}/products/15/warehouse",
+							"raw": "{{API_URL}}/products/15/warehouse-to-shelf",
 							"host": [
 								"{{API_URL}}"
 							],
 							"path": [
 								"products",
 								"15",
-								"warehouse"
+								"warehouse-to-shelf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Transfer from Shelf to Warehouse",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 10\n}"
+						},
+						"url": {
+							"raw": "{{API_URL}}/products/15/shelf-to-warehouse",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"products",
+								"15",
+								"shelf-to-warehouse"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Transfer from Warehouse to Trash",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 5\n}"
+						},
+						"url": {
+							"raw": "{{API_URL}}/products/15/warehouse-to-trash",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"products",
+								"15",
+								"warehouse-to-trash"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Transfer from Shelf to Trash",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 2\n}"
+						},
+						"url": {
+							"raw": "{{API_URL}}/products/15/shelf-to-trash",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"products",
+								"15",
+								"shelf-to-trash"
 							]
 						}
 					},

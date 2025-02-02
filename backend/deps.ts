@@ -1,4 +1,4 @@
-// deps.ts
+    // deps.ts
 
 // === Hono ===
 export { Hono } from "https://deno.land/x/hono@v3.3.2/mod.ts";
@@ -32,4 +32,6 @@ export {
 
 export { hash, compare } from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 
+// === Dotenv ===
+export { config } from "https://deno.land/x/dotenv@v3.2.2/mod.ts";
 
