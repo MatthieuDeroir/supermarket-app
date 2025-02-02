@@ -1,7 +1,7 @@
 import axios from 'axios';
 import useSWR from 'swr';
-import { useState } from 'react';
-import ApiRoutes from '@common/defs/routes/apiRoutes';
+import { useState, useEffect } from 'react';
+import ApiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 import { User } from '@common/defs/types/user';
 
 export interface LoginInput {
@@ -38,40 +38,30 @@ interface AuthData {
 }
 
 const useAuth = (): AuthData => {
+  const { data: user, mutate } = useSWR<User | null>('authUser', null);
   const [initialized, setInitialized] = useState<boolean>(false);
 
-  const { data: user, mutate } = useSWR<User | null>(ApiRoutes.Auth.Me, async (url: string) => {
-    if (!localStorage.getItem('authToken')) {
-      setInitialized(true);
-      return null;
+  useEffect(() => {
+    const storedUser = localStorage.getItem('authUser');
+    if (storedUser) {
+      mutate(JSON.parse(storedUser));
     }
-
-    try {
-      const response = await axios.post(
-        url,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-          },
-        },
-      );
-      setInitialized(true);
-      return response.data.user;
-    } catch (error) {
-      localStorage.removeItem('authToken');
-      setInitialized(true);
-      console.error('Login failed', error);
-      return null;
-    }
-  });
+    setInitialized(true);
+  }, []);
 
   const login = async (input: LoginInput) => {
     try {
-      const response = await axios.post(ApiRoutes.Auth.Login, input);
-      localStorage.setItem('authToken', response.data.token);
-      mutate();
-      return response.data;
+      const response = await makeApiRequest(ApiRoutes.Auth.Login, 'POST', {
+        email: input.email,
+        password: input.password,
+      });
+
+      localStorage.setItem('authToken', response.token);
+      localStorage.setItem('authUser', JSON.stringify(response.user));
+
+      mutate(response.user);
+
+      return { success: true, user: response.user };
     } catch (error) {
       const errorMessage =
         axios.isAxiosError(error) && error.response ? error.response.data.message : 'Login failed';
@@ -82,9 +72,13 @@ const useAuth = (): AuthData => {
   const register = async (input: RegisterInput) => {
     try {
       const response = await axios.post(ApiRoutes.Auth.Register, input);
-      localStorage.setItem('authToken', response.data.token);
-      mutate();
-      return response.data;
+      const { token, user: userData } = response.data;
+
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('authUser', JSON.stringify(userData));
+
+      mutate(userData);
+      return { success: true, user: userData };
     } catch (error) {
       const errorMessage =
         axios.isAxiosError(error) && error.response
@@ -106,6 +100,7 @@ const useAuth = (): AuthData => {
         },
       );
       localStorage.removeItem('authToken');
+      localStorage.removeItem('authUser');
       mutate(null);
       return { success: true };
     } catch (error) {

@@ -25,13 +25,13 @@ export interface User {
 //   updatedAt: Date;
 // }
 
-// export enum ROLE {
-//   ADMIN = 'admin',
-//   USER = 'user',
-// }
+export enum ROLE {
+  ADMIN = 'admin',
+  USER = 'user',
+}
 
-// export interface Permission {
-//   entity: string;
-//   action: string;
-//   entityId?: ID;
-// }
+export interface Permission {
+  entity: string;
+  action: string;
+  entityId?: ID;
+}
