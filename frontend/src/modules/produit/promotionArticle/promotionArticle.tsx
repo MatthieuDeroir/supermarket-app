@@ -11,9 +11,13 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
   const [isApplied, setIsApplied] = useState(false);
   const [discount, setDiscount] = useState(0);
   const [promoId, setPromoId] = useState<number | null>(null);
+  const [hasPromotion, setHasPromotion] = useState<boolean>(false); // Track if promotions exist
   const [isFetching, setIsFetching] = useState(true);
-  const [productPrice, setProductPrice] = useState<string>('0.00'); // Store product price
+  const [productPrice, setProductPrice] = useState<string>('0.00');
   const router = useRouter();
+
+  // Format date as "YYYY-MM-DD"
+  const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
   // Fetch Promotion Details
   const fetchPromotion = async () => {
@@ -22,23 +26,27 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
     }
 
     setIsFetching(true);
-
     try {
-      console.log(`Fetching promotion for product ID: ${productId}`);
+      console.log(`Fetching promotions for product ID: ${productId}`);
       const response = await makeApiRequest(apiRoutes.Promotions.GetByProductId(productId));
 
-      if (response) {
-        setIsApplied(response.active ?? false);
-        setDiscount(response.pourcentage ?? 0);
-        setPromoId(response.id ?? null);
+      if (response && Array.isArray(response) && response.length > 0) {
+        const activePromotion = response.find((promo) => promo.active === true);
+
+        setHasPromotion(true);
+        setPromoId(activePromotion ? activePromotion.promotionId : null);
+        setIsApplied(activePromotion ? activePromotion.active : false);
+        setDiscount(activePromotion ? activePromotion.pourcentage : 0);
       } else {
-        console.log('No promotion found, setting default values.');
+        console.log('No active promotions found, setting default values.');
+        setHasPromotion(false);
         setIsApplied(false);
         setDiscount(0);
         setPromoId(null);
       }
     } catch (error) {
       console.error('❌ Error fetching promotion:', error);
+      setHasPromotion(false);
       setIsApplied(false);
       setDiscount(0);
       setPromoId(null);
@@ -75,40 +83,40 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
   // Calculate discounted price dynamically
   const calculatedTTC = (parseFloat(productPrice) * (1 - discount / 100)).toFixed(2);
 
-  // Format date as "YYYY-MM-DD"
-  const formatDate = (date: Date) => date.toISOString().split('T')[0];
-
+  // Handle Promotion Redirection or Creation
   const handleModifyPromo = async () => {
-    if (promoId) {
-      router.push(`/promotion/${promoId}`);
-    } else {
-      try {
-        console.log(`Creating new promotion for product ID: ${productId}`);
+    if (hasPromotion) {
+      router.push('/promotion'); // Redirect to all promotions
+      return;
+    }
 
-        const today = new Date();
-        const startDate = formatDate(today);
-        const endDate = formatDate(new Date(today.setDate(today.getDate() + 30)));
+    try {
+      console.log(`Creating new promotion for product ID: ${productId}`);
 
-        const newPromo = await makeApiRequest(apiRoutes.Promotions.Create, 'POST', {
-          product_id: productId,
-          pourcentage: 0,
-          beging_date: startDate,
-          end_date: endDate,
-          active: false,
-        });
-        console.log('New promotion:', newPromo);
+      const today = new Date();
+      const startDate = formatDate(today);
+      const endDate = formatDate(new Date(today.setDate(today.getDate() + 30)));
 
-        if (newPromo && newPromo.id) {
-          console.log(`New promotion created with ID: ${newPromo.id}`);
-          setPromoId(newPromo.id);
-          router.push(`/promotion/${newPromo.id}`);
-        } else {
-          alert('Erreur lors de la création de la promotion.');
-        }
-      } catch (error) {
-        console.error('Error creating promotion:', error);
-        alert('Impossible de créer une promotion.');
+      const newPromo = await makeApiRequest(apiRoutes.Promotions.Create, 'POST', {
+        productId,
+        pourcentage: 0,
+        begingDate: startDate,
+        endDate,
+        active: false,
+      });
+
+      console.log('New promotion:', newPromo);
+
+      if (newPromo && newPromo.promotionId) {
+        console.log(`New promotion created with ID: ${newPromo.promotionId}`);
+        setPromoId(newPromo.promotionId);
+        router.push(`/promotion/${newPromo.promotionId}`);
+      } else {
+        alert('Erreur lors de la création de la promotion.');
       }
+    } catch (error) {
+      console.error('Error creating promotion:', error);
+      alert('Impossible de créer une promotion.');
     }
   };
 
@@ -213,7 +221,7 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
               sx={{ backgroundColor: '#F4A261', color: 'white', flex: 10 }}
               onClick={handleModifyPromo}
             >
-              {promoId ? 'MODIFIER' : 'CRÉER UNE PROMOTION'}
+              {hasPromotion ? 'VOIR LES PROMOTIONS' : 'CRÉER UNE PROMOTION'}
             </Button>
           </Box>
         </>
