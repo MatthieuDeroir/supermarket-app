@@ -5,36 +5,36 @@ import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 
 interface ProductInfo {
   productId: number;
-  price: string;
 }
 
-const PromotionArticle: React.FC<ProductInfo> = ({ productId, price }) => {
+const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
   const [isApplied, setIsApplied] = useState(false);
   const [discount, setDiscount] = useState(0);
   const [promoId, setPromoId] = useState<number | null>(null);
   const [isFetching, setIsFetching] = useState(true);
-
+  const [productPrice, setProductPrice] = useState<string>('0.00'); //  State for product price
   const router = useRouter();
 
+  //  Fetch Promotion Details
   const fetchPromotion = async () => {
     if (!productId) {
       return;
     }
     setIsFetching(true);
+
     try {
       const response = await makeApiRequest(apiRoutes.Promotions.GetByProductId(productId));
-      if (response.status === 200) {
-        const promoData = await response.json();
-        setIsApplied(promoData.active);
-        setDiscount(promoData.pourcentage);
-        setPromoId(promoData.id);
+      if (response) {
+        setIsApplied(response.active);
+        setDiscount(response.pourcentage);
+        setPromoId(response.id);
       } else {
         setIsApplied(false);
         setDiscount(0);
         setPromoId(null);
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération de la promotion', error);
+      console.error(' Error fetching promotion:', error);
       setIsApplied(false);
       setDiscount(0);
       setPromoId(null);
@@ -43,11 +43,32 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId, price }) => {
     }
   };
 
+  //  Fetch Product Price
+  const fetchProductPrice = async () => {
+    if (!productId) {
+      return;
+    }
+    try {
+      console.log(`Fetching product price for ID: ${productId}`);
+      const response = await makeApiRequest(apiRoutes.Products.GetById(productId));
+
+      if (response) {
+        setProductPrice(response.price);
+      } else {
+        throw new Error('No product data available.');
+      }
+    } catch (error) {
+      console.error(' Error fetching product price:', error);
+    }
+  };
+
   useEffect(() => {
     fetchPromotion();
+    fetchProductPrice();
   }, [productId]);
 
-  const calculatedTTC = (parseFloat(price) * (1 - discount / 100)).toFixed(2);
+  //  Calculate discounted price dynamically
+  const calculatedTTC = (parseFloat(productPrice) * (1 - discount / 100)).toFixed(2);
 
   const handleModifyPromo = () => {
     router.push(`/promotion/edit/${promoId}`);
@@ -103,7 +124,7 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId, price }) => {
             <TextField
               label="Prix initial (HT)"
               variant="outlined"
-              value={price}
+              value={productPrice}
               sx={{
                 width: 90,
                 borderRadius: 1,

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useRouter } from 'next/router';
-import apiRoutes from '@common/defs/routes/apiRoutes';
-import axios from 'axios';
+import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 
 interface AllStockData {
   product_id: number;
@@ -14,7 +13,7 @@ interface AllStockData {
 }
 
 interface StockData {
-  id: number; // Clé unique requise pour chaque ligne
+  id: number;
   name: string;
   ean: string;
   stock_warehouse: number;
@@ -25,12 +24,12 @@ const AllProducts: React.FC = () => {
   const [rows, setRows] = useState<StockData[]>([]);
   const router = useRouter();
 
-  const handleViewProduct = (ean: string) => {
-    router.push(`/produit/${ean}`);
+  const handleViewProduct = (id: string) => {
+    router.push(`/produit/${id}`);
   };
 
-  const handleDeleteProduct = (ean: string) => {
-    alert(`Supprimer le produit avec le code EAN : ${ean}`);
+  const handleDeleteProduct = (id: string) => {
+    alert(`Supprimer le produit avec le code EAN : ${id}`);
   };
 
   const columns: GridColDef[] = [
@@ -73,7 +72,7 @@ const AllProducts: React.FC = () => {
             variant="contained"
             color="primary"
             size="small"
-            onClick={() => handleViewProduct(params.row.ean)}
+            onClick={() => handleViewProduct(params.row.id)}
           >
             Afficher le produit
           </Button>
@@ -81,7 +80,7 @@ const AllProducts: React.FC = () => {
             variant="contained"
             color="secondary"
             size="small"
-            onClick={() => handleDeleteProduct(params.row.ean)}
+            onClick={() => handleDeleteProduct(params.row.id)}
           >
             Supprimer
           </Button>
@@ -92,9 +91,12 @@ const AllProducts: React.FC = () => {
 
   const fetchAllProducts = async () => {
     try {
-      const response = await axios.get(apiRoutes.Products.GetAll);
-      if (response.status === 200) {
-        const mappedData = response.data.map((item: AllStockData) => ({
+      console.log('Fetching product data from API...');
+      const response = await makeApiRequest(apiRoutes.Products.GetAll);
+
+      if (Array.isArray(response)) {
+        console.log('API Response:', response);
+        const mappedData = response.map((item: AllStockData) => ({
           id: item.product_id,
           name: item.name,
           ean: item.ean,
@@ -102,26 +104,9 @@ const AllProducts: React.FC = () => {
           stock_shelf_bottom: item.stock_shelf_bottom,
         }));
         setRows(mappedData);
-      } else {
-        throw new Error('API not available');
       }
     } catch (error) {
-      console.error('Error fetching data from API', error);
-    }
-
-    // Fallback : Chargement des données locales
-    try {
-      const localData = await import('./allProductsMocked/allProductsMockerd.json');
-      const mappedData = localData.default.map((item: AllStockData) => ({
-        id: item.product_id,
-        name: item.name,
-        ean: item.ean,
-        stock_warehouse: item.stock_warehouse,
-        stock_shelf_bottom: item.stock_shelf_bottom,
-      }));
-      setRows(mappedData); // Mise à jour des données avec un tableau
-    } catch (localError) {
-      console.error('Erreur lors du chargement des données locales', localError);
+      console.error('Error fetching data from API:', error);
     }
   };
 

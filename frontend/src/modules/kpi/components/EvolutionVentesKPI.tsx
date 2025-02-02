@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from 'react';
+import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 import { Box, Typography, TextField, Button } from '@mui/material';
 import { BarChart } from '@mui/x-charts';
-import apiRoutes from '@common/defs/routes/apiRoutes';
-import axios from 'axios';
 
 interface DailyStockData {
   date: string;
   quantity: number;
 }
 
-// ✅ Interface pour définir le format des données API et locales
+//  Interface for API response data
 interface ApiResponseEntry {
   date: string;
   quantity: number;
 }
 
+//  Helper function to format dates as YYYY-MM-DD
 const formatDate = (date: Date): string => date.toISOString().split('T')[0];
 
+//  Generates a range of dates from `start` to `end`
 const generateDateRange = (start: string, end: string): string[] => {
   const dates: string[] = [];
   const currentDate = new Date(start);
@@ -42,12 +43,16 @@ const EvolutionVentesKPI: React.FC<{ productId: number }> = ({ productId }) => {
   const fetchSalesData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        apiRoutes.Logs.GetDailyStocks(productId, startDate, endDate),
+      console.log(
+        `Fetching sales data for product ID: ${productId}, from ${startDate} to ${endDate}`,
+      );
+      const response = await makeApiRequest(
+        apiRoutes.KpiLogs.GetByLogsProductId(productId, startDate, endDate),
       );
 
-      if (response.status === 200) {
-        const apiData: ApiResponseEntry[] = response.data.map((entry: ApiResponseEntry) => ({
+      if (response && Array.isArray(response)) {
+        console.log('API Response:', response);
+        const apiData: ApiResponseEntry[] = response.map((entry: ApiResponseEntry) => ({
           date: formatDate(new Date(entry.date)),
           quantity: Number(entry.quantity) || 0,
         }));
@@ -60,12 +65,14 @@ const EvolutionVentesKPI: React.FC<{ productId: number }> = ({ productId }) => {
 
         setSalesData(completedData);
       } else {
-        throw new Error('API non disponible');
+        console.error('No sales data found for this product.');
       }
     } catch (error) {
-      console.error('Erreur API, utilisation des données locales', error);
+      console.error('Error fetching sales data:', error);
+
       try {
         const localData = await import('./exempleData/exempleLogs.json');
+        console.log(' Using local data fallback:', localData.default);
 
         const localStockData: ApiResponseEntry[] = localData.default.map(
           (entry: ApiResponseEntry) => ({
@@ -82,18 +89,10 @@ const EvolutionVentesKPI: React.FC<{ productId: number }> = ({ productId }) => {
 
         setSalesData(completedLocalData);
       } catch (localError) {
-        console.error('Erreur lors du chargement des données locales', localError);
+        console.error(' Error loading local sales data:', localError);
       }
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleFetch = () => {
-    if (startDate && endDate) {
-      fetchSalesData();
-    } else {
-      alert('Veuillez sélectionner une plage de dates.');
     }
   };
 
@@ -126,9 +125,6 @@ const EvolutionVentesKPI: React.FC<{ productId: number }> = ({ productId }) => {
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
         />
-        <Button variant="contained" color="primary" onClick={handleFetch} disabled={loading}>
-          {loading ? 'Chargement...' : 'Rechercher'}
-        </Button>
       </Box>
 
       <BarChart

@@ -1,52 +1,51 @@
 import React, { useEffect, useState } from 'react';
-import apiRoutes from '@common/defs/routes/apiRoutes';
+import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 import { Box, Typography, TextField, Button } from '@mui/material';
 import { LineChart } from '@mui/x-charts';
-import axios from 'axios';
 
-interface StockData {
+interface ApiStockData {
   date: string;
   stockWarehouse: number;
   stockShelfBottom: number;
 }
 
-const FondRayonKPI: React.FC<{ ean: string }> = ({ ean }) => {
+const FondRayonKPI: React.FC<{ productId: number }> = ({ productId }) => {
   const today = new Date();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(today.getDate() - 30);
 
-  const [startDate, setStartDate] = useState<string>(thirtyDaysAgo.toISOString().split('T')[0]); // Début : 30 jours avant aujourd'hui
-  const [endDate, setEndDate] = useState<string>(today.toISOString().split('T')[0]); // Fin : aujourd'hui
-  const [tableData, setTableData] = useState<StockData[]>([]);
+  const [startDate, setStartDate] = useState<string>(thirtyDaysAgo.toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState<string>(today.toISOString().split('T')[0]);
+  const [tableData, setTableData] = useState<ApiStockData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
-  interface ApiStockData {
-    date: string;
-    stockWarehouse: number;
-    stockShelfBottom: number;
-  }
 
   const fetchStockData = async () => {
     setLoading(true);
     try {
-      // Récupération des données via l'API
-      const response = await axios.get(apiRoutes.KpiLogs.GetByProductEan(ean, startDate, endDate));
-      if (response.status === 200) {
-        const transformedData = response.data.map((item: ApiStockData) => ({
+      console.log(
+        `Fetching stock data for product ID: ${productId}, from ${startDate} to ${endDate}`,
+      );
+      const response = await makeApiRequest(
+        apiRoutes.KpiLogs.GetByLogsProductId(productId, startDate, endDate),
+      );
+
+      if (response && Array.isArray(response)) {
+        console.log('API Response:', response);
+        const transformedData = response.map((item: ApiStockData) => ({
           date: item.date,
           stockWarehouse: item.stockWarehouse,
           stockShelfBottom: item.stockShelfBottom,
         }));
         setTableData(transformedData);
       } else {
-        throw new Error('API non disponible');
+        console.error('No stock data found for this product.');
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération depuis l’API', error);
+      console.error('Error fetching stock data:', error);
 
-      // Fallback : Chargement des données locales
       try {
         const localData = await import('./exempleData/exempleDataKpi.json');
+        console.log('Using local data fallback:', localData.default);
         const transformedData = localData.default.map((item: ApiStockData) => ({
           date: item.date,
           stockWarehouse: item.stockWarehouse,
@@ -54,65 +53,56 @@ const FondRayonKPI: React.FC<{ ean: string }> = ({ ean }) => {
         }));
         setTableData(transformedData);
       } catch (localError) {
-        console.error('Erreur lors du chargement des données locales', localError);
+        console.error('Error loading local stock data:', localError);
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFetch = () => {
-    if (startDate && endDate) {
-      fetchStockData();
-    } else {
-      alert('Veuillez sélectionner une plage de dates.');
-    }
-  };
-
   useEffect(() => {
-    fetchStockData();
-  }, [ean]);
+    if (productId) {
+      fetchStockData();
+    }
+  }, [productId, startDate, endDate]);
 
-  // Préparation des données pour le graphique
   const dataset = tableData.map((item) => ({
-    x: new Date(item.date).getTime(), // Convertir la date en timestamp
-    y: item.stockWarehouse, // Stock Warehouse
+    x: new Date(item.date).getTime(),
+    y: item.stockWarehouse,
   }));
 
   return (
-    <Box>
+    <Box sx={{ width: '100%' }}>
       <Typography variant="h3" gutterBottom>
-        Stock KPI
+        Stock fond de rayon
       </Typography>
       <Box display="flex" gap={2} mb={2}>
         <TextField
           type="date"
           label="Date de début"
-          InputLabelProps={{ shrink: true }}
+          defaultValue={{ shrink: true }}
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
         />
         <TextField
           type="date"
           label="Date de fin"
-          InputLabelProps={{ shrink: true }}
+          defaultValue={{ shrink: true }}
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
         />
-        <Button variant="contained" color="primary" onClick={handleFetch} disabled={loading}>
-          {loading ? 'Chargement...' : 'Rechercher'}
-        </Button>
       </Box>
       <LineChart
-        dataset={dataset} // Données pour le graphique
-        xAxis={[{ dataKey: 'x', label: 'Dates', scaleType: 'time' }]} // Utilisation d'une échelle temporelle
+        dataset={dataset}
+        xAxis={[{ dataKey: 'x', scaleType: 'time' }]}
         series={[
           {
             dataKey: 'y',
-            label: 'Stock dans l’entrepot',
+            label: 'Stock dans l’entrepôt',
           },
         ]}
         height={300}
+        width={500}
         margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
         grid={{ vertical: true, horizontal: true }}
       />
