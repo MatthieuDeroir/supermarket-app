@@ -5,14 +5,15 @@ const Common = {
   Settings: '/settings',
   Account: '/account',
   NotFound: '/404',
+  Users: '/users',
+  TVA: '/tva',
 };
 
 const Stocks = {
   Entrepot: '/allStockProduct',
   FDR: '/allShelfProduct',
   StocksManagment: '/allProduct',
-  StocksLogs: '/stocks-logs',
-  AddProduct: '/add-product',
+  StocksLogs: '/stock-logs',
 };
 const Routes = {
   Common,

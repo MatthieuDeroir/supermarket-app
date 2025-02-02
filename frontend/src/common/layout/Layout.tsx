@@ -15,7 +15,10 @@ import CreditCardIcon from '@mui/icons-material/CreditCard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SettingsIcon from '@mui/icons-material/Settings';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import AddIcon from '@mui/icons-material/Add';
+import PersonIcon from '@mui/icons-material/Person';
+import ArticleIcon from '@mui/icons-material/Article';
+
+// import AddIcon from '@mui/icons-material/Add';
 
 interface ILayoutProps {
   children: React.ReactNode;
@@ -53,11 +56,11 @@ const Layout = (props: ILayoutProps) => {
             itemLabel: 'Logs Stocks',
             itemLink: Routes.Stocks.StocksLogs,
           },
-          {
-            icon: <AddIcon />,
-            itemLabel: 'Ajouter Produit',
-            itemLink: Routes.Stocks.AddProduct,
-          },
+          // {
+          //   icon: <AddIcon />,
+          //   itemLabel: 'Ajouter Produit',
+          //   itemLink: Routes.Stocks.AddProduct,
+          // },
         ],
       },
       {
@@ -74,6 +77,16 @@ const Layout = (props: ILayoutProps) => {
         icon: <SettingsIcon />,
         itemLabel: 'Paramètres',
         itemLink: Routes.Common.Settings,
+      },
+      {
+        icon: <PersonIcon />,
+        itemLabel: 'Utilisateurs',
+        itemLink: Routes.Common.Users,
+      },
+      {
+        icon: <ArticleIcon />,
+        itemLabel: 'TVA',
+        itemLink: Routes.Common.TVA,
       },
     ],
   };
