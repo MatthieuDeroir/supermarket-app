@@ -11,8 +11,9 @@ class PromotionService {
         return promotionRepository.findById(promotionId);
     }
 
-    async createPromotion(data: Omit<Promotion, "promotionId">): Promise<void> {
-        await promotionRepository.create(data);
+    async createPromotion(data: Omit<Promotion, "promotionId">): Promise<Promotion | null> {
+        const id = await promotionRepository.createPromotion(data);
+        return await this.getPromotionById(id);
     }
 
     async updatePromotion(promotionId: number, data: Partial<Promotion>): Promise<void> {
