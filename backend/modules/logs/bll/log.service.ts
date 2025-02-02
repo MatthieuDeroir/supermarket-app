@@ -29,6 +29,10 @@ class LogService {
         return logRepository.findByProductId(productId);
     }
 
+    async getLogsByUserId(userId:number): Promise<Log[]> {
+        return logRepository.findByUserId(userId);
+    }
+
     async createLog(data: Omit<Log, "logId">): Promise<void> {
         await logRepository.create(data);
     }

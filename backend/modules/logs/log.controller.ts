@@ -51,8 +51,17 @@ logController.get("product/:productId", async (c) => {
     } catch(err) {
         return c.json({ message: err }, 400);
     }
+})
 
+logController.get("user/:userId", async (c) => {
+    const userId = Number(c.req.param("userId"));
 
+    try {
+        const logs = await logService.getLogsByUserId(userId);
+        return c.json(logs);
+    } catch(err) {
+        return c.json({ message: err }, 400);
+    }
 })
 
 // GET /log/product/:productId/daily?start=YYYY-MM-DD&end=YYYY-MM-DD

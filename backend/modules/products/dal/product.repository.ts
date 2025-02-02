@@ -32,6 +32,20 @@ export class ProductRepository extends GenericRepository<Product> {
         });
         return result.rows[0].product_id;
     }
+
+    async findByEAN(ean: string): Promise<Product | null> {
+        const client = db.getClient();
+        const query = `
+            SELECT *
+            FROM products
+            WHERE ean = $1
+        `;
+        const result = await client.queryObject<Product>({
+            text: query,
+            args: [ean],
+        });
+        return result.rows[0] ?? null;
+    }
 }
 
 const productRepository = new ProductRepository();
