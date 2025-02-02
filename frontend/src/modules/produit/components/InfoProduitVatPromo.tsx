@@ -24,12 +24,10 @@ interface ProductData {
   picture: string;
   category: number;
   nutritional_information: Record<string, string | number>;
-  stock_shelf_bottom: number;
-  stock_warehouse: number;
   available_quantity: number;
 }
 
-const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
+const InfoProduitVatPromo: React.FC<{ productId: number }> = ({ productId }) => {
   const [productData, setProductData] = useState<ProductData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
@@ -55,8 +53,6 @@ const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
             picture: response.picture,
             category: response.category_id,
             nutritional_information: JSON.parse(response.nutritional_information || '{}'),
-            stock_shelf_bottom: response.stock_shelf_bottom,
-            stock_warehouse: response.stock_warehouse,
             available_quantity: response.stock_warehouse + response.stock_shelf_bottom,
           });
         } else {
@@ -120,16 +116,52 @@ const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
             <AddIcon />
           </Button>
         </Box>
-        <Typography variant="h6">Quantité disponible en en stock :</Typography>
-        <Typography>{productData.stock_warehouse} unités</Typography>
-        <Typography variant="h6">Quantité disponible en en fond de rayon :</Typography>
-        <Typography>{productData.stock_shelf_bottom} unités</Typography>
+        <Typography variant="h6">Prix :</Typography>
+        <Typography>{productData.price}</Typography>
+        <Typography variant="h6">Marque :</Typography>
+        <Typography variant="body1">{productData.brand}</Typography>
+        <Typography variant="h6">Quantité disponible en stock :</Typography>
+        <Typography>{productData.available_quantity} unités</Typography>
         <Typography variant="h6">EAN :</Typography>
         <Typography>{productData.ean}</Typography>
         <CodeBarre value={productData.ean} />
+
+        <Accordion>
+          <AccordionSummary expandIcon={<ArrowDownwardIcon />}>
+            <Typography component="span" variant="h6">
+              Informations nutritionnelles
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography variant="subtitle2" sx={{ maxWidth: '95%', fontSize: '0.75rem' }}>
+              {Object.entries(productData.nutritional_information)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join(', ')}
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+      </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          padding: 2,
+          gap: 2,
+          alignItems: 'center',
+        }}
+      >
+        <PrixComponent productId={productId} />
+        <PromotionArticle productId={productId} />
+        <Box
+          component="img"
+          sx={{ width: '80%', height: 'auto', borderRadius: 1 }}
+          alt="product image"
+          src={productData.picture}
+        />
       </Box>
     </Box>
   );
 };
 
-export default InfoProduit;
+export default InfoProduitVatPromo;

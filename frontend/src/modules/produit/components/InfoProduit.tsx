@@ -13,6 +13,7 @@ import PrixComponent from '@modules/produit/prixComponent/prixComponent';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 import CodeBarre from './CodeBarre';
 import AddIcon from '@mui/icons-material/Add';
+import { useRouter } from 'next/router';
 
 interface ProductData {
   product_id: number;
@@ -23,12 +24,14 @@ interface ProductData {
   picture: string;
   category: number;
   nutritional_information: Record<string, string | number>;
+  stock_warehouse: number;
   available_quantity: number;
 }
 
 const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
   const [productData, setProductData] = useState<ProductData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const router = useRouter();
 
   useEffect(() => {
     if (!productId) {
@@ -51,6 +54,7 @@ const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
             picture: response.picture,
             category: response.category_id,
             nutritional_information: JSON.parse(response.nutritional_information || '{}'),
+            stock_warehouse: response.stock_warehouse,
             available_quantity: response.stock_warehouse + response.stock_shelf_bottom,
           });
         } else {
@@ -65,6 +69,10 @@ const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
 
     fetchProductById();
   }, [productId]);
+
+  const RedirectToAddMoreProduct = (id: number) => {
+    router.push(`/addStockQuantityToStock/${id}`);
+  };
 
   if (loading) {
     return (
@@ -94,8 +102,8 @@ const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
         <Typography>{productData.price}</Typography>
         <Typography variant="h6">Marque :</Typography>
         <Typography variant="body1">{productData.brand}</Typography>
-        <Typography variant="h6">Quantité disponible en stock :</Typography>
-        <Typography>{productData.available_quantity} unités</Typography>
+        <Typography variant="h6">Quantité disponible au dépôt :</Typography>
+        <Typography>{productData.stock_warehouse} unités</Typography>
         <Typography variant="h6">EAN :</Typography>
         <Typography>{productData.ean}</Typography>
         <CodeBarre value={productData.ean} />
@@ -125,8 +133,6 @@ const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
           alignItems: 'center',
         }}
       >
-        <PrixComponent productId={productId} />
-        <PromotionArticle productId={productId} />
         <Box
           component="img"
           sx={{ width: '80%', height: 'auto', borderRadius: 1 }}

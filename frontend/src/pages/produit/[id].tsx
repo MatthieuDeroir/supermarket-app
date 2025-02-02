@@ -1,6 +1,6 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import InfoProduit from '@modules/produit/components/InfoProduit';
+import InfoProduitVatPromo from '@//modules/produit/components/InfoProduitVatPromo';
 import StockKPI from '@modules/kpi/components/StockKPI';
 import FondRayonKPI from '@modules/kpi/components/FondRayonKPI';
 import EvolutionVentesKPI from '@modules/kpi/components/EvolutionVentesKPI';
@@ -32,7 +32,7 @@ const ProduitPage: NextPage = () => {
   return (
     <Box>
       <Box>
-        <InfoProduit productId={parseInt(id, 10)} />
+        <InfoProduitVatPromo productId={parseInt(id, 10)} />
       </Box>
 
       <Box sx={{ display: 'flex', marginTop: 4, gap: 2, justifyContent: 'space-between' }}>

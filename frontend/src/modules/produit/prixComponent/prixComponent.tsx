@@ -35,7 +35,7 @@ const PrixComponent: React.FC<PrixComponentProps> = ({ productId }) => {
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
-        console.log(`🔄 Fetching product details for ID: ${productId}`);
+        console.log(` Fetching product details for ID: ${productId}`);
         const response = await makeApiRequest(apiRoutes.Products.GetById(productId));
 
         if (response) {
@@ -64,7 +64,7 @@ const PrixComponent: React.FC<PrixComponentProps> = ({ productId }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        console.log('🔄 Fetching categories');
+        console.log(' Fetching categories');
         const response = await makeApiRequest(apiRoutes.Categories.GetAll);
 
         if (response) {
@@ -105,7 +105,7 @@ const PrixComponent: React.FC<PrixComponentProps> = ({ productId }) => {
   //  Update product category in the database
   const updateProductCategory = async (categoryId: number) => {
     try {
-      console.log(`🔄 Updating product ${productId} category to ID: ${categoryId}`);
+      console.log(` Updating product ${productId} category to ID: ${categoryId}`);
 
       const response = await makeApiRequest(apiRoutes.Products.Update(productId), 'PUT', {
         category_id: categoryId,
