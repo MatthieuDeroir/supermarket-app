@@ -21,16 +21,20 @@ import { StockLogsType, LogType } from '@common/defs/types/logs';
 //     par: 24,
 //   },
 
+interface StockLogsprops {
+  userId?: number;
+}
+
 export const LogTypeColors: Record<LogType, string> = {
   [LogType.TRANS]: 'orange',
   [LogType.SOLD]: 'blue',
   [LogType.AJOUT]: 'green',
   [LogType.SUPPRIMER]: 'red',
 };
-
-const StockLogs: React.FC = () => {
+const StockLogs: React.FC<StockLogsprops> = ({ userId }) => {
   const [rows, setRows] = useState<StockLogsType[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [userIdInLogs, setUserIdInLogs] = useState<number | null>(userId || null);
   const [selectedLog, setSelectedLog] = useState<StockLogsType | null>(null);
 
   const handleShowLog = (log: StockLogsType) => {
