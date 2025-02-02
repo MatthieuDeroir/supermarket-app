@@ -12,6 +12,7 @@ import logRouter from "./logs/log.routes.ts";
 import promotionRouter from "./promotions/promotion.routes.ts";
 import roleRouter from "./roles/role.routes.ts";
 import userRouter from "./users/user.routes.ts";
+import paymentRouter from "./payment/payment.routes.ts";
 
 // Import du controlleur d'auth
 import authController from "./auth/auth.controller.ts";/**/
@@ -46,5 +47,6 @@ routes.route("/logs", logRouter);
 routes.route("/promotions", promotionRouter);
 routes.route("/roles", roleRouter);
 routes.route("/users", userRouter);
+routes.route("/payment", paymentRouter);
 
 export default routes;
