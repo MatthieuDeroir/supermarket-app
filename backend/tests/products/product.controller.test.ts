@@ -1,37 +1,51 @@
 // product.controller.test.ts
 import { assertEquals } from "https://deno.land/std@0.192.0/testing/asserts.ts";
+import {
+    stub,
+    assertSpyCalls
+} from "https://deno.land/std@0.192.0/testing/mock.ts";
+
 import { Hono } from "hono";
 import { superdeno } from "https://deno.land/x/superdeno/mod.ts";
 
-// On mock le productService pour ne pas faire de vraies requêtes DB.
-import { productService } from "../bll/product.service.ts";
+// On mock le productService pour ne pas faire de vraies requêtes DB
+import { productService } from "../../modules/products/bll/product.service.ts";
 
 // Import du controller
-import productController from "../product.controller.ts";
+import productController from "../../modules/products/product.controller.ts";
+import {Product} from "../../modules/products/product.model.ts";
 
 Deno.test("GET /product → should return 200 and an array of products", async () => {
-    // 1) On mock la réponse de productService.getAllProducts()
+    // 1) On prépare un tableau de produits factices
     const mockProducts = [
-        { product_id: 1, name: "Fake product", ean: "123456", ... },
-    ];
-    // On espionne (spy) ou on mock
-    const getAllSpy = spyOn(productService, "getAllProducts").and.resolveTo(mockProducts);
+        { product_id: 1, name: "Fake product", ean: "123456" },
+    ] as Product[];
 
-    // 2) Créer une app Hono pour brancher productController
+    // 2) On 'stub' la méthode getAllProducts du productService
+    //    Elle renvoie ici un mockProducts directement
+    const getAllStub = stub(
+        productService,
+        "getAllProducts",
+        () => Promise.resolve(mockProducts),
+    );
+
+    // 3) On crée une app Hono pour brancher productController
     const app = new Hono();
-    // /product sera le prefix, ex: GET /product
     app.route("/product", productController);
 
-    // 3) Lancer la requête via SuperDeno
+    // 4) On lance la requête via SuperDeno
     const request = await superdeno(app)
-        .get("/product")     // <— route GET /product
+        .get("/product")
         .expect("Content-Type", /application\/json/)
         .expect(200);
 
-    // 4) Vérifier la réponse
+    // 5) On vérifie la réponse JSON
     const body = request.body;
     assertEquals(body, mockProducts);
 
-    // 5) Vérifier qu’on a bien appelé productService.getAllProducts
-    assertEquals(getAllSpy.calls.length, 1);
+    // 6) On vérifie que productService.getAllProducts a été appelé
+    assertSpyCalls(getAllStub, 1);
+
+    // 7) On restaure la méthode originale pour ne pas polluer d'autres tests
+    getAllStub.restore();
 });
