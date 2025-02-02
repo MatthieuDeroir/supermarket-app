@@ -23,8 +23,8 @@ promotionController.get("/:promotionId", async (c) => {
 // POST /promotion
 promotionController.post("/", async (c) => {
     const body = await c.req.json();
-    await promotionService.createPromotion(body);
-    return c.json({ message: "Promotion created" }, 201);
+    const res = await promotionService.createPromotion(body);
+    return c.json(res, 201);
 });
 
 // PUT /promotion/:promotionId
