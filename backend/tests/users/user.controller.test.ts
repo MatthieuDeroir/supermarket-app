@@ -2,25 +2,28 @@
 if (typeof window === "undefined") {
     (globalThis as any).window = globalThis;
 }
-
 import { assertEquals } from "https://deno.land/std@0.192.0/testing/asserts.ts";
 import { Hono } from "hono";
 import { superdeno } from "https://deno.land/x/superdeno/mod.ts";
 import userController from "../../modules/users/user.controller.ts";
 import userService from "../../modules/users/bll/user.service.ts";
 import { stub, assertSpyCalls } from "https://deno.land/std@0.192.0/testing/mock.ts";
+import { User } from "../../modules/users/index.ts";
+
+// Exemple : utilisateur en camelCase (y compris le champ password)
+const fakeUsers = [{
+    userId: 1,
+    email: "user@example.com",
+    password: "hashed",
+    firstName: "First",
+    lastName: "Last",
+    phoneNumber: "1234567890",
+    roleId: 2,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+}] as unknown as User[];
 
 Deno.test("GET /user returns all users", async () => {
-    const fakeUsers = [{
-        user_id: 1,
-        email: "user@example.com",
-        first_name: "First",
-        last_name: "Last",
-        phone_number: "1234567890",
-        role_id: 2,
-        created_at: new Date(),
-        updated_at: new Date(),
-    }];
     const stubAll = stub(userService, "getAllUsers", () => Promise.resolve(fakeUsers));
     const app = new Hono();
     app.route("/user", userController);

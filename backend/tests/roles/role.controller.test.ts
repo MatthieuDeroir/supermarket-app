@@ -2,7 +2,6 @@
 if (typeof window === "undefined") {
     (globalThis as any).window = globalThis;
 }
-
 import { assertEquals } from "https://deno.land/std@0.192.0/testing/asserts.ts";
 import { Hono } from "hono";
 import { superdeno } from "https://deno.land/x/superdeno/mod.ts";
@@ -10,8 +9,13 @@ import roleController from "../../modules/roles/role.controller.ts";
 import roleService from "../../modules/roles/bll/role.service.ts";
 import { stub, assertSpyCalls } from "https://deno.land/std@0.192.0/testing/mock.ts";
 
+// Exemple : rôle en camelCase
+const fakeRoles = [
+    { roleId: 1, name: "Admin" },
+    { roleId: 2, name: "User" },
+];
+
 Deno.test("GET /role returns all roles", async () => {
-    const fakeRoles = [{ role_id: 1, name: "Admin" }, { role_id: 2, name: "User" }];
     const stubAll = stub(roleService, "getAllRoles", () => Promise.resolve(fakeRoles));
     const app = new Hono();
     app.route("/role", roleController);

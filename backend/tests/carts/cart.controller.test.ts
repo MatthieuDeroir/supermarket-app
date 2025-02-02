@@ -12,14 +12,14 @@ import { stub, assertSpyCalls } from "https://deno.land/std@0.192.0/testing/mock
 import { Cart } from "../../modules/carts/cart.model.ts";
 
 // Ici, le type CartWithLines attend des clés camelCase (par exemple createdAt)
-const fakeCarts = [{
+const fakeCarts = {
   cartId: 1,
   userId: 1,
   payed: false,
   createdAt: new Date(),
   payedAt: null,
   lines: [],
-}];
+} as unknown as CartWithLines[];
 
 Deno.test("GET /carts returns all carts", async () => {
     const stubAll = stub(cartService, "getAllCarts", () => Promise.resolve(fakeCarts));
