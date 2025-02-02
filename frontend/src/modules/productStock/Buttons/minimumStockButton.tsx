@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, TextField } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
+import { useRouter } from 'next/router';
 
 interface UpdateMinimumStockProps {
   productId: number;
@@ -9,13 +10,19 @@ interface UpdateMinimumStockProps {
   currentMinimumStock: number;
 }
 
-const minimumStockButton: React.FC<UpdateMinimumStockProps> = ({
+const MinimumStockButton: React.FC<UpdateMinimumStockProps> = ({
   productId,
   productName,
   currentMinimumStock,
 }) => {
   const [loading, setLoading] = useState(false);
-  const [minimumStock, setMinimumStock] = useState<number | string>(currentMinimumStock);
+  const [minimumStock, setMinimumStock] = useState<number | ''>(currentMinimumStock);
+  const [currentId, setCurrentId] = useState<number>(0);
+  const router = useRouter();
+
+  useEffect(() => {
+    setCurrentId(productId);
+  }, []);
 
   const handleUpdate = async () => {
     if (!minimumStock || Number(minimumStock) < 0) {
@@ -28,17 +35,25 @@ const minimumStockButton: React.FC<UpdateMinimumStockProps> = ({
     ) {
       return;
     }
-
+    console.log('productId:', productId);
     setLoading(true);
+
     try {
-      await makeApiRequest(apiRoutes.Products.Update, 'PUT', {
-        id: productId,
+      console.log(`Making API request to: ${apiRoutes.Products.Update(productId)}`);
+
+      const response = await makeApiRequest(apiRoutes.Products.Update(currentId), 'PUT', {
         minimum_stock: Number(minimumStock),
       });
 
-      alert('Minimum de stock mis à jour avec succès !');
+      if (response) {
+        console.log('Stock updated successfully:', response);
+        alert('Minimum de stock mis à jour avec succès !');
+        setMinimumStock(Number(minimumStock));
+      } else {
+        throw new Error('Échec de la mise à jour.');
+      }
     } catch (error) {
-      console.error('Erreur lors de la mise à jour du minimum de stock', error);
+      console.error('Erreur lors de la mise à jour du minimum de stock:', error);
       alert('Erreur lors de la mise à jour du minimum de stock.');
     } finally {
       setLoading(false);
@@ -68,7 +83,7 @@ const minimumStockButton: React.FC<UpdateMinimumStockProps> = ({
           type="number"
           variant="standard"
           value={minimumStock}
-          onChange={(e) => setMinimumStock(e.target.value)}
+          onChange={(e) => setMinimumStock(e.target.value === '' ? '' : Number(e.target.value))}
           sx={{
             width: 80,
             mx: 2,
@@ -106,4 +121,4 @@ const minimumStockButton: React.FC<UpdateMinimumStockProps> = ({
   );
 };
 
-export default minimumStockButton;
+export default MinimumStockButton;

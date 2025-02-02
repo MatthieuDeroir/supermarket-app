@@ -12,7 +12,6 @@ const AddStockQuantityToStock: React.FC<{ productId: number }> = ({ productId })
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  //  Function to fetch the latest product stock
   const fetchProductData = async () => {
     try {
       console.log(`Fetching product data for ID: ${productId}`);
@@ -107,7 +106,7 @@ const AddStockQuantityToStock: React.FC<{ productId: number }> = ({ productId })
             value={quantity}
             onChange={(e) => setQuantity(Number(e.target.value) || '')}
             sx={{ width: '120px', fontSize: '18px' }}
-            inputProps={{ min: 1, style: { textAlign: 'center' } }}
+            defaultValue={{ min: 1, style: { textAlign: 'center' } }}
           />
           <Typography fontWeight="bold" sx={{ fontSize: '18px' }}>
             Qté.
@@ -137,7 +136,7 @@ const AddStockQuantityToStock: React.FC<{ productId: number }> = ({ productId })
             marginTop: '15px',
             '&:hover': { backgroundColor: '#388E3C' },
           }}
-          onClick={handleOrder} //  Calls `handleOrder` only
+          onClick={handleOrder}
           disabled={loading}
         >
           {loading ? 'Traitement en cours...' : 'COMMANDER'}

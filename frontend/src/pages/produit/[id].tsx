@@ -31,6 +31,21 @@ const ProduitPage: NextPage = () => {
 
   return (
     <Box>
+      <Button
+        variant="contained"
+        sx={{
+          backgroundColor: '#D32F2F', // Red color
+          color: 'white',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          '&:hover': { backgroundColor: '#B71C1C' }, // Darker red on hover
+          marginTop: '20px',
+          marginBottom: '20px',
+        }}
+        onClick={() => router.push(`/allProduct`)}
+      >
+        Retourner aux produits
+      </Button>
       <Box>
         <InfoProduitVatPromo productId={parseInt(id, 10)} />
       </Box>

@@ -2,19 +2,21 @@ import React, { useState } from 'react';
 import { Box, Typography, Button, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
+import { useRouter } from 'next/router';
 
 interface DeleteButtonProps {
   productId: number;
   productName: string;
-  currentStock: number; // Stock actuel en rayon
+  currentStock: number;
 }
 
-const deleteButton: React.FC<DeleteButtonProps> = ({ productId, productName, currentStock }) => {
+const DeleteButton: React.FC<DeleteButtonProps> = ({ productId, productName, currentStock }) => {
   const [loading, setLoading] = useState(false);
-  const [quantity, setQuantity] = useState<number | string>('');
+  const [quantity, setQuantity] = useState<number | ''>('');
+  const router = useRouter();
 
   const handleDelete = async () => {
-    const deleteQuantity = parseInt(quantity as string, 10);
+    const deleteQuantity = Number(quantity);
 
     if (!deleteQuantity || deleteQuantity <= 0) {
       alert('Veuillez entrer une quantité valide.');
@@ -32,20 +34,29 @@ const deleteButton: React.FC<DeleteButtonProps> = ({ productId, productName, cur
 
     setLoading(true);
     try {
-      await makeApiRequest(apiRoutes.Products.Update(productId), 'PUT', {
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          stock_shelf_bottom: currentStock - deleteQuantity,
-        }),
+      const response = await makeApiRequest(apiRoutes.Products.Update(productId), 'PUT', {
+        stock_shelf_bottom: currentStock - deleteQuantity,
       });
 
-      alert('Produit supprimé avec succès !');
+      if (response) {
+        alert('Produit supprimé avec succès !');
+        setQuantity('');
+      } else {
+        throw new Error('Échec de la mise à jour.');
+      }
     } catch (error) {
-      console.error('Erreur lors de la suppression du produit', error);
+      console.error('Erreur lors de la suppression du produit:', error);
       alert('Erreur lors de la suppression du produit.');
     } finally {
       setLoading(false);
+      RedirectBack(productId);
     }
+  };
+
+  const RedirectBack = (id: number) => {
+    setTimeout(() => {
+      router.push(`/produit/${productId}`);
+    }, 1000);
   };
 
   return (
@@ -71,7 +82,7 @@ const deleteButton: React.FC<DeleteButtonProps> = ({ productId, productName, cur
           type="number"
           variant="standard"
           value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
+          onChange={(e) => setQuantity(Number(e.target.value) || '')}
           sx={{
             width: 80,
             mx: 2,
@@ -109,4 +120,4 @@ const deleteButton: React.FC<DeleteButtonProps> = ({ productId, productName, cur
   );
 };
 
-export default deleteButton;
+export default DeleteButton;

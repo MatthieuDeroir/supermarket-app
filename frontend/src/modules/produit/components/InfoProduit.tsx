@@ -70,10 +70,6 @@ const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
     fetchProductById();
   }, [productId]);
 
-  const RedirectToAddMoreProduct = (id: number) => {
-    router.push(`/addStockQuantityToStock/${id}`);
-  };
-
   if (loading) {
     return (
       <Box>
