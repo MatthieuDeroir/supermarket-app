@@ -75,12 +75,40 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
   // Calculate discounted price dynamically
   const calculatedTTC = (parseFloat(productPrice) * (1 - discount / 100)).toFixed(2);
 
-  // Redirect user to edit or create a promotion
-  const handleModifyPromo = () => {
+  // Format date as "YYYY-MM-DD"
+  const formatDate = (date: Date) => date.toISOString().split('T')[0];
+
+  const handleModifyPromo = async () => {
     if (promoId) {
-      router.push(`/promotion/edit/${promoId}`); // Redirect to edit promotion page
+      router.push(`/promotion/${promoId}`);
     } else {
-      router.push(`/promotion/create?productId=${productId}`); // Redirect to create promotion page
+      try {
+        console.log(`Creating new promotion for product ID: ${productId}`);
+
+        const today = new Date();
+        const startDate = formatDate(today);
+        const endDate = formatDate(new Date(today.setDate(today.getDate() + 30)));
+
+        const newPromo = await makeApiRequest(apiRoutes.Promotions.Create, 'POST', {
+          product_id: productId,
+          pourcentage: 0,
+          beging_date: startDate,
+          end_date: endDate,
+          active: false,
+        });
+        console.log('New promotion:', newPromo);
+
+        if (newPromo && newPromo.id) {
+          console.log(`New promotion created with ID: ${newPromo.id}`);
+          setPromoId(newPromo.id);
+          router.push(`/promotion/${newPromo.id}`);
+        } else {
+          alert('Erreur lors de la création de la promotion.');
+        }
+      } catch (error) {
+        console.error('Error creating promotion:', error);
+        alert('Impossible de créer une promotion.');
+      }
     }
   };
 
@@ -95,7 +123,7 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
       }}
     >
       <Typography variant="h5" fontWeight="bold">
-        Promotion on the product
+        Promotion sur le produit
       </Typography>
 
       {isFetching ? (
@@ -104,12 +132,12 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
         <>
           <Box display="flex" alignItems="center" justifyContent="start" my={1}>
             <Checkbox checked={isApplied} sx={{ color: 'black' }} disabled />
-            <Typography fontWeight="bold">Is currently applied</Typography>
+            <Typography fontWeight="bold">Promotion appliquée</Typography>
           </Box>
 
           <Box display="flex" gap={2} justifyContent="center">
             <TextField
-              label="Reduction Applicable (%)"
+              label="Réduction (%)"
               variant="outlined"
               type="number"
               value={discount}
@@ -185,7 +213,7 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
               sx={{ backgroundColor: '#F4A261', color: 'white', flex: 10 }}
               onClick={handleModifyPromo}
             >
-              {promoId ? 'MODIFIER' : 'CRÉER UNE PROMO'}
+              {promoId ? 'MODIFIER' : 'CRÉER UNE PROMOTION'}
             </Button>
           </Box>
         </>

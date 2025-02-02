@@ -19,8 +19,8 @@ const AllPromotions: React.FC = () => {
   const [rows, setRows] = useState<PromotionData[]>([]);
   const router = useRouter();
 
-  const handleEditPromotion = (id: number) => {
-    router.push(`/promotion/edit/${id}`);
+  const handleEditPromotion = (promotionId: number) => {
+    router.push(`/promotion/${promotionId}`);
   };
 
   const columns: GridColDef[] = [
@@ -33,9 +33,8 @@ const AllPromotions: React.FC = () => {
       flex: 1,
       headerAlign: 'center',
       align: 'center',
-      valueFormatter: (params: { value: number }) => {
-        return params.value !== undefined ? `${params.value} %` : 'N/A';
-      },
+      valueFormatter: (params: { value: string }) =>
+        params.value !== undefined ? `${params.value} %` : 'N/A',
     },
 
     {
@@ -44,9 +43,8 @@ const AllPromotions: React.FC = () => {
       flex: 1,
       headerAlign: 'center',
       align: 'center',
-      valueFormatter: (params: { value: string }) => {
-        return params.value ? new Date(params.value).toLocaleDateString('fr-FR') : 'Non spécifié';
-      },
+      valueFormatter: (params: { value: string }) =>
+        params.value ? new Date(params.value).toLocaleDateString('fr-FR') : 'Non spécifié',
     },
 
     {
@@ -55,9 +53,8 @@ const AllPromotions: React.FC = () => {
       flex: 1,
       headerAlign: 'center',
       align: 'center',
-      valueFormatter: (params: { value: string }) => {
-        return params.value ? new Date(params.value).toLocaleDateString('fr-FR') : 'Non spécifié';
-      },
+      valueFormatter: (params: { value: string }) =>
+        params.value ? new Date(params.value).toLocaleDateString('fr-FR') : 'Non spécifié',
     },
 
     {
@@ -66,14 +63,31 @@ const AllPromotions: React.FC = () => {
       flex: 1,
       headerAlign: 'center',
       align: 'center',
-      renderCell: (params) => {
-        console.log('Active Status Data in Row:', params.value);
-        return params.value ? (
+      renderCell: (params) =>
+        params.value ? (
           <Typography color="green">Active</Typography>
         ) : (
           <Typography color="gray">Inactive</Typography>
-        );
-      },
+        ),
+    },
+
+    {
+      field: 'action',
+      headerName: 'Actions',
+      flex: 2,
+      headerAlign: 'center',
+      align: 'center',
+      sortable: false,
+      renderCell: (params) => (
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={() => handleEditPromotion(params.row.promotion_id)}
+        >
+          Modifier la promotion
+        </Button>
+      ),
     },
   ];
 
@@ -115,7 +129,7 @@ const AllPromotions: React.FC = () => {
           }),
         );
 
-        console.log('Processed Promotions Before Setting State:', promotionsWithProducts);
+        console.log('✅ Processed Promotions:', promotionsWithProducts);
         setRows(promotionsWithProducts);
       }
     } catch (error) {
