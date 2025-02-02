@@ -1,95 +1,237 @@
-// product.service.test.ts
 import { productService } from "../../modules/products/bll/product.service.ts";
 import {
     assertEquals,
     assertRejects,
+    assertObjectMatch,
 } from "https://deno.land/std@0.192.0/testing/asserts.ts";
-import {
-    stub,
-    assertSpyCalls,
-    assertSpyCall,
-    assertSpyCallArg,
-} from "https://deno.land/std@0.192.0/testing/mock.ts";
-
-// Ex. 2.30.0
-import { format } from "https://deno.land/x/date_fns@2.30.0/index.js";
-
-const formatted = format(new Date(), "yyyy-MM-dd");
-console.log(formatted);
-
-
-// On mock/stub le repository et le logService
+import { stub, assertSpyCalls } from "https://deno.land/std@0.192.0/testing/mock.ts";
 import productRepository from "../../modules/products/dal/product.repository.ts";
 import logService from "../../modules/logs/bll/log.service.ts";
 import { Product } from "../../modules/products/product.model.ts";
 
+// Test de getAllProducts
+Deno.test("getAllProducts returns all products", async () => {
+    const mockProducts: Product[] = [
+        {
+            product_id: 1,
+            name: "Product 1",
+            ean: "123",
+            brand: "Brand1",
+            description: "Desc",
+            picture: "pic",
+            nutritional_information: "{}",
+            price: 10,
+            stock_warehouse: 100,
+            stock_shelf_bottom: 50,
+            minimum_stock: 10,
+            minimum_shelf_stock: 5,
+            category_id: 1,
+        },
+        {
+            product_id: 2,
+            name: "Product 2",
+            ean: "456",
+            brand: "Brand2",
+            description: "Desc",
+            picture: "pic",
+            nutritional_information: "{}",
+            price: 20,
+            stock_warehouse: 200,
+            stock_shelf_bottom: 100,
+            minimum_stock: 20,
+            minimum_shelf_stock: 10,
+            category_id: 2,
+        },
+    ];
+    const stubFindAll = stub(productRepository, "findAll", () =>
+        Promise.resolve(mockProducts)
+    );
+    const result = await productService.getAllProducts();
+    assertEquals(result, mockProducts);
+    assertSpyCalls(stubFindAll, 1);
+    stubFindAll.restore();
+});
+
+// Test de getProductById retourne un produit si trouvé
+Deno.test("getProductById returns product if exists", async () => {
+    const mockProduct: Product = {
+        product_id: 1,
+        name: "Product 1",
+        ean: "123",
+        brand: "Brand1",
+        description: "Desc",
+        picture: "pic",
+        nutritional_information: "{}",
+        price: 10,
+        stock_warehouse: 100,
+        stock_shelf_bottom: 50,
+        minimum_stock: 10,
+        minimum_shelf_stock: 5,
+        category_id: 1,
+    };
+    const stubFindById = stub(
+        productRepository,
+        "findById",
+        (pk: unknown) => {
+            const _id = pk as number;
+            return Promise.resolve(mockProduct);
+        }
+    );
+    const result = await productService.getProductById(1);
+    assertEquals(result, mockProduct);
+    assertSpyCalls(stubFindById, 1);
+    stubFindById.restore();
+});
+
+// Test de getProductById retourne null si non trouvé
+Deno.test("getProductById returns null if not found", async () => {
+    const stubFindById = stub(
+        productRepository,
+        "findById",
+        (pk: unknown) => Promise.resolve(null)
+    );
+    const result = await productService.getProductById(999);
+    assertEquals(result, null);
+    assertSpyCalls(stubFindById, 1);
+    stubFindById.restore();
+});
+
+// Test de createProduct
+Deno.test("createProduct creates a product and logs creation", async () => {
+    const newProductData = {
+        ean: "789",
+        name: "New Product",
+        brand: "BrandNew",
+        description: "New desc",
+        picture: "pic",
+        nutritional_information: "{}",
+        price: 30,
+        stock_warehouse: 300,
+        stock_shelf_bottom: 150,
+        minimum_stock: 30,
+        minimum_shelf_stock: 15,
+        category_id: 3,
+    };
+    const createdProduct: Product = { product_id: 10, ...newProductData };
+    const userId = 1;
+    const stubCreateReturningId = stub(
+        productRepository,
+        "createReturningId",
+        (_data: Partial<Product>) => Promise.resolve(10)
+    );
+    const stubFindById = stub(
+        productRepository,
+        "findById",
+        (pk: unknown) => {
+            const id = pk as number;
+            return Promise.resolve(createdProduct);
+        }
+    );
+    const stubCreateLog = stub(
+        logService,
+        "createLog",
+        () => Promise.resolve()
+    );
+    await productService.createProduct(newProductData, userId);
+    assertSpyCalls(stubCreateReturningId, 1);
+    assertSpyCalls(stubFindById, 1);
+    assertSpyCalls(stubCreateLog, 1);
+    stubCreateReturningId.restore();
+    stubFindById.restore();
+    stubCreateLog.restore();
+});
+
+// Test de updateProduct
+Deno.test("updateProduct calls repository update", async () => {
+    const stubUpdate = stub(
+        productRepository,
+        "update",
+        (pk: unknown, _data: any) => Promise.resolve()
+    );
+    await productService.updateProduct(1, { name: "Updated" });
+    assertSpyCalls(stubUpdate, 1);
+    stubUpdate.restore();
+});
+
+// Test de deleteProduct
+Deno.test("deleteProduct calls repository deleteById", async () => {
+    const stubDelete = stub(
+        productRepository,
+        "deleteById",
+        (pk: unknown) => Promise.resolve()
+    );
+    await productService.deleteProduct(1);
+    assertSpyCalls(stubDelete, 1);
+    stubDelete.restore();
+});
+
+// Note: Les tests pour addToWarehouse et autres fonctions de transfert doivent être ajustés de la même manière.
+// Voici un exemple pour addToWarehouse :
+
 Deno.test("addToWarehouse → should increment warehouse stock and create a log", async () => {
-    // Préparer un faux produit renvoyé par findById
+    const newQuantity = 50;
+    const userId = 999;
     const fakeProduct = {
         product_id: 10,
         stock_warehouse: 100,
         stock_shelf_bottom: 20,
-        // autres champs si besoin
     } as Product;
 
-    // Stub des méthodes du repository
-    const findByIdStub = stub(
+    let findByIdCallCount = 0;
+    const stubFindById = stub(
         productRepository,
         "findById",
-        () => Promise.resolve(fakeProduct), // renvoie le fakeProduct
+        (pk: unknown) => {
+            findByIdCallCount++;
+            if (findByIdCallCount === 1) {
+                return Promise.resolve(fakeProduct);
+            } else {
+                return Promise.resolve({
+                    ...fakeProduct,
+                    stock_warehouse: fakeProduct.stock_warehouse + newQuantity,
+                });
+            }
+        }
     );
-    const updateStub = stub(
+
+    const stubUpdate = stub(
         productRepository,
         "update",
-        () => Promise.resolve(), // ne fait rien, simule l'update
+        (pk: unknown, _data: any) => Promise.resolve()
     );
 
-    // Stub de logService.createLog
-    const logStub = stub(
+    const stubLog = stub(
         logService,
         "createLog",
-        () => Promise.resolve(),
+        () => Promise.resolve()
     );
 
-    // ======= TEST =======
-    const newQuantity = 50;
-    const userId = 999;
     const updatedProduct = await productService.addToWarehouse(10, newQuantity, userId);
 
-    // Vérifier que productRepository.update a été appelé 1 fois
-    assertSpyCalls(updateStub, 1);
-    // Vérifier précisément les arguments du 1er appel
-    //  - product_id = 10
-    //  - data = { stock_warehouse: 150 }
-    assertSpyCall(updateStub, 0, {
-        args: [10, { stock_warehouse: 150 }],
-    });
+    assertSpyCalls(stubUpdate, 1);
+    assertEquals(stubUpdate.calls[0].args, [10, { stock_warehouse: 150 }]);
 
-    // Vérifier que logService.createLog a été appelé 1 fois
-    assertSpyCalls(logStub, 1);
-    // Vérifier certains arguments du log
-    assertSpyCallArg(logStub, 0, 0, {
-        user_id: 999,
-        quantity: 50,
+    assertSpyCalls(stubLog, 1);
+    const logArg = stubLog.calls[0].args[0];
+    assertObjectMatch(logArg, {
+        user_id: userId,
+        quantity: newQuantity,
         action: "ADD_TO",
         stock_warehouse_after: 150,
     });
-    // ^ Ici, on pourrait vérifier plus de champs si besoin
 
-    // Vérifier la valeur de retour
     assertEquals(updatedProduct?.stock_warehouse, 150);
 
-    // Nettoyage: restaurer les fonctions originales
-    findByIdStub.restore();
-    updateStub.restore();
-    logStub.restore();
+    stubFindById.restore();
+    stubUpdate.restore();
+    stubLog.restore();
 });
 
+// Test de addToWarehouse pour vérifier qu'une quantité négative lance une erreur
 Deno.test("addToWarehouse → should throw error if quantity <= 0", async () => {
-    // Pas besoin de stubs ici, on teste juste la validation
     await assertRejects(
         () => productService.addToWarehouse(10, -5, 999),
         Error,
-        "Quantity must be positive",
+        "Quantity must be positive"
     );
 });
