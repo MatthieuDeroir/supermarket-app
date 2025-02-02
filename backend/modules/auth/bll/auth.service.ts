@@ -20,20 +20,37 @@ export class AuthService {
         this.jwtExpiration = config.jwtExpiration ?? 3600;
     }
 
-    async registerUser(email: string, plainPassword: string): Promise<User> {
-        // 1. Check if user exists
+    // modules/auth/auth.service.ts (extrait)
+    async registerUser(
+        email: string,
+        plainPassword: string,
+        role_id: number,          // Qu’on peut rendre optionnel si on a un default
+        firstName?: string,
+        lastName?: string,
+        phoneNumber?: string
+    ): Promise<User> {
+        // 1. Vérifier si l’utilisateur existe déjà
         const existingUser = await userRepository.findByEmail(email);
         if (existingUser) {
             throw new Error("User with that email already exists.");
         }
 
-        // 2. Hash password with bcrypt
+        // 2. Hasher le mot de passe
         const hashedPassword = await bcrypt.hash(plainPassword);
 
-        // 3. Create user in DB
+        // 3. Créer l’utilisateur
+        // On remplit tous les champs obligatoires (ou on met null / '')
+        const now = new Date();
+
         const userId = await userRepository.createReturningId({
             email,
             password: hashedPassword,
+            first_name: firstName || "",
+            last_name: lastName || "",
+            phone_number: phoneNumber || "",
+            created_at: now,
+            updated_at: now,
+            role_id: role_id,  // ex. 2 si "User" par défaut
         });
 
         const newUser = await userRepository.findById(userId);
@@ -43,6 +60,7 @@ export class AuthService {
 
         return newUser;
     }
+
 
     async loginUser(email: string, plainPassword: string): Promise<string> {
         // 1. Check if user exists
