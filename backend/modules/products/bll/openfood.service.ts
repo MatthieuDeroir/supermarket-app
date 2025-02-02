@@ -3,22 +3,7 @@ import productRepository from "../dal/product.repository.ts";
 import { Product } from "../product.model.ts";
 
 class OpenFoodService {
-    async insertProductFromEAN(ean: string): Promise<Product | null> {
-        const newProduct = await this.fetchProductFromEAN(ean)
-
-        if (newProduct == null) {
-            return null;
-        }
-
-        // 4) Insérer en DB et récupérer product_id
-        const newId = await productRepository.createReturningId(newProduct);
-
-        // 5) Relire le produit complet
-        const created = await productRepository.findById(newId);
-        return created;
-    }
-
-    async fetchProductFromEAN(ean: string): Promise<Partial<Product> | null> {
+    async fetchProductFromEAN(ean: string): Promise<Product | null> {
         // 1) Appel à l’API OFF
         const url = `https://world.openfoodfacts.org/api/v0/product/${ean}.json`;
         const res = await fetch(url);
@@ -44,7 +29,7 @@ class OpenFoodService {
         const nutritional = offProduct.nutriments ? JSON.stringify(offProduct.nutriments) : "";
 
         // 3) Construire l'objet partiel (sans `product_id` qui est auto-incrément)
-        const openfoodfactsProduct: Partial<Product> = {
+        const newProduct: Partial<Product> = {
             ean: ean,
             name: productName,
             brand,
@@ -59,7 +44,12 @@ class OpenFoodService {
             category_id: 1,         // Par exemple
         };
 
-        return openfoodfactsProduct;
+        // 4) Insérer en DB et récupérer product_id
+        const newId = await productRepository.createReturningId(newProduct);
+
+        // 5) Relire le produit complet
+        const created = await productRepository.findById(newId);
+        return created;
     }
 }
 
