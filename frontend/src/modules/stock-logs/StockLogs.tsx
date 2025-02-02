@@ -7,22 +7,6 @@ import LogDetailsModal from '@modules/stock-logs/components/LogDetailsModal';
 import dayjs from 'dayjs';
 import { StockLogsType, LogType } from '@common/defs/types/logs';
 
-// exemple of my data
-// {
-//     id: 1,
-//     ean: '1234567890123',
-//     type: 'Trans',
-//     de: 'FDR',
-//     pour: 'Panier',
-//     qt: 4,
-//     date: '2021-01-01T00:00:00',
-//     par: 24,
-//   },
-
-// interface StockLogsprops {
-//   userId?: number;
-// }
-
 export const LogTypeColors: Record<LogType, string> = {
   [LogType.TRANS]: 'orange',
   [LogType.SOLD]: 'blue',
