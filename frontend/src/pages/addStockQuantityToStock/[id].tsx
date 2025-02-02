@@ -1,11 +1,22 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import AddNewProductToStock from '@//modules/addNewProductToStock/addNewProductToStock';
-import { Box, Button } from '@mui/material';
+import AddStockQuantityToStock from '@//modules/addStockQuantityToStock/addStockQuantityToStock';
+
+import { Box, Typography, Button } from '@mui/material';
 
 const ProductStockPage: NextPage = () => {
   const router = useRouter();
+  const { id } = router.query;
 
+  if (!id || typeof id !== 'string') {
+    return (
+      <Box>
+        <Typography variant="h5" color="error">
+          Invalid Product ID
+        </Typography>
+      </Box>
+    );
+  }
   return (
     <Box>
       <Button
@@ -23,7 +34,7 @@ const ProductStockPage: NextPage = () => {
       >
         Retourner aux produits
       </Button>
-      <AddNewProductToStock />
+      <AddStockQuantityToStock productId={parseInt(id, 10)} />
     </Box>
   );
 };

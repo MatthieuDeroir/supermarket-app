@@ -24,11 +24,10 @@ interface ProductData {
   picture: string;
   category: number;
   nutritional_information: Record<string, string | number>;
-  stock_warehouse: number;
   available_quantity: number;
 }
 
-const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
+const InfoProduitVatPromo: React.FC<{ productId: number }> = ({ productId }) => {
   const [productData, setProductData] = useState<ProductData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
@@ -54,7 +53,6 @@ const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
             picture: response.picture,
             category: response.category_id,
             nutritional_information: JSON.parse(response.nutritional_information || '{}'),
-            stock_warehouse: response.stock_warehouse,
             available_quantity: response.stock_warehouse + response.stock_shelf_bottom,
           });
         } else {
@@ -69,6 +67,10 @@ const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
 
     fetchProductById();
   }, [productId]);
+
+  const RedirectToAddMoreProduct = (id: number) => {
+    router.push(`/addStockQuantityToStock/${id}`);
+  };
 
   if (loading) {
     return (
@@ -93,13 +95,33 @@ const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-evenly', width: '100%', padding: 2 }}>
       <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, padding: 2, gap: 2 }}>
-        <Typography variant="h2">{productData.name}</Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-evenly', gap: 2 }}>
+          <Typography variant="h2">{productData.name}</Typography>
+          <Button
+            sx={{
+              width: '50px',
+              height: '50px',
+              minWidth: '50px',
+              aspectRatio: '1 / 1',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              mt: 1,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              '&:hover': { backgroundColor: '#388E3C' },
+            }}
+            onClick={() => RedirectToAddMoreProduct(productId)}
+          >
+            <AddIcon />
+          </Button>
+        </Box>
         <Typography variant="h6">Prix :</Typography>
         <Typography>{productData.price}</Typography>
         <Typography variant="h6">Marque :</Typography>
         <Typography variant="body1">{productData.brand}</Typography>
-        <Typography variant="h6">Quantité disponible au dépôt :</Typography>
-        <Typography>{productData.stock_warehouse} unités</Typography>
+        <Typography variant="h6">Quantité disponible en stock :</Typography>
+        <Typography>{productData.available_quantity} unités</Typography>
         <Typography variant="h6">EAN :</Typography>
         <Typography>{productData.ean}</Typography>
         <CodeBarre value={productData.ean} />
@@ -129,6 +151,8 @@ const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
           alignItems: 'center',
         }}
       >
+        <PrixComponent productId={productId} />
+        <PromotionArticle productId={productId} />
         <Box
           component="img"
           sx={{ width: '80%', height: 'auto', borderRadius: 1 }}
@@ -140,4 +164,4 @@ const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
   );
 };
 
-export default InfoProduit;
+export default InfoProduitVatPromo;

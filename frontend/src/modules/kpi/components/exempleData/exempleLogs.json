@@ -1,0 +1,122 @@
+[
+  {
+    "log_id": 51,
+    "date": "2025-01-20T14:03:00.922Z",
+    "user_id": 1,
+    "product_id": 4,
+    "quantity": 1,
+    "stock_warehouse_after": 598,
+    "stock_shelf_bottom_after": 60,
+    "reason": "Add product to cart #5",
+    "action": "REMOVE_FROM",
+    "stocktype": "SHELF"
+  },
+  {
+    "log_id": 52,
+    "date": "2025-01-21T14:03:01.811Z",
+    "user_id": 1,
+    "product_id": 4,
+    "quantity": 1,
+    "stock_warehouse_after": 598,
+    "stock_shelf_bottom_after": 59,
+    "reason": "Increment product in cart #5",
+    "action": "REMOVE_FROM",
+    "stocktype": "SHELF"
+  },
+  {
+    "log_id": 53,
+    "date": "2025-01-22T14:03:02.466Z",
+    "user_id": 1,
+    "product_id": 4,
+    "quantity": 1,
+    "stock_warehouse_after": 598,
+    "stock_shelf_bottom_after": 58,
+    "reason": "Increment product in cart #5",
+    "action": "REMOVE_FROM",
+    "stocktype": "SHELF"
+  },
+  {
+    "log_id": 54,
+    "date": "2025-01-23T14:03:03.042Z",
+    "user_id": 1,
+    "product_id": 4,
+    "quantity": 1,
+    "stock_warehouse_after": 598,
+    "stock_shelf_bottom_after": 57,
+    "reason": "Increment product in cart #5",
+    "action": "REMOVE_FROM",
+    "stocktype": "SHELF"
+  },
+  {
+    "log_id": 55,
+    "date": "2025-01-24T14:03:36.342Z",
+    "user_id": 1,
+    "product_id": 4,
+    "quantity": 4,
+    "stock_warehouse_after": 598,
+    "stock_shelf_bottom_after": 57,
+    "reason": "Product 15 paid in cart #5, invoice #11",
+    "action": "PAYED",
+    "stocktype": "CART"
+  },
+  {
+    "log_id": 56,
+    "date": "2025-01-25T14:03:36.346Z",
+    "user_id": 1,
+    "product_id": 4,
+    "quantity": 0,
+    "stock_warehouse_after": 0,
+    "stock_shelf_bottom_after": 0,
+    "reason": "Cart #5 paid and invoice #11 created",
+    "action": "PAYED",
+    "stocktype": "CART"
+  },
+  {
+    "log_id": 56,
+    "date": "2025-01-26T14:03:36.346Z",
+    "user_id": 1,
+    "product_id": 4,
+    "quantity": 1,
+    "stock_warehouse_after": 0,
+    "stock_shelf_bottom_after": 0,
+    "reason": "Cart #5 paid and invoice #11 created",
+    "action": "PAYED",
+    "stocktype": "CART"
+  },
+  {
+    "log_id": 56,
+    "date": "2025-01-27T14:03:36.346Z",
+    "user_id": 1,
+    "product_id": 4,
+    "quantity": 4,
+    "stock_warehouse_after": 0,
+    "stock_shelf_bottom_after": 0,
+    "reason": "Cart #5 paid and invoice #11 created",
+    "action": "PAYED",
+    "stocktype": "CART"
+  },
+  {
+    "log_id": 56,
+    "date": "2025-01-28T14:03:36.346Z",
+    "user_id": 1,
+    "product_id": 4,
+    "quantity": 8,
+    "stock_warehouse_after": 0,
+    "stock_shelf_bottom_after": 0,
+    "reason": "Cart #5 paid and invoice #11 created",
+    "action": "PAYED",
+    "stocktype": "CART"
+  },
+  {
+    "log_id": 56,
+    "date": "2025-01-29T14:03:36.346Z",
+    "user_id": 1,
+    "product_id": 4,
+    "quantity": 3,
+    "stock_warehouse_after": 0,
+    "stock_shelf_bottom_after": 0,
+    "reason": "Cart #5 paid and invoice #11 created",
+    "action": "PAYED",
+    "stocktype": "CART"
+  }
+]

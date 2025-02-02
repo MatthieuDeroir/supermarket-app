@@ -15,20 +15,20 @@ const ApiRoutes = {
   Users: {
     GetAll: '/users',
     GetById: (id: ID) => `/users/${id}`,
-    Create: '/users',
     Update: (id: ID) => `/users/${id}`,
     Delete: (id: ID) => `/users/${id}`,
   },
   Products: {
     GetAll: '/products',
     GetById: (id: ID) => `/products/${id}`,
-    Update: (id: ID) => `/products/${id}/update`,
-    Delete: (id: ID) => `/products/${id}/delete`,
+    Update: (id: ID) => `/products/${id}`,
+    Delete: (id: ID) => `/products/${id}`,
+    Create: '/products',
     GetByEan: (ean: string) => `/products/ean/${ean}`,
   },
   KpiLogs: {
-    GetByProductEan: (ean: string, start: string, end: string) =>
-      `/logs/product/${ean}/daily?start=${start}&end=${end}`,
+    GetByLogsProductId: (id: ID, start: string, end: string) =>
+      `/logs/product/${id}/daily?start=${start}&end=${end}`,
   },
   Addresses: {
     // Added from Postman collection
@@ -95,11 +95,11 @@ const ApiRoutes = {
   Promotions: {
     // Added from Postman collection
     GetAll: '/promotions',
-    GetById: (id: ID) => `/promotions/${id}`,
-    GetByProductId: (productId: ID) => `/promotions/product/${productId}`,
     Create: '/promotions',
+    GetById: (id: ID) => `/promotions/${id}`,
     Update: (id: ID) => `/promotions/${id}`,
     Delete: (id: ID) => `/promotions/${id}`,
+    GetByProductId: (productId: ID) => `/promotions/product/${productId}`,
   },
   Roles: {
     // Added from Postman collection
@@ -112,6 +112,7 @@ const ApiRoutes = {
   OpenFoodFact: {
     // Added from Postman collection
     GetProductByEan: (ean: string) => `/openfood?ean=${ean}`,
+    AddProductByEan: (ean: string) => `/openfood?ean=${ean}`,
   },
   Paypal: {
     // Added from Postman collection
