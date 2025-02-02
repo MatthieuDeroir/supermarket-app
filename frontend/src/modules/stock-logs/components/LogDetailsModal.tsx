@@ -20,7 +20,7 @@ interface LogDetailsModalProps {
 
 const LogDetailsModal: React.FC<LogDetailsModalProps> = ({ stockLog, show, onHide }) => {
   return (
-    <Dialog open={show} onClose={onHide}>
+    <Dialog open={show} onClose={onHide} fullWidth sx={{ padding: 2 }}>
       <DialogTitle>Stock Log Details</DialogTitle>
       <DialogContent>
         <Typography variant="body1">

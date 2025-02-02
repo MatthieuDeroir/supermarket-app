@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { useRouter } from 'next/router';
-import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 import { data } from '@common/defs/fakes/logs';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import LogDetailsModal from '@modules/stock-logs/components/LogDetailsModal';
@@ -21,9 +19,9 @@ import { StockLogsType, LogType } from '@common/defs/types/logs';
 //     par: 24,
 //   },
 
-interface StockLogsprops {
-  userId?: number;
-}
+// interface StockLogsprops {
+//   userId?: number;
+// }
 
 export const LogTypeColors: Record<LogType, string> = {
   [LogType.TRANS]: 'orange',
@@ -31,10 +29,10 @@ export const LogTypeColors: Record<LogType, string> = {
   [LogType.AJOUT]: 'green',
   [LogType.SUPPRIMER]: 'red',
 };
-const StockLogs: React.FC<StockLogsprops> = ({ userId }) => {
+// const StockLogs: React.FC<StockLogsprops> = ({ userId }) => {
+const StockLogs: React.FC = () => {
   const [rows, setRows] = useState<StockLogsType[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [userIdInLogs, setUserIdInLogs] = useState<number | null>(userId || null);
   const [selectedLog, setSelectedLog] = useState<StockLogsType | null>(null);
 
   const handleShowLog = (log: StockLogsType) => {
