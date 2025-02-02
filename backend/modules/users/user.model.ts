@@ -1,14 +1,14 @@
 // modules/users/user.model.ts
 export interface User {
     [key: string]: unknown; // <= index signature
-    userId: number;
+    user_id: number;
     email: string;
     password: string;
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt?: Date | null;
-    roleId: number;
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    created_at: Date;
+    updated_at: Date;
+    deleted_at?: Date | null;
+    role_id: number;
 }

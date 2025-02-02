@@ -47,19 +47,35 @@ class CartService {
         await cartRepository.deleteById(cartId);
     }
 
+    async getTotalAmount(cartId: number): Promise<number> {
+        const cart = await cartRepository.findById(cartId);
+        if (!cart) throw new Error(`Cart ${cartId} not found`);
+
+        const lines = await cartLineRepository.findByCartId(cartId);
+        let total = 0;
+        for (const line of lines) {
+            const product = await productRepository.findById(line.product_id);
+            if (!product) throw new Error(`Product ${line.product_id} not found`);
+            total += product.price * line.quantity;
+        }
+
+        return total;
+    }
+
     /**
      * Ajouter un produit au cart => RETRAIT TEMPORAIRE du shelf.
      * Si aucun panier non payé n'existe pour l'utilisateur, il est créé automatiquement.
      */
     async addProductToCart(productId: number, quantity: number, userId: number): Promise<CartLine> {
         if (quantity <= 0) throw new Error("Quantity must be positive");
-
         // 1) Vérifier s'il existe un panier non payé pour l'utilisateur
         let cart = await cartRepository.findActiveCartByUserId(userId);
+        userId = userId ?? 1; // Pour les tests
         if (!cart) {
+            console.log("No active cart found for user ", userId);
             // Si aucun panier non payé n'existe, créer un nouveau panier
             const newCartData = {
-                user_id: userId,
+                user_id: userId ?? 1,
                 payed: false,
                 created_at: new Date(),
             };
@@ -70,7 +86,7 @@ class CartService {
             cart = allCarts.find((c) => !c.payed) || null;
             if (!cart) throw new Error("Failed to create a new cart");
         }
-
+        console.log("Cart found: ", cart);
         // 2) Vérifier le produit
         const product = await productRepository.findById(productId);
         if (!product) throw new Error(`Product ${productId} not found`);
@@ -158,7 +174,6 @@ class CartService {
         // log
         const finalProduct = await productRepository.findById(product_id);
         await logService.createLog({
-            logId: 0,
             date: new Date(),
             user_id: userId,
             product_id: product_id.toString(),
@@ -231,20 +246,20 @@ class CartService {
         }
 
         // 5) Marquer le cart comme payé
-        await cartRepository.update(cartId, { payed: true, payed_at: new Date() });
+        await cartRepository.update(cartId, {payed: true, payed_at: new Date()});
 
         // 6) Log global pour le cart payé
-        await logService.createLog({
-            date: new Date(),
-            user_id: userId,
-            product_id: "0", // Aucun produit spécifique
-            quantity: 0,
-            reason: `Cart #${cartId} paid and invoice #${invoiceId} created`,
-            action: ActionTypeEnum.PAYED,
-            stockType: StockTypeEnum.CART,
-            stock_warehouse_after: 0,
-            stock_shelf_bottom_after: 0,
-        });
+        //     await logService.createLog({
+        //         date: new Date(),
+        //         user_id: userId,
+        //         product_id: 1, // Aucun produit spécifique
+        //         quantity: 0,
+        //         reason: `Cart #${cartId} paid and invoice #${invoiceId} created`,
+        //         action: ActionTypeEnum.PAYED,
+        //         stockType: StockTypeEnum.CART,
+        //         stock_warehouse_after: 0,
+        //         stock_shelf_bottom_after: 0,
+        //     });
     }
 
 
