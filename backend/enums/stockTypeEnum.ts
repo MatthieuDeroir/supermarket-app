@@ -3,5 +3,5 @@ export enum StockTypeEnum {
     SHELF = "SHELF",
     CART = "CART",
     BOUGHT = "BOUGHT",
-    THRASH = "TRASH",
+    TRASH = "TRASH",
 }

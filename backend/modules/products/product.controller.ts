@@ -20,15 +20,6 @@ productController.get("/:product_id", async (c) => {
     return c.json(product);
 });
 
-productController.get("/ean/:ean", async (c) => {
-    const ean = c.req.param("ean");
-    const product = await productService.getProductByEAN(ean);
-    if (!product) {
-        return c.json({ message: "Product not found" }, 404);
-    }
-    return c.json(product);
-});
-
 // POST /product
 productController.post("/", async (c) => {
     const body = await c.req.json();
@@ -55,7 +46,7 @@ productController.delete("/:product_id", async (c) => {
  * POST /products/:productId/warehouse
  * Body { "quantity": 50 }
  */
-productController.post("/:productId/warehouse", async (c) => {
+productController.post("/:productId/add-to-warehouse", async (c) => {
     const productId = Number(c.req.param("productId"));
     const { quantity } = await c.req.json();
 
@@ -74,7 +65,49 @@ productController.post("/:productId/warehouse", async (c) => {
  * POST /products/:productId/shelf
  * Body { "quantity": 20 }
  */
-productController.post("/:productId/shelf", async (c) => {
+productController.post("/:productId/warehouse-to-shelf", async (c) => {
+    const productId = Number(c.req.param("productId"));
+    const { quantity } = await c.req.json();
+
+    const user_id : number = 1; // TODO: récupérer userId depuis le JWT
+
+    try {
+        const updated = await productService.transferToShelf(productId, quantity, user_id);
+        return c.json(updated);
+    } catch (err) {
+        return c.json({ message: err }, 400);
+    }
+});
+
+productController.post("/:productId/shelf-to-warehouse", async (c) => {
+    const productId = Number(c.req.param("productId"));
+    const { quantity } = await c.req.json();
+
+    const user_id : number = 1; // TODO: récupérer userId depuis le JWT
+
+    try {
+        const updated = await productService.transferToWarehouse(productId, quantity, user_id);
+        return c.json(updated);
+    } catch (err) {
+        return c.json({ message: err }, 400);
+    }
+});
+
+productController.post("/:productId/warehouse-to-trash", async (c) => {
+    const productId = Number(c.req.param("productId"));
+    const { quantity } = await c.req.json();
+
+    const user_id : number = 1; // TODO: récupérer userId depuis le JWT
+
+    try {
+        const updated = await productService.transferToShelf(productId, quantity, user_id);
+        return c.json(updated);
+    } catch (err) {
+        return c.json({ message: err }, 400);
+    }
+});
+
+productController.post("/:productId/shelf-to-trash", async (c) => {
     const productId = Number(c.req.param("productId"));
     const { quantity } = await c.req.json();
 

@@ -9,17 +9,21 @@ const openFoodController = new Hono();
 openFoodController.get("/", async (c) => {
     const ean = c.req.query("ean");
     if (!ean) {
-        return c.json({ message: "Missing EAN parameter" }, 400);
+        return c.json({ error: "Missing EAN parameter" }, 400);
     }
     try {
         const product = await openFoodService.fetchProductFromEAN(ean);
-        if (!product) {
-            return c.json({ message: "Product not found in Open Food Facts" }, 404);
-        }
-        return c.json(product);
+        return c.json(product); // If the product exists, return it
     } catch (err) {
         console.error(err);
-        return c.json({ message: "Error fetching product" }, 500);
+
+        // Handle known errors explicitly
+        if (err instanceof Error) {
+            return c.json({ error: err.message }, 400);
+        }
+
+        // Default error handling for unknown issues
+        return c.json({ error: "An unexpected error occurred." }, 500);
     }
 });
 
