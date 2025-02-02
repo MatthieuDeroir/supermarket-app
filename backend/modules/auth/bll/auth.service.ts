@@ -62,35 +62,38 @@ export class AuthService {
     }
 
 
-    async loginUser(email: string, plainPassword: string): Promise<string> {
-        // 1. Check if user exists
+    async loginUser(email: string, plainPassword: string): Promise<{ token: string; user: User }> {
+        // 1. Vérifier que l'utilisateur existe
         const user = await userRepository.findByEmail(email);
         if (!user) {
             throw new Error("Invalid email or password.");
         }
 
-        // 2. Compare password
+        // 2. Comparer le mot de passe
         const isValidPassword = await bcrypt.compare(plainPassword, user.password);
         if (!isValidPassword) {
             throw new Error("Invalid email or password.");
         }
 
-        // 3. Build JWT
+        // 3. Construire le JWT
         const now = Math.floor(Date.now() / 1000);
         const header: Header = { alg: "HS256", typ: "JWT" };
         const payload = {
             userId: user.user_id,
             iat: now,
-            exp: now + this.jwtExpiration, // e.g. +1 hour
+            exp: now + this.jwtExpiration, // par ex. +1 heure
         };
 
-        // 4. Convert the key Promise => CryptoKey
+        // 4. Récupérer la clé pour signer le token
         const key = await this.keyPromise;
 
-        // 5. Sign token
-        const jwt = await create(header, payload, key);
-        return jwt;
+        // 5. Signer le token
+        const token = await create(header, payload, key);
+
+        // Retourner le token et l'utilisateur complet
+        return { token, user };
     }
+
 }
 
 // Usage

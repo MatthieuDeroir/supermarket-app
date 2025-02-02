@@ -58,7 +58,7 @@ authController.post("/register", async (c) => {
         }, 201);
 
     } catch (error) {
-        return c.json({ error: error.message ?? String(error) }, 400);
+        return c.json({ error: error ?? String(error) }, 400);
     }
 });
 
@@ -77,7 +77,7 @@ authController.post("/login", async (c) => {
         return c.json({ token }, 200);
 
     } catch (error) {
-        return c.json({ error: error.message ?? String(error) }, 401);
+        return c.json({ error: error ?? String(error) }, 401);
     }
 });
 
