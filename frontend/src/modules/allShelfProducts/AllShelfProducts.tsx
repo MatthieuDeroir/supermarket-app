@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useRouter } from 'next/router';
-import apiRoutes from '@common/defs/routes/apiRoutes';
-import axios from 'axios';
+import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 
 interface AllStockData {
   product_id: number;
@@ -17,20 +16,19 @@ interface StockData {
   id: number; // Clé unique requise pour chaque ligne
   name: string;
   ean: string;
-  stock_warehouse: number;
   stock_shelf_bottom: number;
 }
 
-const allShelfProducts: React.FC = () => {
-  const [rows, setRows] = useState<StockData[]>([]); // Assurez-vous d'utiliser `StockData[]`
+const AllShelfProducts: React.FC = () => {
+  const [rows, setRows] = useState<StockData[]>([]);
   const router = useRouter();
 
-  const handleViewProduct = (ean: string) => {
-    router.push(`/produit/${ean}`);
+  const handleViewProduct = (id: string) => {
+    router.push(`/produit/${id}`);
   };
 
-  const handleDeleteProduct = (ean: string) => {
-    alert(`Supprimer le produit avec le code EAN : ${ean}`);
+  const handleDeleteProduct = (id: string) => {
+    alert(`Supprimer le produit avec le code EAN : ${id}`);
   };
 
   const columns: GridColDef[] = [
@@ -66,7 +64,7 @@ const allShelfProducts: React.FC = () => {
             variant="contained"
             color="primary"
             size="small"
-            onClick={() => handleViewProduct(params.row.ean)}
+            onClick={() => handleViewProduct(params.row.id)}
           >
             Afficher le produit
           </Button>
@@ -74,7 +72,7 @@ const allShelfProducts: React.FC = () => {
             variant="contained"
             color="secondary"
             size="small"
-            onClick={() => handleDeleteProduct(params.row.ean)}
+            onClick={() => handleDeleteProduct(params.row.id)}
           >
             Supprimer
           </Button>
@@ -83,51 +81,37 @@ const allShelfProducts: React.FC = () => {
     },
   ];
 
-  const fetchAllProducts = async () => {
+  const fetchAllShelfProducts = async () => {
     try {
-      const response = await axios.get(apiRoutes.Products.GetAll);
-      if (response.status === 200) {
-        const mappedData = response.data.map((item: AllStockData) => ({
-          id: item.product_id,
-          name: item.name,
-          ean: item.ean,
-          stock_warehouse: item.stock_warehouse,
-          stock_shelf_bottom: item.stock_shelf_bottom,
-        }));
-        setRows(mappedData); // Mise à jour des données
-      } else {
-        throw new Error('API not available');
+      const response = await makeApiRequest(apiRoutes.Products.GetAll);
+
+      if (Array.isArray(response)) {
+        console.log('API Response:', response);
+        const mappedData = response
+          .filter((item: AllStockData) => item.stock_shelf_bottom > 0)
+          .map((item: AllStockData) => ({
+            id: item.product_id,
+            name: item.name,
+            ean: item.ean,
+            stock_shelf_bottom: item.stock_shelf_bottom,
+          }));
+        setRows(mappedData);
       }
     } catch (error) {
-      console.error('Error fetching data from API', error);
-    }
-
-    // Fallback : Chargement des données locales
-    try {
-      const localData = await import('../allProducts/allProductsMocked/allProductsMockerd.json');
-      const mappedData = localData.default.map((item: AllStockData) => ({
-        id: item.product_id,
-        name: item.name,
-        ean: item.ean,
-        stock_warehouse: item.stock_warehouse,
-        stock_shelf_bottom: item.stock_shelf_bottom,
-      }));
-      setRows(mappedData); // Mise à jour des données avec un tableau
-    } catch (localError) {
-      console.error('Erreur lors du chargement des données locales', localError);
+      console.error('Error fetching shelf products from API:', error);
     }
   };
 
   useEffect(() => {
-    fetchAllProducts();
+    fetchAllShelfProducts();
   }, []);
 
   return (
     <Box sx={{ height: 600, width: '100%' }}>
-      <Typography variant="h3">Produit en fond de rayon disponible</Typography>
+      <Typography variant="h3">Produits en fond de rayon disponibles</Typography>
       <DataGrid rows={rows} columns={columns} />
     </Box>
   );
 };
 
-export default allShelfProducts;
+export default AllShelfProducts;

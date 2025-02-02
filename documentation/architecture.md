@@ -1,6 +1,6 @@
 .
 ├── config/
-│   ├── database.ts           # Configuration de la base de données avec Drizzle
+│   ├── database.ts           # Configuration de la base de données
 │   └── env.ts                # Gestion des variables d'environnement
 ├── deps.ts                   # Dépendances communes (Hono, etc.)
 ├── modules/

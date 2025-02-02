@@ -159,6 +159,190 @@ class ProductService {
         return finalProduct;
     }
 
+    /**
+     * Transférer du stock shelf vers le warehouse
+     */
+    async transferToWarehouse(product_id: number, quantity: number, user_id: number): Promise<Product | null> {
+        if (quantity <= 0) {
+            throw new Error("Quantity must be positive");
+        }
+
+        const product = await productRepository.findById(product_id);
+        if (!product) {
+            throw new Error(`Product ${product_id} not found`);
+        }
+
+        const currentShelf = product.stock_shelf_bottom ?? 0;
+        if (currentShelf < quantity) {
+            throw new Error("Not enough stock on shelf");
+        }
+
+        const currentWarehouse = product.stock_warehouse ?? 0;
+        const newShelf = currentShelf - quantity;
+        const newWarehouse = currentWarehouse + quantity;
+
+        // Mise à jour en DB
+        await productRepository.update(product_id, {
+            stock_shelf_bottom: newShelf,
+            stock_warehouse: newWarehouse
+        });
+
+        // Relire le produit final
+        const finalProduct = await productRepository.findById(product_id);
+
+        // Création des logs (2 logs : un REMOVE_FROM sur le shelf, un ADD_TO sur le warehouse)
+        const dateNow = new Date();
+
+        // Log A : REMOVE_FROM SHELF
+        await logService.createLog({
+            date: dateNow,
+            user_id: user_id,
+            product_id: product_id.toString(),
+            quantity,
+            reason: "Transfer from shelf to warehouse (out of shelf)",
+            action: ActionTypeEnum.REMOVE_FROM,
+            stockType: StockTypeEnum.SHELF,
+            stock_warehouse_after: finalProduct?.stock_warehouse,
+            stock_shelf_bottom_after: finalProduct?.stock_shelf_bottom
+        });
+
+        // Log B : ADD_TO WAREHOUSE
+        await logService.createLog({
+            date: dateNow,
+            user_id: user_id,
+            product_id: product_id.toString(),
+            quantity,
+            reason: "Transfer from shelf to warehouse (into warehouse)",
+            action: ActionTypeEnum.ADD_TO,
+            stockType: StockTypeEnum.WAREHOUSE,
+            stock_warehouse_after: finalProduct?.stock_warehouse,
+            stock_shelf_bottom_after: finalProduct?.stock_shelf_bottom
+        });
+
+        return finalProduct;
+    }
+
+    /**
+     * Transférer du stock warehouse vers la poubelle (trash)
+     * On décrémente simplement le stock warehouse.
+     * Logs : 1) REMOVE_FROM WAREHOUSE, 2) ADD_TO TRASH
+     */
+    async transferWarehouseToTrash(product_id: number, quantity: number, user_id: number): Promise<Product | null> {
+        if (quantity <= 0) {
+            throw new Error("Quantity must be positive");
+        }
+
+        const product = await productRepository.findById(product_id);
+        if (!product) {
+            throw new Error(`Product ${product_id} not found`);
+        }
+
+        const currentWarehouse = product.stock_warehouse ?? 0;
+        if (currentWarehouse < quantity) {
+            throw new Error("Not enough stock in warehouse");
+        }
+
+        const newWarehouse = currentWarehouse - quantity;
+
+        // Mise à jour (on enlève du warehouse)
+        await productRepository.update(product_id, {
+            stock_warehouse: newWarehouse,
+        });
+
+        const finalProduct = await productRepository.findById(product_id);
+
+        const dateNow = new Date();
+
+        // Log A : REMOVE_FROM WAREHOUSE
+        await logService.createLog({
+            date: dateNow,
+            user_id: user_id,
+            product_id: product_id.toString(),
+            quantity,
+            reason: "Warehouse to trash (out of warehouse)",
+            action: ActionTypeEnum.REMOVE_FROM,
+            stockType: StockTypeEnum.WAREHOUSE,
+            stock_warehouse_after: finalProduct?.stock_warehouse,
+            stock_shelf_bottom_after: finalProduct?.stock_shelf_bottom
+        });
+
+        // Log B : ADD_TO TRASH
+        // Même si on n'a pas de colonne "stock_trash", on peut créer un log symbolique pour suivre l'opération.
+        await logService.createLog({
+            date: dateNow,
+            user_id: user_id,
+            product_id: product_id.toString(),
+            quantity,
+            reason: "Warehouse to trash (into trash)",
+            action: ActionTypeEnum.ADD_TO,
+            stockType: StockTypeEnum.TRASH,
+            stock_warehouse_after: finalProduct?.stock_warehouse,
+            stock_shelf_bottom_after: finalProduct?.stock_shelf_bottom
+        });
+
+        return finalProduct;
+    }
+
+    /**
+     * Transférer du stock shelf vers la poubelle (trash)
+     * On décrémente simplement le stock shelf.
+     * Logs : 1) REMOVE_FROM SHELF, 2) ADD_TO TRASH
+     */
+    async transferShelfToTrash(product_id: number, quantity: number, user_id: number): Promise<Product | null> {
+        if (quantity <= 0) {
+            throw new Error("Quantity must be positive");
+        }
+
+        const product = await productRepository.findById(product_id);
+        if (!product) {
+            throw new Error(`Product ${product_id} not found`);
+        }
+
+        const currentShelf = product.stock_shelf_bottom ?? 0;
+        if (currentShelf < quantity) {
+            throw new Error("Not enough stock on shelf");
+        }
+
+        const newShelf = currentShelf - quantity;
+
+        // Mise à jour (on enlève du shelf)
+        await productRepository.update(product_id, {
+            stock_shelf_bottom: newShelf,
+        });
+
+        const finalProduct = await productRepository.findById(product_id);
+
+        const dateNow = new Date();
+
+        // Log A : REMOVE_FROM SHELF
+        await logService.createLog({
+            date: dateNow,
+            user_id: user_id,
+            product_id: product_id.toString(),
+            quantity,
+            reason: "Shelf to trash (out of shelf)",
+            action: ActionTypeEnum.REMOVE_FROM,
+            stockType: StockTypeEnum.SHELF,
+            stock_warehouse_after: finalProduct?.stock_warehouse,
+            stock_shelf_bottom_after: finalProduct?.stock_shelf_bottom
+        });
+
+        // Log B : ADD_TO TRASH
+        await logService.createLog({
+            date: dateNow,
+            user_id: user_id,
+            product_id: product_id.toString(),
+            quantity,
+            reason: "Shelf to trash (into trash)",
+            action: ActionTypeEnum.ADD_TO,
+            stockType: StockTypeEnum.TRASH,
+            stock_warehouse_after: finalProduct?.stock_warehouse,
+            stock_shelf_bottom_after: finalProduct?.stock_shelf_bottom
+        });
+
+        return finalProduct;
+    }
+
 }
 
 export const productService = new ProductService();

@@ -24,7 +24,6 @@ import CreditCardIcon from '@mui/icons-material/CreditCard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SettingsIcon from '@mui/icons-material/Settings';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import AddIcon from '@mui/icons-material/Add';
 
 const Topbar = () => {
   const [showDrawer, setShowDrawer] = useState(false);
@@ -68,11 +67,6 @@ const Topbar = () => {
             icon: <FilterAltIcon />,
             itemLabel: 'Logs Stocks',
             itemLink: Routes.Stocks.StocksLogs,
-          },
-          {
-            icon: <AddIcon />,
-            itemLabel: 'Ajouter Produit',
-            itemLink: Routes.Stocks.AddProduct,
           },
         ],
       },
