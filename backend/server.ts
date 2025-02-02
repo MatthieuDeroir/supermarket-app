@@ -1,8 +1,19 @@
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import db from './config/database.ts'; // Fichier de connexion
 import routes from './modules/routes.ts';
+import getEnv from './utils/getEnv.ts';
 
 const app = new Hono();
+
+app.use(
+  '/*',
+  cors({
+    origin: getEnv('FRONT_URL'),
+    maxAge: 600,
+    credentials: true,
+  })
+);
 
 app.get('/health', (c) => c.json({ status: 'ok' }));
 

@@ -20,6 +20,15 @@ productController.get("/:product_id", async (c) => {
     return c.json(product);
 });
 
+productController.get("/ean/:ean", async (c) => {
+    const ean = c.req.param("ean");
+    const product = await productService.getProductByEAN(ean);
+    if (!product) {
+        return c.json({ message: "Product not found" }, 404);
+    }
+    return c.json(product);
+});
+
 // POST /product
 productController.post("/", async (c) => {
     const body = await c.req.json();
