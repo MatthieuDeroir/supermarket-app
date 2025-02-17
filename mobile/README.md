@@ -2,6 +2,30 @@
 
 # Getting Started
 
+## Requirements for Development of the Application
+
+For the development of the application, you will need to have the following installed on your machine:
+
+### Java Development Kit (JDK)
+- **Version:** 17.0.2
+
+### Build Tools
+- **Build Tools Version:** 34.0.0
+
+### Android SDK
+- **Minimum SDK Version:** 24
+- **Compile SDK Version:** 34
+- **Target SDK Version:** 34
+
+### Native Development Kit (NDK)
+- **NDK Version:** 26.1.10909125
+
+### Kotlin
+- **Kotlin Version:** 1.9.24
+
+Make sure your development environment is configured with these versions to ensure compatibility and optimal performance of the application.
+
+
 
 ## Step 1: Start the Metro Server
 
