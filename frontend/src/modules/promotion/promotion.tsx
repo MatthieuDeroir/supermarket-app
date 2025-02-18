@@ -39,7 +39,7 @@ const PromotionPage = () => {
   const fetchPromotion = async (promotionId: number) => {
     try {
       const response = await makeApiRequest(apiRoutes.Promotions.GetById(promotionId));
-      if (response) {
+      if (response.success) {
         setPromotion(response);
         setDiscount(response.pourcentage);
         setStartDate(response.beging_date.split('T')[0]);

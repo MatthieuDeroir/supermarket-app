@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run --watch --env=.env server.ts",
+    "dev": "deno run --watch --allow-env  --env=.env server.ts",
     "build": "deno compile main.ts"
   },
   "imports": {
