@@ -28,21 +28,24 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
     setIsFetching(true);
     try {
       console.log(`Fetching promotions for product ID: ${productId}`);
-      const response = await makeApiRequest(apiRoutes.Promotions.GetByProductId(productId));
+      const response = await makeApiRequest(apiRoutes.Promotions.GetAll);
 
-      if (response && Array.isArray(response) && response.length > 0) {
-        const activePromotion = response.find((promo) => promo.active === true);
+      if (response.success) {
+        if (response && Array.isArray(response) && response.length > 0) {
+          const productPromotions = response.filter((promo) => promo.product_id === productId);
+          const activePromotion = productPromotions.find((promo) => promo.active === true);
 
-        setHasPromotion(true);
-        setPromoId(activePromotion ? activePromotion.promotionId : null);
-        setIsApplied(activePromotion ? activePromotion.active : false);
-        setDiscount(activePromotion ? activePromotion.pourcentage : 0);
-      } else {
-        console.log('No active promotions found, setting default values.');
-        setHasPromotion(false);
-        setIsApplied(false);
-        setDiscount(0);
-        setPromoId(null);
+          setHasPromotion(true);
+          setPromoId(activePromotion ? activePromotion.promotionId : null);
+          setIsApplied(activePromotion ? activePromotion.active : false);
+          setDiscount(activePromotion ? activePromotion.pourcentage : 0);
+        } else {
+          console.log('No active promotions found, setting default values.');
+          setHasPromotion(false);
+          setIsApplied(false);
+          setDiscount(0);
+          setPromoId(null);
+        }
       }
     } catch (error) {
       console.error('❌ Error fetching promotion:', error);
@@ -98,10 +101,10 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
       const endDate = formatDate(new Date(today.setDate(today.getDate() + 30)));
 
       const newPromo = await makeApiRequest(apiRoutes.Promotions.Create, 'POST', {
-        productId,
+        product_id: productId,
         pourcentage: 0,
-        begingDate: startDate,
-        endDate,
+        beging_date: startDate,
+        end_date: endDate,
         active: false,
       });
 
