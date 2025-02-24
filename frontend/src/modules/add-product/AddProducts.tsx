@@ -3,7 +3,6 @@ import { Box, Button, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useRouter } from 'next/router';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
-import axios from 'axios';
 import { data } from '@common/defs/fakes/addProduct';
 
 // exemple of my data

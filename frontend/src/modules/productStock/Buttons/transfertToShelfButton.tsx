@@ -3,6 +3,7 @@ import { Box, Typography, Button, TextField } from '@mui/material';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 import { useRouter } from 'next/router';
+import { useConfirmDialog } from '@common/components/ConfirmDialogProvider';
 
 interface TransferButtonProps {
   productId: number;
@@ -17,6 +18,7 @@ const TransfertToShelfButton: React.FC<TransferButtonProps> = ({
   stockShelfBottom,
   stockWarehouse,
 }) => {
+  const { showConfirmDialog } = useConfirmDialog();
   const [loading, setLoading] = useState(false);
   const [quantity, setQuantity] = useState<number | string>('');
   const router = useRouter();
@@ -25,20 +27,33 @@ const TransfertToShelfButton: React.FC<TransferButtonProps> = ({
     const transferQuantity = parseInt(quantity as string, 10);
 
     if (!transferQuantity || transferQuantity <= 0) {
-      alert('Veuillez entrer une quantité valide.');
+      await showConfirmDialog({
+        title: 'Erreur',
+        message: 'Veuillez entrer une quantité valide.',
+        confirmText: 'OK',
+        cancelText: '',
+      });
       return;
     }
 
     if (transferQuantity > stockWarehouse) {
-      alert(`La quantité ne peut pas dépasser le stock en entrepôt (${stockWarehouse}).`);
+      await showConfirmDialog({
+        title: 'Erreur',
+        message: `La quantité ne peut pas dépasser le stock en entrepôt (${stockWarehouse}).`,
+        confirmText: 'OK',
+        cancelText: '',
+      });
       return;
     }
 
-    if (
-      !window.confirm(
-        `Voulez-vous transférer ${transferQuantity} unités de ${productName} vers le rayon ?`,
-      )
-    ) {
+    const isConfirmed = await showConfirmDialog({
+      title: 'Confirmation',
+      message: `Voulez-vous transférer ${transferQuantity} unités de ${productName} vers le rayon ?`,
+      confirmText: 'Oui',
+      cancelText: 'Non',
+    });
+
+    if (!isConfirmed) {
       return;
     }
 
@@ -50,14 +65,24 @@ const TransfertToShelfButton: React.FC<TransferButtonProps> = ({
       });
 
       if (response) {
-        alert('Transfert effectué avec succès !');
+        await showConfirmDialog({
+          title: 'Succès',
+          message: 'Transfert effectué avec succès !',
+          confirmText: 'OK',
+          cancelText: '',
+        });
         setQuantity('');
       } else {
         throw new Error('Le transfert a échoué.');
       }
     } catch (error) {
       console.error('Erreur lors du transfert du stock', error);
-      alert('Erreur lors du transfert du stock.');
+      await showConfirmDialog({
+        title: 'Erreur',
+        message: 'Erreur lors du transfert du stock.',
+        confirmText: 'OK',
+        cancelText: '',
+      });
     } finally {
       setLoading(false);
       RedirectBack(productId);
@@ -66,7 +91,7 @@ const TransfertToShelfButton: React.FC<TransferButtonProps> = ({
 
   const RedirectBack = (id: number) => {
     setTimeout(() => {
-      router.push(`/produit/${productId}`);
+      router.push(`/produit/${id}`);
     }, 1000);
   };
 

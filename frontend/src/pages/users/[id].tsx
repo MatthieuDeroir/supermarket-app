@@ -7,8 +7,6 @@ import {
   Typography,
   Box,
   Grid,
-  InputAdornment,
-  IconButton,
   Dialog,
   DialogActions,
   DialogContent,
@@ -17,15 +15,12 @@ import {
 } from '@mui/material';
 import ApiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 import { User } from '@common/defs/types/user';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import StockLogs from '@//modules/stock-logs/StockLogs';
 
 const UserPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const [updateTexts, setUpdateTexts] = useState(true);
-  const [showPassword, setShowPassword] = useState(false);
   type Role = {
     role_id: number;
     name: string;

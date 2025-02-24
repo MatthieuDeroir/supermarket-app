@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, TextField } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
-import { useRouter } from 'next/router';
+import { useConfirmDialog } from '@common/components/ConfirmDialogProvider';
 
 interface UpdateMinimumStockProps {
   productId: number;
@@ -15,10 +15,10 @@ const MinimumStockButton: React.FC<UpdateMinimumStockProps> = ({
   productName,
   currentMinimumStock,
 }) => {
+  const { showConfirmDialog } = useConfirmDialog();
   const [loading, setLoading] = useState(false);
   const [minimumStock, setMinimumStock] = useState<number | ''>(currentMinimumStock);
   const [currentId, setCurrentId] = useState<number>(0);
-  const router = useRouter();
 
   useEffect(() => {
     setCurrentId(productId);
@@ -26,13 +26,22 @@ const MinimumStockButton: React.FC<UpdateMinimumStockProps> = ({
 
   const handleUpdate = async () => {
     if (!minimumStock || Number(minimumStock) < 0) {
-      alert('Veuillez entrer une quantité minimale valide.');
+      await showConfirmDialog({
+        title: 'Erreur',
+        message: 'Veuillez entrer une quantité minimale valide.',
+        confirmText: 'OK',
+        cancelText: '',
+      });
       return;
     }
+    const isConfirmed = await showConfirmDialog({
+      title: 'Confirmation',
+      message: `Voulez-vous définir ${minimumStock} comme minimum pour ${productName} ?`,
+      confirmText: 'Oui',
+      cancelText: 'Non',
+    });
 
-    if (
-      !window.confirm(`Voulez-vous définir ${minimumStock} comme minimum pour ${productName} ?`)
-    ) {
+    if (!isConfirmed) {
       return;
     }
     console.log('productId:', productId);
@@ -47,14 +56,24 @@ const MinimumStockButton: React.FC<UpdateMinimumStockProps> = ({
 
       if (response) {
         console.log('Stock updated successfully:', response);
-        alert('Minimum de stock mis à jour avec succès !');
+        await showConfirmDialog({
+          title: 'Succès',
+          message: 'Minimum de stock mis à jour avec succès !',
+          confirmText: 'OK',
+          cancelText: '',
+        });
         setMinimumStock(Number(minimumStock));
       } else {
         throw new Error('Échec de la mise à jour.');
       }
     } catch (error) {
       console.error('Erreur lors de la mise à jour du minimum de stock:', error);
-      alert('Erreur lors de la mise à jour du minimum de stock.');
+      await showConfirmDialog({
+        title: 'Erreur',
+        message: 'Erreur lors de la mise à jour du minimum de stock.',
+        confirmText: 'OK',
+        cancelText: '',
+      });
     } finally {
       setLoading(false);
     }
