@@ -12,6 +12,7 @@ import customShadows from '@common/theme/customShadows';
 import GlobalStyles from '@common/theme/GlobalStyles';
 import { frFR } from '@mui/material/locale';
 import ProtectedRoute from '@common/components/ProtectedRoute';
+import { ConfirmDialogProvider } from '@common/components/ConfirmDialogProvider';
 
 const App = ({ Component, pageProps, router }: AppProps) => {
   const authEnabled = process.env.NEXT_PUBLIC_AUTH_ENABLED;
@@ -29,17 +30,21 @@ const App = ({ Component, pageProps, router }: AppProps) => {
 
   if (authEnabled === 'false') {
     return (
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <ConfirmDialogProvider>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </ConfirmDialogProvider>
     );
   }
 
   return (
     <ProtectedRoute>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <ConfirmDialogProvider>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </ConfirmDialogProvider>
     </ProtectedRoute>
   );
 };

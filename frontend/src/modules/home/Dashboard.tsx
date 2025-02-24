@@ -61,6 +61,7 @@ const Dashboard: React.FC = () => {
     fetchTotalUsers();
     fetchTotalProductsStock();
     fetchTotalProductsFDR();
+    setTotalCA(0);
   }, []);
 
   return (

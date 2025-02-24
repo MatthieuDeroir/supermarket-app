@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Checkbox, TextField, Button, InputAdornment } from '@mui/material';
 import { useRouter } from 'next/router';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
+import { useConfirmDialog } from '@common/components/ConfirmDialogProvider';
 
 interface ProductInfo {
   productId: number;
 }
 
 const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
+  const { showConfirmDialog } = useConfirmDialog();
   const [isApplied, setIsApplied] = useState(false);
   const [discount, setDiscount] = useState(0);
-  const [promoId, setPromoId] = useState<number | null>(null);
+  // const [promoId, setPromoId] = useState<number | null>(null);
   const [hasPromotion, setHasPromotion] = useState<boolean>(false); // Track if promotions exist
   const [isFetching, setIsFetching] = useState(true);
   const [productPrice, setProductPrice] = useState<string>('0.00');
@@ -36,7 +38,7 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
           const activePromotion = productPromotions.find((promo) => promo.active === true);
 
           setHasPromotion(true);
-          setPromoId(activePromotion ? activePromotion.promotionId : null);
+          // setPromoId(activePromotion ? activePromotion.promotionId : null);
           setIsApplied(activePromotion ? activePromotion.active : false);
           setDiscount(activePromotion ? activePromotion.pourcentage : 0);
         } else {
@@ -44,7 +46,7 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
           setHasPromotion(false);
           setIsApplied(false);
           setDiscount(0);
-          setPromoId(null);
+          // setPromoId(null);
         }
       }
     } catch (error) {
@@ -52,7 +54,7 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
       setHasPromotion(false);
       setIsApplied(false);
       setDiscount(0);
-      setPromoId(null);
+      // setPromoId(null);
     } finally {
       setIsFetching(false);
     }
@@ -112,14 +114,24 @@ const PromotionArticle: React.FC<ProductInfo> = ({ productId }) => {
 
       if (newPromo && newPromo.promotionId) {
         console.log(`New promotion created with ID: ${newPromo.promotionId}`);
-        setPromoId(newPromo.promotionId);
+        // setPromoId(newPromo.promotionId);
         router.push(`/promotion/${newPromo.promotionId}`);
       } else {
-        alert('Erreur lors de la création de la promotion.');
+        await showConfirmDialog({
+          title: 'Erreur',
+          message: 'Impossible de créer une promotion.',
+          confirmText: 'OK',
+          cancelText: '',
+        });
       }
     } catch (error) {
       console.error('Error creating promotion:', error);
-      alert('Impossible de créer une promotion.');
+      await showConfirmDialog({
+        title: 'Erreur',
+        message: 'Impossible de créer une promotion.',
+        confirmText: 'OK',
+        cancelText: '',
+      });
     }
   };
 

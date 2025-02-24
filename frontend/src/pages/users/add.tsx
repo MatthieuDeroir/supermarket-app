@@ -1,22 +1,10 @@
 import { useState, useEffect } from 'react';
-import {
-  Container,
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Grid,
-  InputAdornment,
-  IconButton,
-} from '@mui/material';
+import { Container, TextField, Button, Typography, Box, Grid } from '@mui/material';
 import ApiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useRouter } from 'next/router';
 
 const CreateUserPage = () => {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
   const [roles, setRoles] = useState<{ role_id: number; name: string }[]>([]);
   const [user, setUser] = useState({
     first_name: '',

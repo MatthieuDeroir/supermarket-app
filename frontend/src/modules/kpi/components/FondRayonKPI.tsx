@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
-import { Box, Typography, TextField, Button } from '@mui/material';
+import { Box, Typography, TextField, Skeleton } from '@mui/material';
 import { LineChart } from '@mui/x-charts';
 
 interface ApiStockData {
@@ -92,20 +92,26 @@ const FondRayonKPI: React.FC<{ productId: number }> = ({ productId }) => {
           onChange={(e) => setEndDate(e.target.value)}
         />
       </Box>
-      <LineChart
-        dataset={dataset}
-        xAxis={[{ dataKey: 'x', scaleType: 'time' }]}
-        series={[
-          {
-            dataKey: 'y',
-            label: 'Stock dans l’entrepôt',
-          },
-        ]}
-        height={300}
-        width={500}
-        margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
-        grid={{ vertical: true, horizontal: true }}
-      />
+      {loading ? (
+        <Box>
+          <Skeleton variant="rectangular" width="100%" height={300} />
+        </Box>
+      ) : (
+        <LineChart
+          dataset={dataset}
+          xAxis={[{ dataKey: 'x', scaleType: 'time' }]}
+          series={[
+            {
+              dataKey: 'y',
+              label: 'Stock dans l’entrepôt',
+            },
+          ]}
+          height={300}
+          width={500}
+          margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
+          grid={{ vertical: true, horizontal: true }}
+        />
+      )}
     </Box>
   );
 };

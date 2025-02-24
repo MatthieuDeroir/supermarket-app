@@ -3,6 +3,7 @@ import { Box, Typography, Button, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 import { useRouter } from 'next/router';
+import { useConfirmDialog } from '@common/components/ConfirmDialogProvider';
 
 interface DeleteButtonProps {
   productId: number;
@@ -11,6 +12,8 @@ interface DeleteButtonProps {
 }
 
 const DeleteButton: React.FC<DeleteButtonProps> = ({ productId, productName, currentStock }) => {
+  const { showConfirmDialog } = useConfirmDialog();
+
   const [loading, setLoading] = useState(false);
   const [quantity, setQuantity] = useState<number | ''>('');
   const router = useRouter();
@@ -19,16 +22,34 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({ productId, productName, cur
     const deleteQuantity = Number(quantity);
 
     if (!deleteQuantity || deleteQuantity <= 0) {
-      alert('Veuillez entrer une quantité valide.');
+      await showConfirmDialog({
+        title: 'Erreur',
+        message: 'Veuillez entrer une quantité valide.',
+        confirmText: 'OK',
+        cancelText: '',
+      });
+
       return;
     }
 
     if (deleteQuantity > currentStock) {
-      alert(`La quantité ne peut pas dépasser le stock actuel (${currentStock}).`);
+      await showConfirmDialog({
+        title: 'Erreur',
+        message: `La quantité ne peut pas dépasser le stock actuel (${currentStock}).`,
+        confirmText: 'OK',
+        cancelText: '',
+      });
       return;
     }
 
-    if (!window.confirm(`Voulez-vous vraiment supprimer ${deleteQuantity} ${productName} ?`)) {
+    const isConfirmed = await showConfirmDialog({
+      title: 'Confirmation',
+      message: `Voulez-vous vraiment supprimer ${deleteQuantity} ${productName} ?`,
+      confirmText: 'Oui',
+      cancelText: 'Non',
+    });
+
+    if (!isConfirmed) {
       return;
     }
 
@@ -39,14 +60,24 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({ productId, productName, cur
       });
 
       if (response) {
-        alert('Produit supprimé avec succès !');
+        await showConfirmDialog({
+          title: 'Succès',
+          message: 'Produit supprimé avec succès !',
+          confirmText: 'OK',
+          cancelText: '',
+        });
         setQuantity('');
       } else {
         throw new Error('Échec de la mise à jour.');
       }
     } catch (error) {
       console.error('Erreur lors de la suppression du produit:', error);
-      alert('Erreur lors de la suppression du produit.');
+      await showConfirmDialog({
+        title: 'Erreur',
+        message: 'Erreur lors de la suppression du produit.',
+        confirmText: 'OK',
+        cancelText: '',
+      });
     } finally {
       setLoading(false);
       RedirectBack(productId);
@@ -55,7 +86,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({ productId, productName, cur
 
   const RedirectBack = (id: number) => {
     setTimeout(() => {
-      router.push(`/produit/${productId}`);
+      router.push(`/produit/${id}`);
     }, 1000);
   };
 

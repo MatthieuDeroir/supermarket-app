@@ -1,15 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Button,
-} from '@mui/material';
-import ArrowDownwardIcon from '@mui/icons-material/ExpandMore';
-import PromotionArticle from '@modules/produit/promotionArticle/promotionArticle';
-import PrixComponent from '@modules/produit/prixComponent/prixComponent';
+import { Box, Typography, Button } from '@mui/material';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 import CodeBarre from './CodeBarre';
 import AddIcon from '@mui/icons-material/Add';

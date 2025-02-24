@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
-import { Box, Typography, TextField, Button } from '@mui/material';
+import { Box, Typography, TextField, Skeleton } from '@mui/material';
 import { BarChart } from '@mui/x-charts';
 
 interface DailyStockData {
@@ -127,14 +127,20 @@ const EvolutionVentesKPI: React.FC<{ productId: number }> = ({ productId }) => {
         />
       </Box>
 
-      <BarChart
-        dataset={dataset}
-        xAxis={[{ dataKey: 'x', label: 'Dates', scaleType: 'band' }]}
-        series={[{ dataKey: 'y', label: 'Produits vendus', color: '#3b82f6' }]}
-        height={300}
-        margin={{ left: 50, right: 30, top: 30, bottom: 50 }}
-        grid={{ vertical: true, horizontal: true }}
-      />
+      {loading ? (
+        <Box>
+          <Skeleton variant="rectangular" width="100%" height={300} />
+        </Box>
+      ) : (
+        <BarChart
+          dataset={dataset}
+          xAxis={[{ dataKey: 'x', label: 'Dates', scaleType: 'band' }]}
+          series={[{ dataKey: 'y', label: 'Produits vendus', color: '#3b82f6' }]}
+          height={300}
+          margin={{ left: 50, right: 30, top: 30, bottom: 50 }}
+          grid={{ vertical: true, horizontal: true }}
+        />
+      )}
     </Box>
   );
 };

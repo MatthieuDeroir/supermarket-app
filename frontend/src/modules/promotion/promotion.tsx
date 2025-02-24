@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react';
 import { Box, Typography, TextField, Button, Grid } from '@mui/material';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 import InfoProduit from '@modules/produit/components/InfoProduit';
+import { useConfirmDialog } from '@common/components/ConfirmDialogProvider';
 
 const PromotionPage = () => {
+  const { showConfirmDialog } = useConfirmDialog();
   const router = useRouter();
   const { id } = router.query;
   const [promotionId, setPromotionId] = useState<number | null>(null);
@@ -83,11 +85,21 @@ const PromotionPage = () => {
         active: status,
       });
 
-      alert(`Promotion ${status ? 'applied' : 'disabled'} successfully!`);
+      await showConfirmDialog({
+        title: 'Succès',
+        message: `Promotion ${status ? 'applied' : 'disabled'} successfully!`,
+        confirmText: 'OK',
+        cancelText: '',
+      });
       router.push('/promotions');
     } catch (error) {
       console.error('Error updating promotion:', error);
-      alert('Error updating promotion.');
+      await showConfirmDialog({
+        title: 'Erreur',
+        message: 'Erreur lors de la mise à jour de la promotion.',
+        confirmText: 'OK',
+        cancelText: '',
+      });
     }
   };
 

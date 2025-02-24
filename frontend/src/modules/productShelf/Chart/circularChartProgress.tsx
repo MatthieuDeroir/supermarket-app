@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 
-interface ProductData {
-  product_id: number;
-  ean: string;
-  name: string;
-  stock_warehouse: number;
-  stock_shelf_bottom: number;
-}
+// interface ProductData {
+//   product_id: number;
+//   ean: string;
+//   name: string;
+//   stock_warehouse: number;
+//   stock_shelf_bottom: number;
+// }
 
 const CircularChartProgress: React.FC<{ productId: number }> = ({ productId }) => {
   const [stockShelf, setStockShelf] = useState<number>(0);

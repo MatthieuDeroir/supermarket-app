@@ -4,7 +4,6 @@ import StockKPI from '@modules/kpi/components/StockKPI';
 import FondRayonKPI from '@modules/kpi/components/FondRayonKPI';
 
 import { Box } from '@mui/material';
-import { Margin } from '@mui/icons-material';
 
 const Index: NextPage = () => {
   return (
