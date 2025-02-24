@@ -1,11 +1,15 @@
 {
   "extends": "@react-native/typescript-config/tsconfig.json",
   "compilerOptions": {
-    "jsx": "react"
-  },
-  "paths": {
-      "@/*": ["./src*"],
-      "@common/*": ["./src/common/*"],
-      "@modules/*": ["./src/modules/*"]
+    "jsx": "react",
+    "baseUrl": "./", 
+    "paths": {
+      "@/*": ["android/src/*"],
+      "@common/*": ["android/src/common/*"],
+      "@modules/*": ["android/src/modules/*"],
+      "@public/*": ["android/public/*"]
     }
+  },
+  "include": ["android/src/**/*", "android/index.tsx"],
+  "exclude": ["node_modules", "android/build", "android/app/build"]
 }

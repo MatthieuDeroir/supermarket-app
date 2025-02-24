@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import LoginDisplay from '../../modules/Login/Login';
 
 const App: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Text>Login Page</Text>
+      <LoginDisplay />
     </View>
   );
 };
