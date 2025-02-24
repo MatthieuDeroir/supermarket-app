@@ -91,3 +91,10 @@ npm run android-release
 The APK file can be found in ./android/app/outputs/apk/release/
 
 ## Congratulations! :tada:
+
+
+
+
+
+Executer les logs ->
+npx react-native log-android

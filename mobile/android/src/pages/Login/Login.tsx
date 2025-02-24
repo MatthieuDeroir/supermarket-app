@@ -9,28 +9,27 @@ import {
   Alert,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
-import * as Keychain from 'react-native-keychain';
+import { useAuth } from '../../utils/AuthContext';
 
-const Login = ({ navigation }: { navigation?: any }) => {
+const Login = ({ navigation }: { navigation: any }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const { login } = useAuth();
+
 
   const handleLogin = async () => {
-    // Simulation d'une authentification
     if (email === 'user@basilik.com' && password === '1234') {
       try {
-        // Stockage sécurisé du token
-        await Keychain.setGenericPassword('user', 'mocked_token');
-        Alert.alert('Connexion réussie', 'Vous êtes connecté(e) avec succès.');
-        navigation?.replace('Home');
+        await login('mocked_token');
       } catch (error) {
-        console.error('Erreur lors du stockage du token:', error);
+        console.error('❌ Erreur lors du stockage du token:', error);
       }
     } else {
       Alert.alert('Erreur', 'Email ou mot de passe incorrect');
     }
   };
+
 
   return (
     <View style={styles.container}>

@@ -1,21 +1,15 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import * as Keychain from 'react-native-keychain';
+import { useAuth } from '../../utils/AuthContext';
 
-const HomeScreen = ({ navigation }: { navigation: any }) => {
-  const handleLogout = async () => {
-    try {
-      await Keychain.resetGenericPassword(); // Suppression sécurisée du token
-      navigation.replace('Login');
-    } catch (error) {
-      console.error('Erreur lors de la suppression du token:', error);
-    }
-  };
+
+const HomeScreen = () => {
+  const { logout } = useAuth();
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bienvenue sur Basilik 🥬</Text>
-      <Button title="Se déconnecter" onPress={handleLogout} color="#6B8E7D" />
+      <Button title="Se déconnecter" onPress={logout} color="#6B8E7D" />
     </View>
   );
 };
