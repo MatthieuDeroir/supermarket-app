@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import { useAuth } from '../../utils/AuthContext';
+import { useAuth } from '../../context/AuthProvider';
 
 
 const HomeScreen = () => {

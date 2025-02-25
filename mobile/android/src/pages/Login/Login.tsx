@@ -9,27 +9,31 @@ import {
   Alert,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
-import { useAuth } from '../../utils/AuthContext';
+import { useAuth } from '../../context/AuthProvider';
 
 const Login = ({ navigation }: { navigation: any }) => {
+  const authContext = useAuth(); // 🔥 Utilisation de `useAuth()`
+  if (!authContext) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  const { login } = authContext;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const { login } = useAuth();
-
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (email === 'user@basilik.com' && password === '1234') {
-      try {
-        await login('mocked_token');
-      } catch (error) {
-        console.error('❌ Erreur lors du stockage du token:', error);
-      }
-    } else {
-      Alert.alert('Erreur', 'Email ou mot de passe incorrect');
+    setLoading(true);
+
+    try {
+      await login(email, password, navigation); // 🔥 On appelle `login()` du contexte
+    } catch (error) {
+      console.error('Erreur lors de la connexion:', error);
+      Alert.alert('Erreur', 'Une erreur est survenue, veuillez réessayer.');
+    } finally {
+      setLoading(false);
     }
   };
-
 
   return (
     <View style={styles.container}>
@@ -61,24 +65,23 @@ const Login = ({ navigation }: { navigation: any }) => {
       />
 
       <View style={styles.rememberContainer}>
-        <CheckBox
-          value={rememberMe}
-          onValueChange={setRememberMe}
-        />
+        <CheckBox value={rememberMe} onValueChange={setRememberMe} />
         <Text style={styles.rememberText}>Se souvenir de moi</Text>
       </View>
 
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>Se connecter</Text>
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
+        <Text style={styles.loginButtonText}>
+          {loading ? 'Connexion...' : 'Se connecter'}
+        </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation?.navigate('ForgotPassword')}>
+      <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
         <Text style={styles.forgotPassword}>Mot de passe oublié ?</Text>
       </TouchableOpacity>
 
       <Text style={styles.registerText}>
         Vous n'avez pas de compte ?{' '}
-        <TouchableOpacity onPress={() => navigation?.navigate('Register')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
           <Text style={styles.registerLink}>S'inscrire</Text>
         </TouchableOpacity>
       </Text>

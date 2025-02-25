@@ -32,13 +32,13 @@ const routes = new Hono();
  * 1) On monte d’abord la route d’auth.
  *    => Elle n’aura pas le middleware d’auth
  */
-// routes.route("/auth", authController);
+routes.route("/auth", authController);
 
 /**
  * 2) On applique notre middleware sur toutes les routes suivantes (*).
  *    => Tout ce qui n’a pas déjà matché /auth passera par le middleware.
  */
-// routes.use("*", authMiddleware);/**/
+routes.use("*", authMiddleware);
 
 /**
  * 3) On monte toutes les autres routes

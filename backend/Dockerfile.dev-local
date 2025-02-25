@@ -11,4 +11,4 @@ COPY . .
 EXPOSE 4000
 
 # Set the entrypoint command to run the Deno app
-CMD deno run --allow-read --allow-net --allow-env scripts/initDB.ts && deno run --allow-net --allow-read --allow-env server.ts
+CMD deno run --allow-read --allow-net --allow-env scripts/initDB.ts && deno run --allow-net --allow-read --allow-env server.ts && deno run scripts/seeders.ts
