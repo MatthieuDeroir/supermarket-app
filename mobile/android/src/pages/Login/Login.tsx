@@ -6,13 +6,12 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import { useAuth } from '../../context/AuthProvider';
 
 const Login = ({ navigation }: { navigation: any }) => {
-  const authContext = useAuth(); // 🔥 Utilisation de `useAuth()`
+  const authContext = useAuth();
   if (!authContext) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
@@ -26,10 +25,10 @@ const Login = ({ navigation }: { navigation: any }) => {
     setLoading(true);
 
     try {
-      await login(email, password, navigation); // 🔥 On appelle `login()` du contexte
+      console.log('Tentative de connexion...');
+      await login(email, password, navigation);
     } catch (error) {
-      console.error('Erreur lors de la connexion:', error);
-      Alert.alert('Erreur', 'Une erreur est survenue, veuillez réessayer.');
+      console.error('Erreur dans la page login lors de la connexion:', error);
     } finally {
       setLoading(false);
     }

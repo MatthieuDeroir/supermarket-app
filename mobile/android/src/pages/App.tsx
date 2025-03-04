@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native';
 import AuthNavigator from '../navigator/AuthNavigator';
 import { AuthProvider } from '../context/AuthProvider';
 
+
 const App = () => {
   return (
     <AuthProvider>

@@ -1,7 +1,9 @@
-import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance } from 'axios';
+import { PUBLIC_API_BASE_URL } from '@env';
 import { ID } from '@common/defs/types/id';
 
-const ApiURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const ApiURL = PUBLIC_API_BASE_URL;
+console.log('Hello i am the url :) ' + ApiURL);
 
 const ApiRoutes = {
   Auth: {
@@ -125,18 +127,18 @@ const ApiRoutes = {
 
 const api: AxiosInstance = axios.create();
 
-api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.set('Authorization', `Bearer ${token}`);
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
+// api.interceptors.request.use(
+//   (config: InternalAxiosRequestConfig) => {
+//     const token = localStorage.getItem('authToken');
+//     if (token) {
+//       config.headers.set('Authorization', `Bearer ${token}`);
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   },
+// );
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const makeApiRequest = async (
@@ -147,6 +149,7 @@ export const makeApiRequest = async (
 ) => {
   const url = `${ApiURL}${typeof route === 'function' ? route(...args) : route}`;
   try {
+    console.log('myurl ' + url + ' and what i\'m sending ' + data);
     const response = await api({
       method: method.toLowerCase(),
       url,

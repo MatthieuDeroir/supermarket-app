@@ -7,9 +7,10 @@
       "@/*": ["android/src/*"],
       "@common/*": ["android/src/common/*"],
       "@modules/*": ["android/src/modules/*"],
-      "@public/*": ["android/public/*"]
-    }
+      "@public/*": ["android/public/*"],
+    },
+    "typeRoots": ["./node_modules/@types", "./@types"]
   },
   "include": ["android/src/**/*", "android/index.tsx"],
-  "exclude": ["node_modules", "android/build", "android/app/build"]
+  "exclude": ["node_modules", "android/build", "android/app/build"],
 }

@@ -4,6 +4,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from '../pages/Login/Login';
 import HomeScreen from '../pages/Home/Home';
+import ForgotPassword from '../pages/ForgotPassword/ForgotPassword';
+import Register from '../pages/Register/Register';
 import { useAuth } from '../context/AuthProvider';
 
 const Stack = createStackNavigator();
@@ -25,7 +27,11 @@ const AuthNavigator = () => {
         {isAuth ? (
           <Stack.Screen name="Home" component={HomeScreen} />
         ) : (
-          <Stack.Screen name="Login" component={LoginScreen} />
+          <>
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+            <Stack.Screen name="Register" component={Register} />
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>

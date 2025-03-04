@@ -98,3 +98,6 @@ The APK file can be found in ./android/app/outputs/apk/release/
 
 Executer les logs ->
 npx react-native log-android
+
+connecter pc et phone ->
+adb reverse tcp:4000 tcp:4000 

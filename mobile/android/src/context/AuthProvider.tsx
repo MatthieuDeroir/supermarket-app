@@ -5,6 +5,10 @@ import * as Keychain from 'react-native-keychain';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import ApiRoutes from '../common/defs/routes/apiRoutes';
+import { makeApiRequest } from '../common/defs/routes/apiRoutes';
+// import { NEXT_PUBLIC_API_BASE_URL } from '@env';
+
+
 
 // 📌 Définition du type du contexte d'authentification
 interface AuthContextType {
@@ -15,7 +19,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Hook sécurisé pour utiliser l'auth (évite `null`)
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -24,8 +27,8 @@ export const useAuth = (): AuthContextType => {
   return context;
 };
 
-// 📌 Fonctions de gestion du token
-const saveToken = async (token: string) => {
+// SUPPRIMER EXPORT QUAND BACKEND OK
+export const saveToken = async (token: string) => {
   try {
     await Keychain.setGenericPassword('authToken', token);
   } catch (error) {
@@ -51,7 +54,6 @@ const deleteToken = async () => {
   }
 };
 
-// 📌 `AuthProvider` : Gère l'état d'authentification
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
 
@@ -63,26 +65,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkAuth();
   }, []);
 
-  const login = async (email: string, password: string, navigation: any) => {
-    try {
-      const response = await axios.post(ApiRoutes.Auth.Login, {
-        email,
-        password,
-      });
+const login = async (email: string, password: string, navigation: any) => {
+  try {
+    console.log('Tentative de connexion...');
+    console.log(`Envoi des données: ${JSON.stringify({ email, password })}`);
 
-      if (response.data.success && response.data.token) {
-        await saveToken(response.data.token);
-        setIsAuth(true);
-        Alert.alert('Connexion réussie', 'Vous êtes connecté(e) avec succès.');
-        navigation.replace('Home');
-      } else {
-        Alert.alert('Erreur', 'Email ou mot de passe incorrect');
-      }
-    } catch (error) {
-      console.error('Erreur lors de la connexion:', error);
-      Alert.alert('Erreur', 'Une erreur est survenue.');
+    const response = await makeApiRequest(ApiRoutes.Auth.Login, 'POST', { email, password });
+    console.log();
+    console.log('Réponse API:', response.data);
+
+    if (response.token) {
+      await saveToken(response.token);
+      setIsAuth(true);
+      Alert.alert('Connexion réussie', 'Vous êtes connecté(e) avec succès.');
+      navigation.replace('Home');
+    } else {
+      Alert.alert('Erreur', 'Identifiants incorrects.');
     }
-  };
+  } catch (error) {
+      console.error('Erreur lors de la connexion:', error);
+
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.log('Erreur de l\'API:', error.response.data);
+        } else if (error.request) {
+          console.log('Aucune réponse reçue de l\'API.');
+        } else {
+          console.log('Erreur inconnue:', error.message);
+        }
+      } else {
+        console.log('Erreur inconnue:', error);
+      }
+
+      Alert.alert('Erreur', 'Impossible de se connecter.');
+    }
+    };
+
 
   const logout = async (navigation: any) => {
     await deleteToken();
