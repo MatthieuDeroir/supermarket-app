@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { useAuth } from '../../context/AuthProvider';
 import Header from '../../common/components/Header/header'
+import Footer from '../../common/components/Footer/Footer'
+
 
 
 const HomeScreen = () => {
@@ -12,6 +14,7 @@ const HomeScreen = () => {
       <Header />
       <Text style={styles.title}>Bienvenue sur Basilik 🥬</Text>
       <Button title="Se déconnecter" onPress={logout} color="#6B8E7D" />
+      <Footer />
     </View>
   );
 };
