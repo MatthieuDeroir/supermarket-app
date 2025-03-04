@@ -3,6 +3,7 @@ import { Box, Button, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useRouter } from 'next/router';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
+import { useConfirmDialog } from '@common/components/ConfirmDialogProvider';
 
 interface AllStockData {
   product_id: number;
@@ -21,6 +22,7 @@ interface StockData {
 }
 
 const AllProducts: React.FC = () => {
+  const { showConfirmDialog } = useConfirmDialog();
   const [rows, setRows] = useState<StockData[]>([]);
   const router = useRouter();
 
@@ -28,8 +30,14 @@ const AllProducts: React.FC = () => {
     router.push(`/produit/${id}`);
   };
 
-  const handleDeleteProduct = (id: string) => {
-    alert(`Supprimer le produit avec le code EAN : ${id}`);
+  // const handleDeleteProduct = async (id: string) => {
+  const handleDeleteProduct = async (id: string) => {
+    await showConfirmDialog({
+      title: `Supprimer l'élément`,
+      message: `Êtes-vous sûr de vouloir supprimer cet produit avec le code EAN : ${id} ?`,
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+    });
   };
 
   const columns: GridColDef[] = [

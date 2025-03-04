@@ -4,8 +4,13 @@ import InfoCard from '@modules/home/components/InfoCard';
 import DashboardCard from '@modules/home/components/DashboardCard';
 import ApiRoutes, { makeApiRequest } from '@//common/defs/routes/apiRoutes';
 import { Product } from '@common/defs/types/produit';
+import usePermissions from '@common/hooks/usePermisions';
+import useAuth from '@common/hooks/useAuth';
 
 const Dashboard: React.FC = () => {
+  const { isAdmin, isManager, isUser } = usePermissions();
+  const { user } = useAuth();
+
   const [totalUsers, setTotalUsers] = React.useState(0);
   const [totalProductsStock, setTotalProductsStock] = React.useState(0);
   const [totalProductsFDR, setTotalProductsFDR] = React.useState(0);
@@ -61,12 +66,13 @@ const Dashboard: React.FC = () => {
     fetchTotalUsers();
     fetchTotalProductsStock();
     fetchTotalProductsFDR();
+    setTotalCA(0);
   }, []);
 
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Welcome DP
+        Welcome {user?.first_name} {user?.last_name}
       </Typography>
 
       <Grid container mb={4} spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>

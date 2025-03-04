@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -65,7 +65,7 @@ const AddNewProductToStock: React.FC = () => {
 
     try {
       console.log(`Adding product to database: ${productData.ean}`);
-      const response = await makeApiRequest(apiRoutes.Products.Create, 'POST', {
+      const response = await makeApiRequest(apiRoutes.OpenFoodFact.AddProductByEan(ean), 'POST', {
         ean: productData.ean,
         name: productData.name,
         brand: productData.brand,

@@ -95,42 +95,43 @@ const AllPromotions: React.FC = () => {
     try {
       console.log('Fetching promotions from API...');
       const response = await makeApiRequest(apiRoutes.Promotions.GetAll);
+      if (response.success) {
+        if (Array.isArray(response)) {
+          console.log('API Response:', response);
 
-      if (Array.isArray(response)) {
-        console.log('API Response:', response);
+          const promotionsWithProducts = await Promise.all(
+            response.map(async (promo) => {
+              try {
+                const productResponse = await makeApiRequest(
+                  apiRoutes.Products.GetById(promo.product_id),
+                );
+                return {
+                  ...promo,
+                  id: promo.promotion_id,
+                  product_name: productResponse?.name || 'Nom inconnu',
+                  ean: productResponse?.ean || 'Non spécifié',
+                  pourcentage: promo.pourcentage,
+                  beging_date: promo.beging_date,
+                  end_date: promo.end_date,
+                };
+              } catch (error) {
+                console.error(`Error fetching product for ID ${promo.product_id}:`, error);
+                return {
+                  ...promo,
+                  id: promo.promotion_id,
+                  product_name: 'Nom inconnu',
+                  ean: 'Non spécifié',
+                  pourcentage: promo.pourcentage,
+                  beging_date: promo.beging_date,
+                  end_date: promo.end_date,
+                };
+              }
+            }),
+          );
 
-        const promotionsWithProducts = await Promise.all(
-          response.map(async (promo) => {
-            try {
-              const productResponse = await makeApiRequest(
-                apiRoutes.Products.GetById(promo.product_id),
-              );
-              return {
-                ...promo,
-                id: promo.promotion_id,
-                product_name: productResponse?.name || 'Nom inconnu',
-                ean: productResponse?.ean || 'Non spécifié',
-                pourcentage: promo.pourcentage,
-                beging_date: promo.beging_date,
-                end_date: promo.end_date,
-              };
-            } catch (error) {
-              console.error(`Error fetching product for ID ${promo.product_id}:`, error);
-              return {
-                ...promo,
-                id: promo.promotion_id,
-                product_name: 'Nom inconnu',
-                ean: 'Non spécifié',
-                pourcentage: promo.pourcentage,
-                beging_date: promo.beging_date,
-                end_date: promo.end_date,
-              };
-            }
-          }),
-        );
-
-        console.log('✅ Processed Promotions:', promotionsWithProducts);
-        setRows(promotionsWithProducts);
+          console.log('✅ Processed Promotions:', promotionsWithProducts);
+          setRows(promotionsWithProducts);
+        }
       }
     } catch (error) {
       console.error('Error fetching promotions from API:', error);

@@ -57,7 +57,7 @@ const useAuth = (): AuthData => {
       });
 
       localStorage.setItem('authToken', response.token);
-      localStorage.setItem('authUser', JSON.stringify(response.user));
+      localStorage.setItem('authUser', JSON.stringify(response.user)); // Stocker l'utilisateur avec le rôle
 
       mutate(response.user);
 

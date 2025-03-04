@@ -100,7 +100,7 @@ const ApiRoutes = {
     GetById: (id: ID) => `/promotions/${id}`,
     Update: (id: ID) => `/promotions/${id}`,
     Delete: (id: ID) => `/promotions/${id}`,
-    GetByProductId: (productId: ID) => `/promotions/product/${productId}`,
+    GetByProductId: (productId: ID) => `/promotions/${productId}`,
   },
   Roles: {
     // Added from Postman collection

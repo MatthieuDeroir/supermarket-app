@@ -1,19 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Button,
-} from '@mui/material';
+import { Box, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ExpandMore';
-import PromotionArticle from '@modules/produit/promotionArticle/promotionArticle';
-import PrixComponent from '@modules/produit/prixComponent/prixComponent';
 import apiRoutes, { makeApiRequest } from '@common/defs/routes/apiRoutes';
 import CodeBarre from './CodeBarre';
-import AddIcon from '@mui/icons-material/Add';
-import { useRouter } from 'next/router';
 
 interface ProductData {
   product_id: number;
@@ -31,7 +20,6 @@ interface ProductData {
 const InfoProduit: React.FC<{ productId: number }> = ({ productId }) => {
   const [productData, setProductData] = useState<ProductData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const router = useRouter();
 
   useEffect(() => {
     if (!productId) {
