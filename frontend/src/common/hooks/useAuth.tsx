@@ -69,7 +69,6 @@ const useAuth = (): AuthData => {
     }
   };
 
-
   const register = async (input: RegisterInput) => {
     try {
       const response = await axios.post(ApiRoutes.Auth.Register, input);

@@ -1,4 +1,3 @@
-
 const permissions = {
   user: [
     { label: 'Accueil', link: '/accueil', icon: 'HomeIcon' },
