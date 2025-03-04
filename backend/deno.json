@@ -5,7 +5,7 @@
     "initdb": "deno run -RNE scripts/initDB.ts",
     "seed": "deno run -RNE scripts/seeders.ts",
     "start": {
-      "command": "deno run -NRE server.ts",
+      "command": "deno run -NRE --watch server.ts",
       "dependencies": ["initdb", "seed"]
     }
   },

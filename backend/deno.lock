@@ -1,15 +1,15 @@
 {
   "version": "4",
   "specifiers": {
-    "jsr:@std/assert@1": "1.0.10",
+    "jsr:@std/assert@1": "1.0.11",
     "jsr:@std/internal@^1.0.5": "1.0.5",
     "npm:hono@^4.6.9": "4.6.17",
     "npm:paypal-rest-sdk@^1.8.1": "1.8.1",
     "npm:pg@^8.13.1": "8.13.1"
   },
   "jsr": {
-    "@std/assert@1.0.10": {
-      "integrity": "59b5cbac5bd55459a19045d95cc7c2ff787b4f8527c0dd195078ff6f9481fbb3",
+    "@std/assert@1.0.11": {
+      "integrity": "2461ef3c368fe88bc60e186e7744a93112f16fd110022e113a0849e94d1c83c1",
       "dependencies": [
         "jsr:@std/internal"
       ]
@@ -101,9 +101,6 @@
     "xtend@4.0.2": {
       "integrity": "sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ=="
     }
-  },
-  "redirects": {
-    "https://deno.land/x/superdeno/mod.ts": "https://deno.land/x/superdeno@4.9.0/mod.ts"
   },
   "remote": {
     "https://deno.land/std@0.160.0/_util/assert.ts": "e94f2eb37cebd7f199952e242c77654e43333c1ac4c5c700e929ea3aa5489f74",
@@ -211,8 +208,6 @@
     "https://deno.land/x/hono@v3.3.2/utils/url.ts": "ad1c84749c1d8fc9b069a074003855b52c04bd56b64ac731a0abc276dfe90dcc",
     "https://deno.land/x/hono@v3.3.2/validator/index.ts": "6c986e8b91dcf857ecc8164a506ae8eea8665792a4ff7215471df669c632ae7c",
     "https://deno.land/x/hono@v3.3.2/validator/validator.ts": "e52183ddf8cefc3cfe2788802fe6ce766df8ac904df485107b01cbcca167dbad",
-    "https://deno.land/x/opine@2.3.4/src/methods.ts": "0481daecc6068d24e9e5391818baddf555ab803d39a465dcd259161f8bd8ee49",
-    "https://deno.land/x/opine@2.3.4/src/utils/mergeDescriptors.ts": "1fe498d4a1a8dcfd3570f9ca5e0647590d86d029b3c340bfcfdb57002851e41b",
     "https://deno.land/x/postgres@v0.17.0/client.ts": "348779c9f6a1c75ef1336db662faf08dce7d2101ff72f0d1e341ba1505c8431d",
     "https://deno.land/x/postgres@v0.17.0/client/error.ts": "0817583b666fd546664ed52c1d37beccc5a9eebcc6e3c2ead20ada99b681e5f7",
     "https://deno.land/x/postgres@v0.17.0/connection/auth.ts": "1070125e2ac4ca4ade36d69a4222d37001903092826d313217987583edd61ce9",
@@ -232,13 +227,10 @@
     "https://deno.land/x/postgres@v0.17.0/query/oid.ts": "8c33e1325f34e4ca9f11a48b8066c8cfcace5f64bc1eb17ad7247af4936999e1",
     "https://deno.land/x/postgres@v0.17.0/query/query.ts": "edb473cbcfeff2ee1c631272afb25d079d06b66b5853f42492725b03ffa742b6",
     "https://deno.land/x/postgres@v0.17.0/query/transaction.ts": "8e75c3ce0aca97da7fe126e68f8e6c08d640e5c8d2016e62cee5c254bebe7fe8",
-    "https://deno.land/x/postgres@v0.17.0/query/types.ts": "a6dc8024867fe7ccb0ba4b4fa403ee5d474c7742174128c8e689c3b5e5eaa933",
     "https://deno.land/x/postgres@v0.17.0/utils/deferred.ts": "dd94f2a57355355c47812b061a51b55263f72d24e9cb3fdb474c7519f4d61083",
     "https://deno.land/x/postgres@v0.17.0/utils/utils.ts": "19c3527ddd5c6c4c49ae36397120274c7f41f9d3cbf479cb36065d23329e9f90",
     "https://esm.sh/bcrypt-ts@5.0.3": "f72c22d18a7e5550d5cb01cef0d85fe1454b44cc90b09de84953bd889dd9f97a",
-    "https://esm.sh/bcrypt-ts@5.0.3/denonext/bcrypt-ts.mjs": "9d87cc9a64c00e4055ca489a76a1a02e0a6216654790fc306d5cb1f4ce28b399",
-    "https://esm.sh/date-fns@2.30.0": "86c803098828885e7d88afa080c9545e51572c53d21b1333e0e24be6c0e52100",
-    "https://esm.sh/date-fns@2.30.0/denonext/date-fns.mjs": "ed6535a9106d2c525c0e7b0a7690445915d716880939e9a355e2666785fe498f"
+    "https://esm.sh/bcrypt-ts@5.0.3/denonext/bcrypt-ts.mjs": "9d87cc9a64c00e4055ca489a76a1a02e0a6216654790fc306d5cb1f4ce28b399"
   },
   "workspace": {
     "dependencies": [
