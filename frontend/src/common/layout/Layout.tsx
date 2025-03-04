@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Box from '@mui/material/Box';
 import { Container, useTheme } from '@mui/material';
@@ -6,92 +6,56 @@ import Stack from '@mui/material/Stack';
 import Footer from '@common/layout/Footer';
 import Topbar from '@common/layout/Topbar';
 import LeftBar, { LeftBarProps } from '@common/layout/LeftBar';
-import HomeIcon from '@mui/icons-material/Home';
 import Routes from '@common/defs/routes/routes';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import permissions from '@common/defs/types/permissions';
+
+// Import des icônes dynamiquement
+import HomeIcon from '@mui/icons-material/Home';
 import LayersIcon from '@mui/icons-material/Layers';
-import InboxIcon from '@mui/icons-material/Inbox';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SettingsIcon from '@mui/icons-material/Settings';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import PersonIcon from '@mui/icons-material/Person';
 import ArticleIcon from '@mui/icons-material/Article';
-
-// import AddIcon from '@mui/icons-material/Add';
 
 interface ILayoutProps {
   children: React.ReactNode;
 }
 
+const iconMap = {
+  HomeIcon: <HomeIcon />,
+  LayersIcon: <LayersIcon />,
+  CreditCardIcon: <CreditCardIcon />,
+  ShoppingCartIcon: <ShoppingCartIcon />,
+  SettingsIcon: <SettingsIcon />,
+  PersonIcon: <PersonIcon />,
+  ArticleIcon: <ArticleIcon />,
+};
+
 const Layout = (props: ILayoutProps) => {
-  const LeftBarItems: LeftBarProps = {
-    items: [
-      {
-        icon: <HomeIcon />,
-        itemLabel: 'Accueil',
-        itemLink: Routes.Common.Home,
-      },
-      {
-        icon: <DragIndicatorIcon />,
-        itemLabel: 'Stocks',
-        sousItems: [
-          {
-            icon: <LayersIcon />,
-            itemLabel: 'Entrepôt',
-            itemLink: Routes.Stocks.Entrepot,
-          },
-          {
-            icon: <LayersIcon />,
-            itemLabel: 'FDR',
-            itemLink: Routes.Stocks.FDR,
-          },
-          {
-            icon: <InboxIcon />,
-            itemLabel: 'Gestion des Stocks',
-            itemLink: Routes.Stocks.StocksManagment,
-          },
-          {
-            icon: <FilterAltIcon />,
-            itemLabel: 'Logs Stocks',
-            itemLink: Routes.Stocks.StocksLogs,
-          },
-          // {
-          //   icon: <AddIcon />,
-          //   itemLabel: 'Ajouter Produit',
-          //   itemLink: Routes.Stocks.AddProduct,
-          // },
-        ],
-      },
-      {
-        icon: <CreditCardIcon />,
-        itemLabel: 'Ventes',
-        itemLink: Routes.Common.Sales,
-      },
-      {
-        icon: <ShoppingCartIcon />,
-        itemLabel: 'Promotions',
-        itemLink: Routes.Common.Promotions,
-      },
-      {
-        icon: <SettingsIcon />,
-        itemLabel: 'Paramètres',
-        itemLink: Routes.Common.Settings,
-      },
-      {
-        icon: <PersonIcon />,
-        itemLabel: 'Utilisateurs',
-        itemLink: Routes.Common.Users,
-      },
-      {
-        icon: <ArticleIcon />,
-        itemLabel: 'TVA',
-        itemLink: Routes.Common.TVA,
-      },
-    ],
-  };
   const { children } = props;
   const theme = useTheme();
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  // Simulation de récupération du rôle utilisateur
+  useEffect(() => {
+    const roleFromStorage = localStorage.getItem('userRole') || 'user';
+    setUserRole(roleFromStorage);
+  }, []);
+
+  if (!userRole) {
+    return null; // En attendant le chargement du rôle
+  }
+
+  // Filtrer les éléments du menu en fonction du rôle
+  const LeftBarItems: LeftBarProps = {
+    items: permissions[userRole].map((item) => ({
+      icon: iconMap[item.icon] || <HomeIcon />, 
+      itemLabel: item.label,
+      itemLink: item.link,
+    })),
+  };
+
   return (
     <div>
       <Head>
