@@ -50,7 +50,7 @@ const Layout = (props: ILayoutProps) => {
   // Filtrer les éléments du menu en fonction du rôle
   const LeftBarItems: LeftBarProps = {
     items: permissions[userRole].map((item) => ({
-      icon: iconMap[item.icon] || <HomeIcon />, 
+      icon: iconMap[item.icon] || <HomeIcon />,
       itemLabel: item.label,
       itemLink: item.link,
     })),
