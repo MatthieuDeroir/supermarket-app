@@ -25,7 +25,6 @@ const Login = ({ navigation }: { navigation: any }) => {
     setLoading(true);
 
     try {
-      console.log('Tentative de connexion...');
       await login(email, password, navigation);
     } catch (error) {
       console.error('Erreur dans la page login lors de la connexion:', error);

@@ -6,11 +6,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import ApiRoutes from '../common/defs/routes/apiRoutes';
 import { makeApiRequest } from '../common/defs/routes/apiRoutes';
-// import { NEXT_PUBLIC_API_BASE_URL } from '@env';
+import { setUserInfo } from '../modules/UserInfo';
 
 
 
-// 📌 Définition du type du contexte d'authentification
 interface AuthContextType {
   isAuth: boolean;
   login: (email: string, password: string, navigation: any) => Promise<void>;
@@ -27,7 +26,6 @@ export const useAuth = (): AuthContextType => {
   return context;
 };
 
-// SUPPRIMER EXPORT QUAND BACKEND OK
 export const saveToken = async (token: string) => {
   try {
     await Keychain.setGenericPassword('authToken', token);
@@ -77,7 +75,7 @@ const login = async (email: string, password: string, navigation: any) => {
     if (response.token) {
       await saveToken(response.token);
       setIsAuth(true);
-      Alert.alert('Connexion réussie', 'Vous êtes connecté(e) avec succès.');
+      setUserInfo(response.user.firstName, response.user.lastName, response.user.phoneNumber);
       navigation.replace('Home');
     } else {
       Alert.alert('Erreur', 'Identifiants incorrects.');
