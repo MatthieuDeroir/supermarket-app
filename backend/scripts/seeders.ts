@@ -12,7 +12,7 @@ async function seed() {
         console.log("Seeding table: roles");
         await client.queryArray`
       INSERT INTO roles (name)
-      VALUES ('Admin'), ('User')
+      VALUES ('Admin'),('Manager') , ('User')
       ON CONFLICT DO NOTHING
     `;
 
@@ -29,7 +29,7 @@ async function seed() {
         // =====================
         // Table: users
         // =====================
-        // Remarque : role_id = 1 => Admin, role_id = 2 => User (selon l'ordre d'insertion ci-dessus)
+        // Remarque : role_id = 1 => Admin, role_id = 2 => Manager, role_id = 3 => User (selon l'ordre d'insertion ci-dessus)
         console.log("Seeding table: users");
         await client.queryArray`
       INSERT INTO users (
@@ -46,13 +46,22 @@ async function seed() {
         1
       ),
       (
+        'manager@example.com',
+        'managerpassword',    -- À remplacer par un hash idéalement
+        'UserFirst',
+        'UserLast',
+        '0202020202',
+        NOW(), NOW(),
+        3
+      ),
+      (
         'user@example.com',
         'userpassword',    -- À remplacer par un hash idéalement
         'UserFirst',
         'UserLast',
         '0202020202',
         NOW(), NOW(),
-        2
+        3
       )
       ON CONFLICT DO NOTHING
     `;
