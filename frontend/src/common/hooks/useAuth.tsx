@@ -42,9 +42,16 @@ const useAuth = (): AuthData => {
   const [initialized, setInitialized] = useState<boolean>(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('authUser');
-    if (storedUser) {
-      mutate(JSON.parse(storedUser));
+    const storedData = localStorage.getItem('authUser');
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      if (parsedData.expiresAt && Date.now() > parsedData.expiresAt) {
+        // Expired, remove from localStorage
+        localStorage.removeItem('authUser');
+        localStorage.removeItem('authToken');
+      } else {
+        mutate(parsedData.user);
+      }
     }
     setInitialized(true);
   }, []);
@@ -55,9 +62,13 @@ const useAuth = (): AuthData => {
         email: input.email,
         password: input.password,
       });
+      const expirationTime = Date.now() + 60 * 60 * 1000;
 
-      localStorage.setItem('authToken', response.token);
-      localStorage.setItem('authUser', JSON.stringify(response.user)); // Stocker l'utilisateur avec le rôle
+      localStorage.setItem('authToken', response.token); // Stocker le token
+      localStorage.setItem(
+        'authUser',
+        JSON.stringify({ user: response.user, expiresAt: expirationTime }),
+      );
 
       mutate(response.user);
 
