@@ -8,6 +8,7 @@ import {
   ListItemButton,
   Box,
 } from '@mui/material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 import LockIcon from '@mui/icons-material/Lock';
@@ -113,14 +114,24 @@ const LeftBar: React.FC<LeftBarProps> = ({ items }) => {
         ))}
       </List>
 
-      <Box sx={{ height: '100%', display: 'flex' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', mt: 'auto' }}>
+        <StyledListItem
+          onClick={() => router.push('/')}
+          sx={{
+            color: 'common.black',
+            width: '100%',
+          }}
+        >
+          <ListItemIcon sx={{ color: 'common.black', minWidth: '36px' }}>
+            <AccountCircleIcon />
+          </ListItemIcon>
+          <ListItemText primary="Mon compte" />
+        </StyledListItem>
         <StyledListItem
           onClick={() => router.push('/')}
           sx={{
             color: 'error.main',
             width: '100%',
-            marginTop: 'auto',
-            alignSelf: 'flex-end',
           }}
         >
           <ListItemIcon sx={{ color: 'error.main', minWidth: '36px' }}>
