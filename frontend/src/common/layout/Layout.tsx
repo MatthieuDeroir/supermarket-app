@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Head from 'next/head';
 import Box from '@mui/material/Box';
 import { Container, useTheme } from '@mui/material';
@@ -6,54 +6,62 @@ import Stack from '@mui/material/Stack';
 import Footer from '@common/layout/Footer';
 import Topbar from '@common/layout/Topbar';
 import LeftBar, { LeftBarProps } from '@common/layout/LeftBar';
-import Routes from '@common/defs/routes/routes';
-import permissions from '@common/defs/types/permissions';
+import permissions, { PermissionsData } from '@common/defs/types/permissions';
+import LockIcon from '@mui/icons-material/Lock';
+import usePermissions from '@common/hooks/usePermisions';
+import { iconMap } from '@common/defs/types/IconMap';
 
-// Import des icônes dynamiquement
-import HomeIcon from '@mui/icons-material/Home';
-import LayersIcon from '@mui/icons-material/Layers';
-import CreditCardIcon from '@mui/icons-material/CreditCard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import SettingsIcon from '@mui/icons-material/Settings';
-import PersonIcon from '@mui/icons-material/Person';
-import ArticleIcon from '@mui/icons-material/Article';
+type SousItem = {
+  icon: React.ReactElement;
+  itemLabel: string;
+  itemLink?: string;
+};
+
+type Item = {
+  icon: React.ReactElement;
+  itemLabel: string;
+  itemLink?: string;
+  sousItems?: SousItem[];
+};
 
 interface ILayoutProps {
   children: React.ReactNode;
 }
 
-const iconMap = {
-  HomeIcon: <HomeIcon />,
-  LayersIcon: <LayersIcon />,
-  CreditCardIcon: <CreditCardIcon />,
-  ShoppingCartIcon: <ShoppingCartIcon />,
-  SettingsIcon: <SettingsIcon />,
-  PersonIcon: <PersonIcon />,
-  ArticleIcon: <ArticleIcon />,
-};
-
 const Layout = (props: ILayoutProps) => {
   const { children } = props;
   const theme = useTheme();
-  const [userRole, setUserRole] = useState<string | null>(null);
-
-  // Simulation de récupération du rôle utilisateur
-  useEffect(() => {
-    const roleFromStorage = localStorage.getItem('userRole') || 'user';
-    setUserRole(roleFromStorage);
-  }, []);
-
-  if (!userRole) {
-    return null; // En attendant le chargement du rôle
-  }
+  const { isAdmin, isManager, isUser } = usePermissions();
 
   // Filtrer les éléments du menu en fonction du rôle
+  const mapPermissionsToItems = (permissionsData: PermissionsData): Item[] => {
+    return permissionsData.items.map((permission) => ({
+      itemLabel: permission.itemLabel,
+      itemLink: permission.itemLink,
+      sousItems: permission.sousItems
+        ? permission.sousItems.map((sousItem) => ({
+            itemLabel: sousItem.itemLabel,
+            itemLink: sousItem.itemLink,
+            icon: iconMap[sousItem.icon] ?? <LockIcon />, // Default icon
+          }))
+        : undefined,
+      icon: iconMap[permission.icon] ?? <LockIcon />, // Default icon
+    }));
+  };
+
+  const getUserPermissions = (): Item[] => {
+    switch (true) {
+      case isAdmin:
+        return mapPermissionsToItems(permissions.admin);
+      case isManager:
+        return mapPermissionsToItems(permissions.manager);
+      default:
+        return mapPermissionsToItems(permissions.user);
+    }
+  };
+
   const LeftBarItems: LeftBarProps = {
-    items: permissions[userRole].map((item) => ({
-      icon: iconMap[item.icon] || <HomeIcon />,
-      itemLabel: item.label,
-      itemLink: item.link,
-    })),
+    items: getUserPermissions(),
   };
 
   return (

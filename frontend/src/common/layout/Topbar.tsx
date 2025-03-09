@@ -16,76 +16,62 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Image from 'next/image';
 import Routes from '@common/defs/routes/routes';
 import LeftBar, { LeftBarProps } from '@common/layout/LeftBar';
-import HomeIcon from '@mui/icons-material/Home';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import LayersIcon from '@mui/icons-material/Layers';
-import InboxIcon from '@mui/icons-material/Inbox';
-import CreditCardIcon from '@mui/icons-material/CreditCard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import SettingsIcon from '@mui/icons-material/Settings';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import LockIcon from '@mui/icons-material/Lock';
+import usePermissions from '@common/hooks/usePermisions';
+import permissions, { PermissionsData } from '@common/defs/types/permissions';
+import { iconMap } from '@common/defs/types/IconMap';
+
+type SousItem = {
+  icon: React.ReactElement;
+  itemLabel: string;
+  itemLink?: string;
+};
+
+type Item = {
+  icon: React.ReactElement;
+  itemLabel: string;
+  itemLink?: string;
+  sousItems?: SousItem[];
+};
 
 const Topbar = () => {
   const [showDrawer, setShowDrawer] = useState(false);
 
-  const toggleSidebar = () => {
-    setShowDrawer((oldValue) => !oldValue);
+  const { isAdmin, isManager, isUser } = usePermissions();
+
+  // Filtrer les éléments du menu en fonction du rôle
+  const mapPermissionsToItems = (permissionsData: PermissionsData): Item[] => {
+    return permissionsData.items.map((permission) => ({
+      itemLabel: permission.itemLabel,
+      itemLink: permission.itemLink,
+      sousItems: permission.sousItems
+        ? permission.sousItems.map((sousItem) => ({
+            itemLabel: sousItem.itemLabel,
+            itemLink: sousItem.itemLink,
+            icon: iconMap[sousItem.icon] ?? <LockIcon />, // Default icon
+          }))
+        : undefined,
+      icon: iconMap[permission.icon] ?? <LockIcon />, // Default icon
+    }));
+  };
+
+  const getUserPermissions = (): Item[] => {
+    switch (true) {
+      case isAdmin:
+        return mapPermissionsToItems(permissions.admin);
+      case isManager:
+        return mapPermissionsToItems(permissions.manager);
+      default:
+        return mapPermissionsToItems(permissions.user);
+    }
   };
 
   const LeftBarItems: LeftBarProps = {
-    items: [
-      {
-        icon: <HomeIcon />,
-        itemLabel: 'Accueil',
-        itemLink: Routes.Common.Home,
-      },
-      {
-        icon: <AccountCircleIcon />,
-        itemLabel: 'Mon Compte',
-        itemLink: Routes.Common.Account,
-      },
-      {
-        icon: <DragIndicatorIcon />,
-        itemLabel: 'Stocks',
-        sousItems: [
-          {
-            icon: <LayersIcon />,
-            itemLabel: 'Entrepôt',
-            itemLink: Routes.Stocks.Entrepot,
-          },
-          {
-            icon: <LayersIcon />,
-            itemLabel: 'FDR',
-            itemLink: Routes.Stocks.FDR,
-          },
-          {
-            icon: <InboxIcon />,
-            itemLabel: 'Gestion des Stocks',
-            itemLink: Routes.Stocks.StocksManagment,
-          },
-          {
-            icon: <FilterAltIcon />,
-            itemLabel: 'Logs Stocks',
-            itemLink: Routes.Stocks.StocksLogs,
-          },
-        ],
-      },
-      {
-        icon: <CreditCardIcon />,
-        itemLabel: 'Ventes',
-        itemLink: Routes.Common.Sales,
-      },
-      {
-        icon: <ShoppingCartIcon />,
-        itemLabel: 'Promotions',
-        itemLink: Routes.Common.Promotions,
-      },
-      {
-        icon: <SettingsIcon />,
-        itemLabel: 'Paramètres',
-        itemLink: Routes.Common.Settings,
-      },
-    ],
+    items: getUserPermissions(),
+  };
+
+  const toggleSidebar = () => {
+    setShowDrawer((oldValue) => !oldValue);
   };
 
   const router = useRouter();
