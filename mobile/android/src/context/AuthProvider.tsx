@@ -29,6 +29,7 @@ export const useAuth = (): AuthContextType => {
 export const saveToken = async (token: string) => {
   try {
     await Keychain.setGenericPassword('authToken', token);
+    console.log('Token enregistré:', token);
   } catch (error) {
     console.error('Erreur lors du stockage du token:', error);
   }

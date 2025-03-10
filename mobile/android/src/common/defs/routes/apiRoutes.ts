@@ -1,6 +1,7 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, InternalAxiosRequestConfig  } from 'axios';
 import { PUBLIC_API_BASE_URL } from '@env';
 import { ID } from '@common/defs/types/id';
+import * as Keychain from 'react-native-keychain';
 
 const ApiURL = PUBLIC_API_BASE_URL;
 console.log('Hello i am the url :) ' + ApiURL);
@@ -127,18 +128,23 @@ const ApiRoutes = {
 
 const api: AxiosInstance = axios.create();
 
-// api.interceptors.request.use(
-//   (config: InternalAxiosRequestConfig) => {
-//     const token = localStorage.getItem('authToken');
-//     if (token) {
-//       config.headers.set('Authorization', `Bearer ${token}`);
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   },
-// );
+api.interceptors.request.use(
+  async (config: InternalAxiosRequestConfig) => {
+    try {
+      const credentials = await Keychain.getGenericPassword();
+      if (credentials) {
+        config.headers.set('Authorization', `Bearer ${credentials.password}`);
+      }
+      console.log('hello ' + config.headers )
+    } catch (error) {
+      console.error('Erreur lors de la récupération du token:', error);
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const makeApiRequest = async (
@@ -158,7 +164,6 @@ export const makeApiRequest = async (
     return response.data;
   } catch (error: any) {
     console.error('API Error:', error);
-    // ... (Error handling remains the same)
     throw error;
   }
 };
