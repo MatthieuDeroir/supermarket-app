@@ -76,7 +76,8 @@ const login = async (email: string, password: string, navigation: any) => {
     if (response.token) {
       await saveToken(response.token);
       setIsAuth(true);
-      setUserInfo(response.user.firstName, response.user.lastName, response.user.phoneNumber);
+      console.log(response.user.user_id,response.user.first_name, response.user.last_name, response.user.phone_number, response.user.email);
+      setUserInfo(response.user.user_id,response.user.first_name, response.user.last_name, response.user.phone_number, response.user.email);
       navigation.replace('Home');
     } else {
       Alert.alert('Erreur', 'Identifiants incorrects.');

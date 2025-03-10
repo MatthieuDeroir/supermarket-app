@@ -1,4 +1,6 @@
 interface UserInfo {
+    userId: number;
+    email: string;
     firstName: string;
     lastName: string;
     phoneNumber: string;
@@ -6,11 +8,13 @@ interface UserInfo {
 
 let user: UserInfo | null = null;
 
-export const setUserInfo = (firstName: string, lastName: string, phoneNumber: string) => {
+export const setUserInfo = (userId: number, firstName: string, lastName: string, phoneNumber: string, email: string) => {
     user = {
+        userId,
+        email,
         firstName,
         lastName,
-        phoneNumber
+        phoneNumber,
     };
 };
 

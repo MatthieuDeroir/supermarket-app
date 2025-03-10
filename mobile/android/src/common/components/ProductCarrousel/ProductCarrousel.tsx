@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { makeApiRequest } from '../../defs/routes/apiRoutes';
-import ProductCard from '../ProductCard/ProductCard';
 import apiRoutes from '../../defs/routes/apiRoutes';
+import ProductCard from '../ProductCard/ProductCard';
+
+// **Define navigation type inline**
+type NavigationProp = StackNavigationProp<{ ProductSpecific: { productId: string } }>;
 
 interface Product {
     product_id: string;
@@ -15,13 +20,15 @@ interface Product {
 const ProductCarrousel: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    
+    const navigation = useNavigation<NavigationProp>();
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 console.log('Fetching products from:', apiRoutes.Products.GetAll);
                 const response = await makeApiRequest(apiRoutes.Products.GetAll);
-                
+
                 if (response && Array.isArray(response)) {
                     setProducts(response);
                     console.log('Products fetched successfully:', response);
@@ -51,8 +58,12 @@ const ProductCarrousel: React.FC = () => {
             <FlatList
                 data={products}
                 keyExtractor={(item) => item.product_id}
-                renderItem={({ item }) => <ProductCard product={item} />}
-                numColumns={2} 
+                renderItem={({ item }) => (
+                    <TouchableOpacity onPress={() => navigation.navigate('ProductSpecific', { productId: item.product_id })}>
+                        <ProductCard product={item} />
+                    </TouchableOpacity>
+                )}
+                numColumns={2}
                 columnWrapperStyle={styles.row}
                 showsVerticalScrollIndicator={false}
             />
@@ -63,8 +74,7 @@ const ProductCarrousel: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 80,
-        
+        paddingTop: 100,
     },
     loader: {
         flex: 1,
@@ -72,11 +82,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     row: {
-        justifyContent: 'space-around',  
-        // marginBottom: 10, 
-        // marginLeft: 10,
-        // marginRight: 10,
-
+        justifyContent: 'space-around',
     },
 });
 

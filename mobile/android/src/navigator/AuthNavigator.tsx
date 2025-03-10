@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from '../pages/Login/Login';
 import HomeScreen from '../pages/Home/Home';
 import ForgotPassword from '../pages/ForgotPassword/ForgotPassword';
+import ProductSpecific from '../common/components/ProductSpecific/ProductSpecific';
 import Register from '../pages/Register/Register';
 import { useAuth } from '../context/AuthProvider';
 
@@ -25,7 +26,10 @@ const AuthNavigator = () => {
     <NavigationContainer>
       <Stack.Navigator id={undefined} screenOptions={{ headerShown: false }}>
         {isAuth ? (
-          <Stack.Screen name="Home" component={HomeScreen} />
+          <>
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="ProductSpecific" component={ProductSpecific} /> 
+          </>
         ) : (
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
