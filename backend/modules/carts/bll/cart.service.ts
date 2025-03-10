@@ -16,11 +16,70 @@ import { CartResponseDto } from "../dto/cart.dto.ts";
 import { CartLineResponseDto } from "../dto/cartline.dto.ts";
 import { ProductResponseDto } from "../../products/dto/product.dto.ts";
 
-export interface CartWithLines extends Cart {
-    lines: CartLine[];
-}
-
 class CartService {
+    /**
+     * Get or create active cart for a user
+     */
+    async getOrCreateActiveCart(userId: number): Promise<CartResponseDto> {
+        // Find active cart for user
+        let cart = await cartRepository.findActiveCartByUserId(userId);
+
+        // If no active cart exists, create one
+        if (!cart) {
+            const cartData = {
+                user_id: userId,
+                payed: false,
+                created_at: new Date(),
+            };
+
+            await cartRepository.create(cartData);
+
+            // Retrieve the newly created cart
+            cart = await cartRepository.findActiveCartByUserId(userId);
+
+            if (!cart) {
+                throw new Error("Failed to create new active cart for user");
+            }
+        }
+
+        return await this.getCartWithDetails(cart);
+    }
+
+    /**
+     * Pay for the active cart of a user
+     * Automatically uses the user's active address
+     */
+    async payActiveCart(userId: number): Promise<number> {
+        const client = db.getClient();
+
+        try {
+            await client.queryArray("BEGIN");
+
+            // 1. Get the user's active cart
+            const cart = await cartRepository.findActiveCartByUserId(userId);
+            if (!cart) {
+                throw new Error("No active cart found for user");
+            }
+
+            // 2. Get the user's active address
+            const activeAddress = await addressRepository.findActiveAddressByUserId(userId);
+            if (!activeAddress) {
+                throw new Error("No active address found for user");
+            }
+
+            // 3. Pay the cart using the active address
+            const invoiceId = await this.payCart(cart.cart_id, userId, activeAddress.address_id);
+
+            await client.queryArray("COMMIT");
+
+            return invoiceId;
+
+        } catch (error) {
+            await client.queryArray("ROLLBACK");
+            throw error;
+        }
+    }
+
     /**
      * Get all carts with their lines
      */
@@ -519,5 +578,4 @@ class CartService {
     }
 }
 
-const cartService = new CartService();
-export default cartService;
+export default new CartService();

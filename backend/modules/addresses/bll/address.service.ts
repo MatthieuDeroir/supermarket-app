@@ -2,6 +2,7 @@
 import addressRepository from "../dal/address.repository.ts";
 import { Address } from "../address.model.ts";
 import { AddressResponseDto, AddressCreateDto, AddressUpdateDto } from "../dto/address.dto.ts";
+import db from "../../../config/database.ts";
 
 class AddressService {
     /**
@@ -30,10 +31,18 @@ class AddressService {
     }
 
     /**
-     * Get active addresses for a user
+     * Get the active address for a user (single one)
      */
-    async getActiveAddressesForUser(user_id: number): Promise<AddressResponseDto[]> {
-        const client = (await import("../../../config/database.ts")).default.getClient();
+    async getActiveAddressForUser(userId: number): Promise<AddressResponseDto | null> {
+        const address = await addressRepository.findActiveAddressByUserId(userId);
+        return address ? this.mapToResponseDto(address) : null;
+    }
+
+    /**
+     * Get all active addresses for a user
+     */
+    async getActiveAddressesForUser(userId: number): Promise<AddressResponseDto[]> {
+        const client = db.getClient();
 
         const query = `
             SELECT * FROM addresses
@@ -43,7 +52,7 @@ class AddressService {
 
         const result = await client.queryObject<Address>({
             text: query,
-            args: [user_id]
+            args: [userId]
         });
 
         return result.rows.map(this.mapToResponseDto);
@@ -52,100 +61,177 @@ class AddressService {
     /**
      * Get all addresses for a user (active and inactive)
      */
-    async getAllAddressesForUser(user_id: number): Promise<AddressResponseDto[]> {
-        const client = (await import("../../../config/database.ts")).default.getClient();
-
-        const query = `
-      SELECT * FROM addresses 
-      WHERE user_id = $1
-      ORDER BY active DESC, address_id DESC
-    `;
-
-        const result = await client.queryObject<Address>({
-            text: query,
-            args: [user_id]
-        });
-
-        return result.rows.map(this.mapToResponseDto);
+    async getAllAddressesForUser(userId: number): Promise<AddressResponseDto[]> {
+        const addresses = await addressRepository.findByUserId(userId);
+        return addresses.map(this.mapToResponseDto);
     }
 
     /**
      * Get an address by ID
      */
-    async getAddressById(address_id: number): Promise<AddressResponseDto | null> {
-        const address = await addressRepository.findById(address_id);
+    async getAddressById(addressId: number): Promise<AddressResponseDto | null> {
+        const address = await addressRepository.findById(addressId);
         return address ? this.mapToResponseDto(address) : null;
     }
 
     /**
      * Create a new address
+     * If setting as active, deactivates all other addresses for this user
      */
     async createAddress(data: AddressCreateDto): Promise<AddressResponseDto> {
-        // Ensure all required fields are present
-        const addressData: Omit<Address, "address_id"> = {
-            user_id: data.user_id,
-            address_line1: data.address_line1,
-            address_line2: data.address_line2,
-            address_complement: data.address_complement,
-            zip_code: data.zip_code,
-            city: data.city,
-            country: data.country,
-            active: data.active !== undefined ? data.active : true
-        };
+        const client = db.getClient();
 
-        await addressRepository.create(addressData);
+        try {
+            await client.queryArray("BEGIN");
 
-        // Get the created address (not ideal, but works for now)
-        const allAddresses = await this.getAllAddressesForUser(data.user_id);
-        const newAddress = allAddresses[0]; // Should be the most recent one
+            // Determine if we should make this address active
+            const makeActive = data.active !== false; // Default to true if undefined
 
-        if (!newAddress) {
-            throw new Error("Failed to create address");
+            if (makeActive) {
+                // Deactivate all other addresses for this user
+                const deactivateQuery = `
+                    UPDATE addresses
+                    SET active = false
+                    WHERE user_id = $1
+                `;
+
+                await client.queryArray({
+                    text: deactivateQuery,
+                    args: [data.user_id]
+                });
+            }
+
+            // Create the address with appropriate active flag
+            const addressData: Omit<Address, "address_id"> = {
+                user_id: data.user_id,
+                address_line1: data.address_line1,
+                address_line2: data.address_line2,
+                address_complement: data.address_complement,
+                zip_code: data.zip_code,
+                city: data.city,
+                country: data.country,
+                active: makeActive
+            };
+
+            await addressRepository.create(addressData);
+
+            await client.queryArray("COMMIT");
+
+            // Get the created address
+            const addresses = await this.getAllAddressesForUser(data.user_id);
+            const newAddress = addresses[0]; // Should be the first one (most recent)
+
+            if (!newAddress) {
+                throw new Error("Failed to create address");
+            }
+
+            return newAddress;
+        } catch (error) {
+            await client.queryArray("ROLLBACK");
+            console.error("Error creating address:", error);
+            throw error;
         }
-
-        return newAddress;
     }
 
     /**
      * Update an address
+     * If setting as active, deactivates all other addresses for this user
      */
-    async updateAddress(address_id: number, data: AddressUpdateDto): Promise<AddressResponseDto | null> {
-        const address = await addressRepository.findById(address_id);
-        if (!address) return null;
+    async updateAddress(addressId: number, data: AddressUpdateDto, userId: number): Promise<AddressResponseDto | null> {
+        const client = db.getClient();
 
-        // Convert DTO to DB model
-        const updateData: Partial<Address> = {};
+        try {
+            await client.queryArray("BEGIN");
 
-        if (data.address_line1 !== undefined) updateData.address_line1 = data.address_line1;
-        if (data.address_line2 !== undefined) updateData.address_line2 = data.address_line2;
-        if (data.address_complement !== undefined) updateData.address_complement = data.address_complement;
-        if (data.zip_code !== undefined) updateData.zip_code = data.zip_code;
-        if (data.city !== undefined) updateData.city = data.city;
-        if (data.country !== undefined) updateData.country = data.country;
-        if (data.active !== undefined) updateData.active = data.active;
+            const address = await addressRepository.findById(addressId);
+            if (!address) {
+                await client.queryArray("ROLLBACK");
+                return null;
+            }
 
-        await addressRepository.update(address_id, updateData);
+            // Ensure the address belongs to the user
+            if (address.user_id !== userId) {
+                await client.queryArray("ROLLBACK");
+                throw new Error("Cannot update an address that doesn't belong to you");
+            }
 
-        const updatedAddress = await addressRepository.findById(address_id);
-        return updatedAddress ? this.mapToResponseDto(updatedAddress) : null;
+            // Check if we're setting this address as active
+            if (data.active === true) {
+                // Deactivate all other addresses for this user
+                const deactivateQuery = `
+                    UPDATE addresses
+                    SET active = false
+                    WHERE user_id = $1 AND address_id != $2
+                `;
+
+                await client.queryArray({
+                    text: deactivateQuery,
+                    args: [userId, addressId]
+                });
+            }
+
+            // Convert DTO to DB model
+            const updateData: Partial<Address> = {};
+
+            if (data.address_line1 !== undefined) updateData.address_line1 = data.address_line1;
+            if (data.address_line2 !== undefined) updateData.address_line2 = data.address_line2;
+            if (data.address_complement !== undefined) updateData.address_complement = data.address_complement;
+            if (data.zip_code !== undefined) updateData.zip_code = data.zip_code;
+            if (data.city !== undefined) updateData.city = data.city;
+            if (data.country !== undefined) updateData.country = data.country;
+            if (data.active !== undefined) updateData.active = data.active;
+
+            await addressRepository.update(addressId, updateData);
+
+            await client.queryArray("COMMIT");
+
+            const updatedAddress = await addressRepository.findById(addressId);
+            return updatedAddress ? this.mapToResponseDto(updatedAddress) : null;
+        } catch (error) {
+            await client.queryArray("ROLLBACK");
+            console.error("Error updating address:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Set an address as active
+     */
+    async setAddressActive(addressId: number, userId: number): Promise<boolean> {
+        return await addressRepository.setAsActive(addressId, userId);
     }
 
     /**
      * Deactivate an address (soft delete)
      */
-    async deactivateAddress(address_id: number): Promise<boolean> {
-        const address = await addressRepository.findById(address_id);
+    async deactivateAddress(addressId: number, userId: number): Promise<boolean> {
+        const address = await addressRepository.findById(addressId);
         if (!address) return false;
 
-        await addressRepository.update(address_id, { active: false });
+        // Ensure the address belongs to the user
+        if (address.user_id !== userId) {
+            throw new Error("Cannot update an address that doesn't belong to you");
+        }
+
+        await addressRepository.update(addressId, { active: false });
         return true;
     }
 
     /**
      * Hard delete an address - use with caution
      */
-    async deleteAddress(address_id: number): Promise<void> {
-        await addressRepository.deleteById(address_id);
+    async deleteAddress(addressId: number, userId: number): Promise<void> {
+        const address = await addressRepository.findById(addressId);
+        if (!address) {
+            throw new Error("Address not found");
+        }
+
+        // Ensure the address belongs to the user
+        if (address.user_id !== userId) {
+            throw new Error("Cannot delete an address that doesn't belong to you");
+        }
+
+        await addressRepository.deleteById(addressId);
     }
 }
 

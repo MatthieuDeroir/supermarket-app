@@ -83,10 +83,10 @@ addressController.post("/", async (c) => {
         const userId = c.get("userId");
         const body = await c.req.json();
 
-        // Set the userId from the authenticated user
+        // Set the user_id from the authenticated user
         const addressData = {
             ...body,
-            userId
+            user_id: userId
         };
 
         const newAddress = await addressService.createAddress(addressData);
@@ -119,7 +119,7 @@ addressController.put("/:addressId", async (c) => {
             return c.json({ message: "Access denied" }, 403);
         }
 
-        const updatedAddress = await addressService.updateAddress(addressId, body);
+        const updatedAddress = await addressService.updateAddress(addressId, body, userId);
         return c.json(updatedAddress);
     } catch (error) {
         console.error("Error updating address:", error);
@@ -148,7 +148,7 @@ addressController.patch("/:addressId/deactivate", async (c) => {
             return c.json({ message: "Access denied" }, 403);
         }
 
-        const success = await addressService.deactivateAddress(addressId);
+        const success = await addressService.deactivateAddress(addressId, userId);
 
         if (success) {
             return c.json({ message: "Address deactivated successfully" });
@@ -182,10 +182,14 @@ addressController.patch("/:addressId/activate", async (c) => {
             return c.json({ message: "Access denied" }, 403);
         }
 
-        const updatedAddress = await addressService.updateAddress(addressId, { active: true });
+        const success = await addressService.setAddressActive(addressId, userId);
 
-        if (updatedAddress) {
-            return c.json({ message: "Address activated successfully", address: updatedAddress });
+        if (success) {
+            const updatedAddress = await addressService.getAddressById(addressId);
+            return c.json({
+                message: "Address activated successfully",
+                address: updatedAddress
+            });
         } else {
             return c.json({ message: "Failed to activate address" }, 500);
         }
@@ -216,7 +220,7 @@ addressController.delete("/:addressId", async (c) => {
             return c.json({ message: "Access denied" }, 403);
         }
 
-        await addressService.deleteAddress(addressId);
+        await addressService.deleteAddress(addressId, userId);
         return c.json({ message: "Address deleted" });
     } catch (error) {
         console.error("Error deleting address:", error);
