@@ -1,5 +1,4 @@
-
-
+// modules/addresses/dto/address.dto.ts
 export interface AddressCreateDto {
     user_id: number;
     address_line1: string;
