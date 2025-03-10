@@ -17,7 +17,7 @@ export class AddressRepository extends GenericRepository<Address> {
     async findActiveAddressByUserId(userId: number): Promise<Address | null> {
         const client = db.getClient();
         const query = `
-            SELECT * FROM addresses 
+            SELECT * FROM addresses
             WHERE user_id = $1 AND active = true
             LIMIT 1
         `;
@@ -36,7 +36,7 @@ export class AddressRepository extends GenericRepository<Address> {
     async findByUserId(userId: number): Promise<Address[]> {
         const client = db.getClient();
         const query = `
-            SELECT * FROM addresses 
+            SELECT * FROM addresses
             WHERE user_id = $1
             ORDER BY active DESC, address_id DESC
         `;
@@ -60,8 +60,8 @@ export class AddressRepository extends GenericRepository<Address> {
 
             // First, deactivate all addresses for the user
             const deactivateQuery = `
-                UPDATE addresses 
-                SET active = false 
+                UPDATE addresses
+                SET active = false
                 WHERE user_id = $1
             `;
 
@@ -72,8 +72,8 @@ export class AddressRepository extends GenericRepository<Address> {
 
             // Then, activate the specified address
             const activateQuery = `
-                UPDATE addresses 
-                SET active = true 
+                UPDATE addresses
+                SET active = true
                 WHERE address_id = $1 AND user_id = $2
             `;
 

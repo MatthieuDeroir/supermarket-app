@@ -42,7 +42,7 @@ class AddressService {
      * Get all active addresses for a user
      */
     async getActiveAddressesForUser(userId: number): Promise<AddressResponseDto[]> {
-        const client = (await import("../../../config/database.ts")).default.getClient();
+        const client = db.getClient();
 
         const query = `
             SELECT * FROM addresses
