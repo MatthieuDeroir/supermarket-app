@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "100cadd5-0b7f-4211-8829-e3184216c9cb",
-		"name": "Deno Hono API",
+		"_postman_id": "78a298fb-d2bb-434e-8f04-301837dbb51e",
+		"name": "Deno Hono API Copy",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "20848918"
 	},
@@ -1648,33 +1648,6 @@
 			"name": "auth",
 			"item": [
 				{
-					"name": "Register",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"phoneNumber\": \"0123456789\"\n}"
-						},
-						"url": {
-							"raw": "{{API_URL}}/auth/register",
-							"host": [
-								"{{API_URL}}"
-							],
-							"path": [
-								"auth",
-								"register"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Login",
 					"event": [
 						{
@@ -1686,7 +1659,8 @@
 									"  pm.environment.set('JWT_TOKEN', jsonData.token);",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1710,6 +1684,33 @@
 							"path": [
 								"auth",
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"phoneNumber\": \"0123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{API_URL}}/auth/register",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"auth",
+								"register"
 							]
 						}
 					},
@@ -1794,6 +1795,17 @@
 						"header": [
 							{
 								"key": "Authorization",
+								"value": "Bearer {{JWT_TOKEN}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text"
+							},
+							{
+								"key": "",
 								"value": "Bearer {{JWT_TOKEN}}",
 								"type": "text"
 							}
