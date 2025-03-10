@@ -1,7 +1,7 @@
 // modules/products/openfood.controller.ts
 import { Hono } from "hono";
 import { openFoodService } from "./bll/openfood.service.ts";
-import { ProductCreateDto } from "./dto/product-create.dto.ts";
+import { ProductCreateDto } from "./dto/product.dto.ts";
 
 const openFoodController = new Hono();
 
@@ -30,19 +30,35 @@ openFoodController.get("/", async (c) => {
 // POST /products/openfood?ean=3029330003533
 openFoodController.post("/", async (c) => {
     const ean = c.req.query("ean");
-    const body: ProductCreateDto = await c.req.json();
+
+    // Check if EAN is provided
     if (!ean) {
         return c.json({ message: "Missing EAN parameter" }, 400);
     }
+
     try {
-        const product = await openFoodService.insertProductFromEAN(ean);
+        // Try to parse the request body, but make it optional
+        let body: Partial<ProductCreateDto> = {};
+        try {
+            body = await c.req.json();
+        } catch (parseErr) {
+            console.warn("No body provided or invalid JSON:", parseErr);
+        }
+
+        // Insert product from EAN
+        const product = await openFoodService.insertProductFromEAN(ean, body);
+
         if (!product) {
             return c.json({ message: "Product not found in Open Food Facts" }, 404);
         }
+
         return c.json(product);
     } catch (err) {
         console.error(err);
-        return c.json({ message: "Error fetching product" }, 500);
+        return c.json({
+            message: "Error fetching or inserting product",
+            error: err instanceof Error ? err.message : String(err)
+        }, 500);
     }
 });
 

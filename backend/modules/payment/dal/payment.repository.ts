@@ -1,5 +1,5 @@
 import paypal from "paypal-rest-sdk";
-import { CreatePaymentDTO, ExecutePaymentDTO, PaymentResponseDTO } from "../dto/payment.dto.ts";
+import { PaymentResponseDto, ExecutePaymentDto, CreatePaymentDto } from "../dto/payment.dto.ts";
 
 // Configuration du SDK PayPal
 paypal.configure({
@@ -9,7 +9,7 @@ paypal.configure({
 });
 
 export class PaymentRepository {
-  static createPayment(dto: CreatePaymentDTO): Promise<PaymentResponseDTO> {
+  static createPayment(dto: CreatePaymentDto): Promise<PaymentResponseDto> {
     return new Promise((resolve, reject) => {
       const payment = {
         intent: "sale",
@@ -24,23 +24,23 @@ export class PaymentRepository {
           }
         ],
         redirect_urls: {
-          return_url: "https://yourapp.com/return",
-          cancel_url: "https://yourapp.com/cancel"
+          return_url: `${Deno.env.get("APP_BASE_URL")}/payment/success`,
+          cancel_url: `${Deno.env.get("APP_BASE_URL")}/payment/cancel`
         }
       };
 
-      paypal.payment.create(payment, (err: paypal.Error, payment: PaymentResponseDTO) => {
+      paypal.payment.create(payment, (err: paypal.Error, payment: PaymentResponseDto) => {
         if (err) return reject(err);
-        resolve(payment as PaymentResponseDTO);
+        resolve(payment as PaymentResponseDto);
       });
     });
   }
 
-  static executePayment(dto: ExecutePaymentDTO): Promise<PaymentResponseDTO> {
+  static executePayment(dto: ExecutePaymentDto): Promise<PaymentResponseDto> {
     return new Promise((resolve, reject) => {
-      paypal.payment.execute(dto.paymentId, { payer_id: dto.payerId }, (err: paypal.Error, payment: PaymentResponseDTO) => {
+      paypal.payment.execute(dto.paymentId, { payer_id: dto.payerId }, (err: paypal.Error, payment: PaymentResponseDto) => {
         if (err) return reject(err);
-        resolve(payment as PaymentResponseDTO);
+        resolve(payment as PaymentResponseDto);
       });
     });
   }

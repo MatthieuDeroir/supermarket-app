@@ -29,7 +29,8 @@ invoiceController.get("/user/:user_id", async (c) => {
 // POST /invoices
 invoiceController.post("/", async (c) => {
     const body = await c.req.json();
-    await invoiceService.createInvoice(body);
+    const user_id = c.get("userId");
+    await invoiceService.createInvoice(body, user_id);
     return c.json({ message: "Invoice created" }, 201);
 });
 
@@ -37,14 +38,17 @@ invoiceController.post("/", async (c) => {
 invoiceController.put("/:invoice_id", async (c) => {
     const invoice_id = Number(c.req.param("invoice_id"));
     const body = await c.req.json();
-    await invoiceService.updateInvoice(invoice_id, body);
+
+    const user_id = c.get("userId");
+    await invoiceService.updateInvoice(invoice_id, body, user_id);
     return c.json({ message: "Invoice updated" });
 });
 
 // DELETE /invoices/:invoice_id
 invoiceController.delete("/:invoice_id", async (c) => {
     const invoice_id = Number(c.req.param("invoice_id"));
-    await invoiceService.deleteInvoice(invoice_id);
+    const user_id = c.get("userId");
+    await invoiceService.deleteInvoice(invoice_id, user_id);
     return c.json({ message: "Invoice deleted" });
 });
 
