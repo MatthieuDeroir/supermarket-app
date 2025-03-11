@@ -27,6 +27,32 @@ productController.get("/:product_id", async (c) => {
     return c.json(product);
 });
 
+// Add this to modules/products/product.controller.ts
+
+/**
+ * GET /product/ean/:ean
+ * Get a product by its EAN code
+ */
+productController.get("/ean/:ean", async (c) => {
+    try {
+        const ean = c.req.param("ean");
+        if (!ean) {
+            return c.json({ message: "EAN code is required" }, 400);
+        }
+
+        const product = await productService.getProductByEAN(ean);
+        if (!product) {
+            return c.json({ message: "Product not found" }, 404);
+        }
+        return c.json(product);
+    } catch (err) {
+        console.error("Error fetching product by EAN:", err);
+        return c.json({
+            message: err instanceof Error ? err.message : "An error occurred"
+        }, 400);
+    }
+});
+
 // POST /product
 productController.post("/", async (c) => {
     try {
