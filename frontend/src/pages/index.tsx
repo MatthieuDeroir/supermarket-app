@@ -3,7 +3,7 @@ import Home from '@modules/home/Dashboard';
 import UserDashboard from '@modules/home/UserDashboard';
 
 import { Box } from '@mui/material';
-import usePermissions from '@common/hooks/usePermisions';
+import usePermissions from '@//common/hooks/usePermissions';
 import useAuth from '@common/hooks/useAuth';
 
 const Index: NextPage = () => {

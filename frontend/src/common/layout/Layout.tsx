@@ -8,7 +8,7 @@ import Topbar from '@common/layout/Topbar';
 import LeftBar, { LeftBarProps } from '@common/layout/LeftBar';
 import permissions, { PermissionsData } from '@common/defs/types/permissions';
 import LockIcon from '@mui/icons-material/Lock';
-import usePermissions from '@common/hooks/usePermisions';
+import usePermissions from '@//common/hooks/usePermissions';
 import { iconMap } from '@common/defs/types/IconMap';
 
 type SousItem = {
