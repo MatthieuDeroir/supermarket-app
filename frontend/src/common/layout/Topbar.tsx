@@ -17,7 +17,7 @@ import Image from 'next/image';
 import Routes from '@common/defs/routes/routes';
 import LeftBar, { LeftBarProps } from '@common/layout/LeftBar';
 import LockIcon from '@mui/icons-material/Lock';
-import usePermissions from '@common/hooks/usePermisions';
+import usePermissions from '@//common/hooks/usePermissions';
 import permissions, { PermissionsData } from '@common/defs/types/permissions';
 import { iconMap } from '@common/defs/types/IconMap';
 

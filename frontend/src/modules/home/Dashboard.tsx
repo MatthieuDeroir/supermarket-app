@@ -4,7 +4,7 @@ import InfoCard from '@modules/home/components/InfoCard';
 import DashboardCard from '@modules/home/components/DashboardCard';
 import ApiRoutes, { makeApiRequest } from '@//common/defs/routes/apiRoutes';
 import { Product } from '@common/defs/types/produit';
-import usePermissions from '@common/hooks/usePermisions';
+import usePermissions from '@//common/hooks/usePermissions';
 import useAuth from '@common/hooks/useAuth';
 
 const Dashboard: React.FC = () => {
