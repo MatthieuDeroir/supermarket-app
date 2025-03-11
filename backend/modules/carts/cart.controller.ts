@@ -39,6 +39,28 @@ cartController.get("/:cartId", async (c) => {
 });
 
 /**
+ * GET /carts/active
+ * - Gets the active cart for the current user or creates one if none exists
+ */
+cartController.get("/active", async (c) => {
+    try {
+        const userId = c.get("userId");
+
+        if (!userId) {
+            return c.json({ error: "User ID is required" }, 401);
+        }
+
+        const cart = await cartService.getOrCreateActiveCart(userId);
+        return c.json(cart);
+    } catch (error) {
+        console.error("Error in getOrCreateActiveCart:", error);
+        return c.json({
+            error: error instanceof Error ? error.message : "An unknown error occurred"
+        }, 500);
+    }
+});
+
+/**
  * POST /carts
  * - Crée un nouveau panier
  */
