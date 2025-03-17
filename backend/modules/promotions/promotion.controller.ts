@@ -42,7 +42,7 @@ promotionController.post('/', async (c) => {
   } catch (error) {
     console.error("Error creating promotion:", error);
     return c.json({
-      error: error instanceof Error ? error.message : "An unknown error occurred"
+      error: error instanceof Error ? error.message : "An unknown error occurred" 
     }, 400);
   }
 });

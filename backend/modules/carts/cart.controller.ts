@@ -25,20 +25,6 @@ cartController.get("/", async (c) => {
 });
 
 /**
- * GET /carts/:cartId
- * - Récupère un panier par son ID
- */
-cartController.get("/:cartId", async (c) => {
-    const cartId = Number(c.req.param("cartId"));
-    const cart = await cartService.getCartById(cartId);
-
-    if (!cart) {
-        return c.json({ message: "Cart not found" }, 404);
-    }
-    return c.json(cart);
-});
-
-/**
  * GET /carts/active
  * - Gets the active cart for the current user or creates one if none exists
  */
@@ -59,6 +45,21 @@ cartController.get("/active", async (c) => {
         }, 500);
     }
 });
+
+/**
+ * GET /carts/:cartId
+ * - Récupère un panier par son ID
+ */
+cartController.get("/:cartId", async (c) => {
+    const cartId = Number(c.req.param("cartId"));
+    const cart = await cartService.getCartById(cartId);
+
+    if (!cart) {
+        return c.json({ message: "Cart not found" }, 404);
+    }
+    return c.json(cart);
+});
+
 
 /**
  * POST /carts

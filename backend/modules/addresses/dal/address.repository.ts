@@ -85,7 +85,12 @@ export class AddressRepository extends GenericRepository<Address> {
             await client.queryArray("COMMIT");
 
             // Return true if at least one row was affected
-            return result.rowCount > 0;
+            if (result.rowCount != undefined)
+                return result.rowCount > 0;
+            else {
+                console.error("Error setting active address: rowCount is undefined");
+                return false;
+            }
 
         } catch (error) {
             await client.queryArray("ROLLBACK");
