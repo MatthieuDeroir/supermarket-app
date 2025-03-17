@@ -1,0 +1,4 @@
+ALTER TABLE addresses
+    ADD COLUMN IF NOT EXISTS active BOOLEAN DEFAULT TRUE;
+
+UPDATE addresses SET active = TRUE WHERE active IS NULL;

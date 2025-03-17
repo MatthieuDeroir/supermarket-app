@@ -1,0 +1,11 @@
+# Use the official Deno image
+FROM denoland/deno:alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Expose the port that the Deno app will run on
+EXPOSE 4000
+
+# Set the entrypoint command to run the Deno app
+CMD deno task start

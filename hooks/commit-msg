@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Read the commit message from the first argument
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Define the commit message regex
+REGEX='^TDEV[0-9]{1,3}-[0-9]{1,4} (🐛|🧹|🚀|🛠️|📄) (fix|feat|clean|config|doc) \((frontend|backend|project)\): .+'
+
+# Red color code
+RED='\033[0;31m'
+# Green color code
+GREEN='\033[0;32m'
+# No color code
+NC='\033[0m'
+
+# Check if the commit message matches the regex
+if ! echo "$COMMIT_MSG" | grep -Pq "$REGEX"; then
+  echo -e "${RED}ERR!: Commit message does not match the required format!${NC}"
+  echo -e "${RED}Expected format:${NC}"
+  echo -e "Ticket number + emoji + fix/feat/clean/config/doc + (frontend/backend/project): description"
+  echo -e "${GREEN}Emoji Examples:${NC} 🐛(fix) 🧹(clean) 🚀(feat) 🛠️(config) 📄(doc)"
+  echo -e "${GREEN}Commit message example:${NC} TDEV700-37 🚀 feat (frontend): add new feature"
+  exit 1
+fi
+
+# If the commit message is valid, allow the commit to proceed
+exit 0
