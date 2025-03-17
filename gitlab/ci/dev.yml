@@ -36,7 +36,7 @@ test-backend:
     - dev
   script:
     - echo "Running backend tests during Dev pipeline..."
-    - docker run --rm backend-dev deno test --allow-net --allow-read --allow-env
+    - docker run --rm backend-dev deno test --allow-net --allow-read --allow-env --allow-import
 
 test-frontend:
   stage: test-dev
