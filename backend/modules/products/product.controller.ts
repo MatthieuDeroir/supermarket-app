@@ -15,8 +15,7 @@ const productController = new Hono();
 productController.get("/", async (c) => {
     const products = await productService.getAllProducts();
     return c.json(products);
-});
-
+})
 // GET /product/:product_id
 productController.get("/:product_id", async (c) => {
     const productId = Number(c.req.param("product_id"));
